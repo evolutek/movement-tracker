@@ -441,7 +441,7 @@
         (effects (font (size 1 1) (thickness 0.15)))
       (tstamp 2de0946e-63a1-4322-b17f-f4b92c7b1340)
     )
-    (fp_text value "Conn_01x06" (at 0 4.445) (layer "F.Fab")
+    (fp_text value "Conn_01x06" (at 0 5.588) (layer "F.Fab") hide
         (effects (font (size 1 1) (thickness 0.15)))
       (tstamp 34b1635a-cc67-44b2-9f7c-f3f4b0d1016d)
     )
