@@ -49,7 +49,16 @@
         }
       },
       "diff_pair_dimensions": [],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        "missing_courtyard|115824000|83312000|5e8d68b9-b92c-4148-8b04-28b85749507d|00000000-0000-0000-0000-000000000000",
+        "missing_courtyard|116158000|61722000|6ead11e8-4ba5-4675-a80d-04c970ca61a6|00000000-0000-0000-0000-000000000000",
+        "silk_edge_clearance|109158000|59203807|1d9cc271-da24-4156-b6a7-3ca0a4a7a279|02061859-7a10-4436-ac11-730e776237da",
+        "silk_edge_clearance|119634095|79222000|5a29faa2-1907-4bbe-b1e2-7de0f2953289|e10caf1d-5c51-4e37-98b3-18b134e18bbe",
+        "silk_edge_clearance|121744462|58572000|1d9cc271-da24-4156-b6a7-3ca0a4a7a279|54d84f23-4ca9-4822-8e4a-f56f2ae327bd",
+        "silk_edge_clearance|123158000|59296186|1d9cc271-da24-4156-b6a7-3ca0a4a7a279|203ce260-32f1-4f70-b5ec-a4468f755bd8",
+        "silk_over_copper|109158000|63652112|02061859-7a10-4436-ac11-730e776237da|00000000-0000-0000-0000-000000000000",
+        "text_height|127254000|63246000|fa0c49fe-3bd0-4251-b8db-1551c79d1305|00000000-0000-0000-0000-000000000000"
+      ],
       "meta": {
         "version": 2
       },
@@ -66,7 +75,7 @@
         "duplicate_footprints": "warning",
         "extra_footprint": "warning",
         "footprint": "error",
-        "footprint_type_mismatch": "ignore",
+        "footprint_type_mismatch": "error",
         "hole_clearance": "error",
         "hole_near_hole": "error",
         "invalid_outline": "error",
@@ -78,12 +87,12 @@
         "lib_footprint_mismatch": "warning",
         "malformed_courtyard": "error",
         "microvia_drill_out_of_range": "error",
-        "missing_courtyard": "ignore",
+        "missing_courtyard": "error",
         "missing_footprint": "warning",
         "net_conflict": "warning",
-        "npth_inside_courtyard": "ignore",
+        "npth_inside_courtyard": "error",
         "padstack": "warning",
-        "pth_inside_courtyard": "ignore",
+        "pth_inside_courtyard": "error",
         "shorting_items": "error",
         "silk_edge_clearance": "warning",
         "silk_over_copper": "warning",

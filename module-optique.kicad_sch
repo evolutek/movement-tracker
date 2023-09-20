@@ -990,7 +990,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid c60ff204-3539-49aa-be92-6fc05dfcbfb4)
   )
-  (text "Mounting holes\n" (at 13.97 41.91 0)
+  (text "Mounting holes / Logo\n\n" (at 13.97 44.45 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid f00b92e8-75ff-4707-97f4-723723e12026)
   )
