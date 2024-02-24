@@ -1,0 +1,16 @@
+../Core/Src/ADNS9800.c:27:6:adnsInit	3
+../Core/Src/ADNS9800.c:39:6:adnsUpdate	1
+../Core/Src/ADNS9800.c:48:6:adnsReset	1
+../Core/Src/ADNS9800.c:53:6:adnsSetCoef	1
+../Core/Src/ADNS9800.c:57:6:adnsEnableReports	1
+../Core/Src/ADNS9800.c:61:7:adnsX	1
+../Core/Src/ADNS9800.c:65:7:adnsY	1
+../Core/Src/ADNS9800.c:71:6:_adnsComBegin	1
+../Core/Src/ADNS9800.c:75:6:_adnsComEnd	1
+../Core/Src/ADNS9800.c:79:9:_adnsReadReg	1
+../Core/Src/ADNS9800.c:99:6:_adnsWriteReg	1
+../Core/Src/ADNS9800.c:115:6:_adnsUploadFirmware	2
+../Core/Src/ADNS9800.c:155:6:_adnsPerformStartup	2
+../Core/Src/ADNS9800.c:182:6:_adnsUpdatePointer	1
+../Core/Src/ADNS9800.c:189:6:_dispRegisters	2
+../Core/Src/ADNS9800.c:213:6:_adnsConvTwosComp	2
