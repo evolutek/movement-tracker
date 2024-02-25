@@ -2,6 +2,7 @@
 #include "ADNS9800_firmware.h"
 #include "stm32g4xx_hal.h"
 #include "main.h"
+#include "micros.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -10,61 +11,11 @@ uint8_t initComplete=0;
 uint8_t testctr=0;
 SPI_HandleTypeDef* _spi_port;
 
-long _xydat[2];
 float _xydelta[2] = {0,0};
-float _delta_y = 0;
-float _delta_x = 0;
+long _xydat[2];
 float _units_per_millimeter = DEFAULT_COEF;
-double _current_calculated_x = 0;
-double _current_calculated_y = 0;
 
 bool _debug = 0;
-bool _reports = 0;
-
-
-/*============================ Public ============================*/
-
-void adnsInit(SPI_HandleTypeDef* spi_port){
-	_spi_port = spi_port;
-	//SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
-
-	_adnsPerformStartup();
-	if (_debug) _adnsDispRegisters();
-	HAL_Delay(100);
-	initComplete=9;
-
-	if(_debug) printf("The optical sensor should now be initialized");
-}
-
-void adnsUpdate(void) {
-	//SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
-	_adnsUpdatePointer();
-
-	_xydelta[0] = _adnsConvTwosComp(_xydat[0]);
-	_xydelta[1] = - _adnsConvTwosComp(_xydat[1]);
-
-}
-
-void adnsReset(void){
-    _current_calculated_x = 0;
-    _current_calculated_y = 0;
-}
-
-void adnsSetCoef(float coef){
-	_units_per_millimeter = coef;
-}
-
-void adnsEnableReports(bool state){
-	_debug = state;
-}
-
-float adnsX(void){
-		return _current_calculated_x/_units_per_millimeter;
-}
-
-float adnsY(void){
-		return _current_calculated_y/_units_per_millimeter;
-}
 
 /*============================ Private ============================*/
 
@@ -83,15 +34,15 @@ uint8_t _adnsReadReg(uint8_t ADNS_REG_addr){
   uint8_t buffer = ADNS_REG_addr & 0x7f;
   HAL_SPI_Transmit(_spi_port, &buffer, 1, 100);
 
-  delayMicroseconds(100); // tSRAD
+  delay_us(100); // tSRAD
   // read data
 
   uint8_t data = 0x00;
   HAL_SPI_Receive(_spi_port, &data, 1, 100);
 
-  delayMicroseconds(1); // tSCLK-_ncs for read operation is 120ns
+  delay_us(1); // tSCLK-_ncs for read operation is 120ns
   _adnsComEnd();
-  delayMicroseconds(19); //  tSRW/tSRR (=20us) minus tSCLK-_ncs
+  delay_us(19); //  tSRW/tSRR (=20us) minus tSCLK-_ncs
 
   return data;
 }
@@ -100,22 +51,21 @@ void _adnsWriteReg(uint8_t ADNS_REG_addr, uint8_t data){
 	_adnsComBegin();
 
 	//send adress of the register, with MSBit = 1 to indicate it's a write
-
 	uint8_t register_buffer = ADNS_REG_addr | 0x80;
     HAL_SPI_Transmit(_spi_port, &register_buffer, 1, 100);
     //sent data
     uint8_t data_buffer = data;
     HAL_SPI_Transmit(_spi_port, &data_buffer, 1, 100);
 
-    delayMicroseconds(20); // tSCLK-_ncs for write operation
+    delay_us(20); // tSCLK-_ncs for write operation
     _adnsComEnd();
-    delayMicroseconds(100); // tSWW/tSWR (=120us) minus tSCLK-_ncs. Could be shortened, but is looks like a safe lower bound
+    delay_us(100); // tSWW/tSWR (=120us) minus tSCLK-_ncs. Could be shortened, but is looks like a safe lower bound
 }
 
 void _adnsUploadFirmware(){
   // send the firmware to the chip, cf p.18 of the datasheet
 
-  if (_debug) printf("Uploading optical sensors's firmware...");
+  if (_debug) printf("Uploading optical sensors's firmware... \n");
 
   // set the configuration_IV register in 3k firmware mode
   _adnsWriteReg(ADNS_REG_Configuration_IV, 0x02); // bit 1 = 1 for 3k mode, other bits are reserved
@@ -135,23 +85,21 @@ void _adnsUploadFirmware(){
   uint8_t buffer = ADNS_REG_SROM_Load_Burst | 0x80;
   HAL_SPI_Transmit(_spi_port, &buffer, 1, 100); // write burst destination adress
 
-  delayMicroseconds(15);
+  delay_us(15);
 
-  // send all uint8_ts of the firmware
-
-  HAL_SPI_Transmit(_spi_port, (uint8_t *)&_adns_firmware_data, ADNS_FIRMWARE_LENGHT, 100);
-  /* déjà géré par la fonction transmit . . . si j'ai bien compris
-  unsigned char c;
+  // send all uint8_ts of the firmware (on ne peut pas utiliser la fonction transmit directement, car il faut respecter le délais de 15us)
+  uint8_t c;
   for(int i = 0; i < ADNS_FIRMWARE_LENGHT; i++){
-    c = (unsigned char)pgm_read_uint8_t(firmware_data + i);
-    SPI.transfer(c);
-    delayMicroseconds(15);
+    c = _adns_firmware_data + i;
+    HAL_SPI_Transmit(_spi_port, (uint8_t *)&c, 1, 100);
+    delay_us(15);
   }
-  */
+
+
   _adnsComEnd();
   }
 
-void _adnsPerformStartup(void){
+void _adnsPerformStartup(void){ // see datasheet page 20
   _adnsComEnd(); // ensure that the serial port is reset
   _adnsComBegin(); // ensure that the serial port is reset
   _adnsComEnd(); // ensure that the serial port is reset
@@ -164,7 +112,7 @@ void _adnsPerformStartup(void){
   _adnsReadReg(ADNS_REG_delta_y_L);
   _adnsReadReg(ADNS_REG_delta_y_H);
   // upload the firmware
-  _adnsUuploadFirmware();
+  _adnsUploadFirmware();
   HAL_Delay(10);
   //enable laser(bit 0 = 0b), in normal mode (bits 3,2,1 = 000b)
   // reading the actual value of the register is important because the real
@@ -175,7 +123,7 @@ void _adnsPerformStartup(void){
 
   HAL_Delay(1);
 
-  if (_debug) printf("Optical Chip Initialized");
+  if (_debug) printf("Optical chip started up \n");
   }
 
 void _adnsUpdatePointer(void){
@@ -185,24 +133,25 @@ void _adnsUpdatePointer(void){
 	_adnsComEnd();
 }
 
-void _dispRegisters(void){
+void _adnsDispRegisters(void){
 	int oreg[7] = {0x00,0x3F,0x2A,0x02};
 	char* oregname[] = {"Product_ID","Inverse_Product_ID","SROM_Version","Motion"};
 	uint8_t regres;
 
 	_adnsComBegin();
 
+	//printf("                   testing : 0x%02X \n", _adnsReadReg(ADNS_REG_Configuration_IV));
+	printf("ADNS9800 Registers : \n");
 	for(int i=0; i<4; i++){
 		uint8_t buffer = oreg[i];
-		HAL_SPI_Transmit(_spi_port, (uint8_t *)&buffer, 1, 100); // write burst destination adress
+		HAL_SPI_Transmit(_spi_port, &buffer, 1, 100); // write burst destination adress
 		HAL_Delay(1);
 
-		printf("ADNS9800 Registers :");
 		printf(oregname[i]);
-		printf("%#02X", oreg[i]);
+		printf(" (at adress 0x%02X) :", oreg[i]);
 
 		HAL_SPI_Receive(_spi_port, &regres, 1, 100);
-		printf(" %#02X",regres);
+		printf(" 0x%02X \n",regres);
 
 		HAL_Delay(1);
 	}
@@ -215,5 +164,54 @@ long _adnsConvTwosComp(long b){
     b = -1 * ((b ^ 0xffff) + 1);
     }
   return b;
+}
+
+/*============================ Public ============================*/
+
+void adnsInit(SPI_HandleTypeDef* spi_port){
+	_spi_port = spi_port;
+	//SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
+
+	_adnsPerformStartup();
+	if (_debug) _adnsDispRegisters();
+	if (_debug) printf("coef is set to %.4f dots per millimeter \n", _units_per_millimeter);
+	HAL_Delay(100);
+	initComplete=9;
+
+	if(_debug) printf("ADNS9800 initialization done \n ");
+}
+
+bool adnsUpdate(void) {
+	//SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
+
+	_adnsUpdatePointer();
+
+	_xydelta[0] = _adnsConvTwosComp(_xydat[0]);
+	_xydelta[1] = - _adnsConvTwosComp(_xydat[1]);
+
+	if (_xydelta[0] != 0 || _xydelta[1] != 0) return 1;
+	else return 0;
+}
+
+void adnsReset(void){
+    //_current_calculated_x = 0;
+    //_current_calculated_y = 0;
+}
+
+void adnsSetCoef(float coef){
+	_units_per_millimeter = coef;
+}
+
+void adnsEnableDebugReports(bool state){
+	printf("Reports for the ADNS 9800 are now set to %d \n", state);
+	_debug = state;
+}
+
+float adnsX(void){
+		return _xydelta[0]/_units_per_millimeter;
+}
+
+float adnsY(void){
+		return _xydelta[1]/_units_per_millimeter;
 }
 

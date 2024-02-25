@@ -26,6 +26,7 @@
 #include "BNO085.h"
 #include "ADNS9800.h"
 
+#include "micros.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -114,8 +115,11 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  DWT_Init();
   printf("HAL init done, proceeding ...\n");
   setup();
+  adnsEnableDebugReports(1);
+  adnsInit(&hspi1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -123,6 +127,7 @@ int main(void)
   while (1)
   {
 	  loop();
+	  if(adnsUpdate()) printf("data : %.2f %.2f \n", adnsX(), adnsY());
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
