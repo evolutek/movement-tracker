@@ -117,9 +117,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
   DWT_Init();
   printf("HAL init done, proceeding ...\n");
-  setup();
-  adnsEnableDebugReports(1);
+  adnsEnableDebugReports();
   adnsInit(&hspi1);
+  setup();
+  printf("User init done, proceeding ...\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */

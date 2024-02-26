@@ -57,10 +57,10 @@
 void adnsInit(SPI_HandleTypeDef* spi_port);
 void adnsSetCoef(float);
 bool adnsUpdate(void);
-void adnsReset(void);
-void adnsEnableDebugReports(bool);
+void adnsSetDebugReports(bool);
+void adnsEnableDebugReports(void);
 
-float adnsX(void);
-float adnsY(void);
+double adnsX(void);
+double adnsY(void);
 
 #endif /* INC_ADNS9800_H_ */
