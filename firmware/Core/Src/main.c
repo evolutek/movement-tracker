@@ -118,9 +118,10 @@ int main(void)
   DWT_Init();
   printf("HAL init done, proceeding ...\n");
   adnsEnableDebugReports();
-  adnsInit(&hspi1);
+  adnsInit();
   setup();
   printf("User init done, proceeding ...\n");
+  double x = 0, y = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -128,7 +129,7 @@ int main(void)
   while (1)
   {
 	  loop();
-	  if(adnsUpdate()) printf("data : %.2f %.2f \n", adnsX(), adnsY());
+	  if(adnsUpdate()){ x += adnsX(); y += adnsY(); printf("%.2f %.2f \n",x,y);}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

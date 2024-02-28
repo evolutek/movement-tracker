@@ -54,7 +54,7 @@
 
 #define DEFAULT_COEF 67.2 // units (as seen per the sensors) per millimeter of actual travel of the module
 
-void adnsInit(SPI_HandleTypeDef* spi_port);
+void adnsInit();
 void adnsSetCoef(float);
 bool adnsUpdate(void);
 void adnsSetDebugReports(bool);
