@@ -4,8 +4,8 @@
 ../Core/Src/BNO085.c:44:13:_wait_for_int_blocking_timeout	24	static
 ../Core/Src/BNO085.c:53:13:_wait_for_int_blocking	8	static
 ../Core/Src/BNO085.c:57:6:bno_data_available	8	static
-../Core/Src/BNO085.c:61:6:print_header	16	static
-../Core/Src/BNO085.c:74:6:print_packet	16	static
+../Core/Src/BNO085.c:61:6:print_header	24	static
+../Core/Src/BNO085.c:75:6:print_packet	16	static
 ../Core/Src/BNO085.c:115:6:_receive_packet	16	static
-../Core/Src/BNO085.c:166:6:_send_packet	24	static
-../Core/Src/BNO085.c:194:6:setup_bno	24	static
+../Core/Src/BNO085.c:160:6:_send_packet	24	static
+../Core/Src/BNO085.c:188:6:setup_bno	24	static

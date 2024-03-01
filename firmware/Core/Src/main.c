@@ -121,7 +121,7 @@ int main(void)
   adnsEnableDebugReports();
   adnsInit();
 
-  if(!setup_bno()) printf(" === Could NOT initialize the BNO085 ! ===\n");
+  if(!bno_setup()) printf(" === Could NOT initialize the BNO085 ! ===\n");
 
   setup();
   printf(" === User init done, proceeding ... ===\n");
