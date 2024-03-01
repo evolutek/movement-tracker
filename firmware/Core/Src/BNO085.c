@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-static bool _debug = 1;
+static short _debug = 2;
+// 1 for minimal
+// 2 for all (including tranfer reports, LOTS of stuff)
 
 //Registers
 static const uint8_t CHANNEL_COMMAND = 0;
@@ -39,7 +41,7 @@ static inline void _reset_slave_blocking(){
 //Blocking wait for BNO080 to assert (pull low) the INT pin
 //indicating it's ready for comm. Can take more than 104ms
 //after a hardware reset
-static bool _wait_for_bno_int_blocking_timeout(uint8_t timeout){
+static bool _wait_for_int_blocking_timeout(uint8_t timeout){
 	for (uint8_t counter = 0; counter < timeout; counter++){
 		if (!HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin))
 			return (true);
@@ -48,8 +50,8 @@ static bool _wait_for_bno_int_blocking_timeout(uint8_t timeout){
 	return (false);
 }
 
-static bool _wait_for_bno_int_blocking(){
-	return _wait_for_bno_int_blocking_timeout(BNO_STANDARD_INT_TIMEOUT);
+static bool _wait_for_int_blocking(){
+	return _wait_for_int_blocking_timeout(BNO_STANDARD_INT_TIMEOUT);
 }
 
 bool bno_data_available(){
@@ -119,11 +121,11 @@ bool _receive_packet(void){
 	_enable_slave();
 
 	//Get the first four bytes, aka the packet header
-	HAL_SPI_Receive(&hspi1, &shtpHeader[0], 1, 100); // aka LSB
-	HAL_SPI_Receive(&hspi1, &shtpHeader[1], 1, 100); // aka MSB
-	HAL_SPI_Receive(&hspi1, &shtpHeader[2], 1, 100); // aka channel number
-	HAL_SPI_Receive(&hspi1, &shtpHeader[3], 1, 100); // aka sequence number
-	//HAL_SPI_Receive(&hspi1, &shtpHeader[0], 4, 100); // untested but should work . . . ?
+	//HAL_SPI_Receive(&hspi1, &shtpHeader[0], 1, 100); // aka LSB
+	//HAL_SPI_Receive(&hspi1, &shtpHeader[1], 1, 100); // aka MSB
+	//HAL_SPI_Receive(&hspi1, &shtpHeader[2], 1, 100); // aka channel number
+	//HAL_SPI_Receive(&hspi1, &shtpHeader[3], 1, 100); // aka sequence number
+	HAL_SPI_Receive(&hspi1, &shtpHeader[0], 4, 100); // untested but should work . . . ?
 
 	//Calculate the number of data bytes in this packet
 	uint16_t dataLength = (((uint16_t)shtpHeader[1]/*MSB*/) << 8) | ((uint16_t)shtpHeader[0]/*LSB*/);
@@ -133,24 +135,20 @@ bool _receive_packet(void){
 	if (dataLength == 0)
 	{
 		//Packet is empty
-		if (_debug) {print_header();printf("Packet empty !");}
+		if (_debug) printf("Packet empty !");
+		if (_debug == 2) print_header();
 		return (false); //All done
 	}
 	dataLength -= 4; //Remove the header bytes from the data count
 
 	//Read incoming data into the shtpData array
-	uint8_t data_buffer = 0xFF;
-	for (uint16_t dataSpot = 0; dataSpot < dataLength; dataSpot++)
-	{
-		uint8_t incoming = 0;
-		HAL_SPI_TransmitReceive(&hspi1, &data_buffer, &incoming, 1, 100);
-		if (dataSpot < BNO_MAX_PACKET_SIZE)	//BNO080 can respond with upto 270 bytes, avoid overflow
-			shtpData[dataSpot] = incoming; //Store data into the shtpData array
-	}
+	if (dataLength > BNO_MAX_PACKET_SIZE)  dataLength = BNO_MAX_PACKET_SIZE;
+	HAL_SPI_Receive(&hspi1, shtpData, dataLength, 100);
+
 
 	_disable_slave(); //Release BNO080
 
-	if(_debug){printf("Packet successfully retrieved \n");print_packet();}
+	if(_debug == 2){printf("Packet successfully retrieved \n");print_packet();}
 
 
 	// Quickly check for reset complete packet. No need for a seperate parser.
@@ -170,7 +168,7 @@ bool _send_packet(uint8_t channelNumber, uint8_t dataLength)
 	uint8_t packetLength = dataLength + 4; //Add four bytes for the header
 
 	//Wait for BNO080 to indicate it is available for communication
-	if (_wait_for_bno_int_blocking() == false)
+	if (_wait_for_int_blocking() == false)
 		return false;
 
 	//BNO080 has max CLK of 3MHz, MSB first,
@@ -199,18 +197,18 @@ bool setup_bno(void){
 	_reset_slave_blocking();
 
 	//Wait for first assertion of INT before using WAK pin. Can take ~104ms
-	if(!_wait_for_bno_int_blocking()) return false;
+	if(!_wait_for_int_blocking()) return false;
 
 	//At system startup, the hub must send its full advertisement message (see 5.2 and 5.3) to the
 	//host. It must not send any other data until this step is complete.
 	//When BNO080 first boots it broadcasts big startup packet
 	//Read it and dump it
-	if(!_wait_for_bno_int_blocking()) return false; //Wait for assertion of INT before reading advert message.
+	if(!_wait_for_int_blocking()) return false; //Wait for assertion of INT before reading advert message.
 	_receive_packet();
 
 	//The BNO080 will then transmit an unsolicited Initialize Response (see 6.4.5.2)
 	//Read it and dump it
-	if(!_wait_for_bno_int_blocking()) return false; //Wait for assertion of INT before reading Init response
+	if(!_wait_for_int_blocking()) return false; //Wait for assertion of INT before reading Init response
 	_receive_packet();
 
 	//Check communication with device
@@ -224,12 +222,13 @@ bool setup_bno(void){
 	}
 
 	//Now we wait for response
-	if(!_wait_for_bno_int_blocking()) return false;
+	if(!_wait_for_int_blocking()) return false;
 	if (_receive_packet()){
-		if (shtpData[0] == BNO_REG_SHTP_REPORT_PRODUCT_ID_RESPONSE){
+		printf("%d", shtpData[0]);
+		if (1){//shtpData[0] == BNO_REG_SHTP_REPORT_PRODUCT_ID_RESPONSE){
 			if (_debug){
-				printf("SW Version Major: 0x%02X", shtpData[2]);
-				printf(" SW Version Minor: 0x%02X \n", shtpData[3]);
+				printf("SW Version Major: 0x%04X", shtpData[2]);
+				printf(" SW Version Minor: 0x%04X \n", shtpData[3]);
 				uint32_t SW_Part_Number = ((uint32_t)shtpData[7] << 24) | ((uint32_t)shtpData[6] << 16) | ((uint32_t)shtpData[5] << 8) | ((uint32_t)shtpData[4]);
 				printf("SW Part Number: %ld \n",SW_Part_Number);
 				uint32_t SW_Build_Number = ((uint32_t)shtpData[11] << 24) | ((uint32_t)shtpData[10] << 16) | ((uint32_t)shtpData[9] << 8) | ((uint32_t)shtpData[8]);
