@@ -8,9 +8,9 @@
 ../Core/Src/ADNS9800.c:113:13:_convert_from_comp	16	static
 ../Core/Src/ADNS9800.c:121:13:_update_pointer	16	static
 ../Core/Src/ADNS9800.c:129:6:adnsInit	16	static
-../Core/Src/ADNS9800.c:163:6:adnsUpdate	8	static
-../Core/Src/ADNS9800.c:179:6:adnsSetCoef	16	static
-../Core/Src/ADNS9800.c:183:6:adnsEnableDebugReports	8	static
-../Core/Src/ADNS9800.c:187:6:adnsSetDebugReports	16	static
-../Core/Src/ADNS9800.c:192:8:adnsX	4	static
-../Core/Src/ADNS9800.c:196:8:adnsY	4	static
+../Core/Src/ADNS9800.c:165:6:adnsUpdate	8	static
+../Core/Src/ADNS9800.c:181:6:adnsSetCoef	16	static
+../Core/Src/ADNS9800.c:185:6:adnsEnableDebugReports	8	static
+../Core/Src/ADNS9800.c:189:6:adnsSetDebugReports	16	static
+../Core/Src/ADNS9800.c:194:8:adnsX	4	static
+../Core/Src/ADNS9800.c:198:8:adnsY	4	static

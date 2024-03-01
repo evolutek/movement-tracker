@@ -6,13 +6,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-long raw_data[2]; // raw sensor data
-long raw_delta[2]; // delta from last read in dots
-double mm_delta[2]; // delta from last read in mm
+static long raw_data[2]; // raw sensor data
+static long raw_delta[2]; // delta from last read in dots
+static double mm_delta[2]; // delta from last read in mm
 
-float _units_per_millimeter = DEFAULT_COEF;
+static float _units_per_millimeter = DEFAULT_COEF;
 
-bool _debug = 0;
+static bool _debug = 0;
 
 /*============================ Private ============================*/
 
@@ -156,6 +156,8 @@ void adnsInit(){ // see datasheet page 20
 	if (_debug) _display_registers();
 	if (_debug) printf("coef is set to %.4f dots per millimeter \n", _units_per_millimeter);
 	HAL_Delay(100);
+
+	_disable_slave();
 
 	if(_debug) printf("ADNS9800 initialization done \n");
 }

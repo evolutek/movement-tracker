@@ -116,11 +116,15 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   DWT_Init();
-  printf("HAL init done, proceeding ...\n");
+  printf("=== HAL init done, proceeding ... ===\n");
+
   adnsEnableDebugReports();
   adnsInit();
+
+  if(!setup_bno()) printf(" === Could NOT initialize the BNO085 ! ===\n");
+
   setup();
-  printf("User init done, proceeding ...\n");
+  printf(" === User init done, proceeding ... ===\n");
   double x = 0, y = 0;
   /* USER CODE END 2 */
 
@@ -129,7 +133,7 @@ int main(void)
   while (1)
   {
 	  loop();
-	  if(adnsUpdate()){ x += adnsX(); y += adnsY(); printf("%.2f %.2f \n",x,y);}
+	  //if(adnsUpdate()){ x += adnsX(); y += adnsY(); printf("%.2f %.2f \n",x,y);}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -438,7 +442,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : INT_IMU_Pin */
   GPIO_InitStruct.Pin = INT_IMU_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(INT_IMU_GPIO_Port, &GPIO_InitStruct);
 

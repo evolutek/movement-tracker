@@ -1,0 +1,8 @@
+../Core/Src/BNO085.c:13:20:_disable_slave	0	static
+../Core/Src/BNO085.c:36:13:_wait_for_bno_int_blocking	8	static
+../Core/Src/BNO085.c:40:6:bno_data_available	8	static
+../Core/Src/BNO085.c:44:6:print_header	16	static
+../Core/Src/BNO085.c:57:6:print_packet	40	static
+../Core/Src/BNO085.c:99:6:_receive_packet	48	static
+../Core/Src/BNO085.c:155:6:_send_packet	24	static
+../Core/Src/BNO085.c:183:6:setup_bno	8	static
