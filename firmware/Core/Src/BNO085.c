@@ -3,6 +3,7 @@
 #include "main.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 
 static short _debug = 2;
 // 1 for minimal
@@ -23,9 +24,20 @@ static uint8_t sequenceNumber[6] = {0, 0, 0, 0, 0, 0}; //There are 6 com channel
 static uint8_t commandSequenceNumber = 0;				//Commands have a seqNum as well. These are inside command packet, the header uses its own seqNum per channel
 static uint32_t metaData[BNO_MAX_METADATA_SIZE];			//There is more than 10 words in a metadata record but we'll stop at Q point 3
 
+uint16_t rawQuatI, rawQuatJ, rawQuatK, rawQuatReal, rawQuatRadianAccuracy, quatAccuracy;
+
+//These Q values are defined in the datasheet but can also be obtained by querying the meta data records
+//See the read metadata example for more info
+int16_t rotationVector_Q1 = 14;
+int16_t rotationVectorAccuracy_Q1 = 12; //Heading accuracy estimate in radians. The Q point is 12.
+int16_t accelerometer_Q1 = 8;
+int16_t linear_accelerometer_Q1 = 8;
+int16_t gyro_Q1 = 9;
+int16_t magnetometer_Q1 = 4;
+int16_t angular_velocity_Q1 = 10;
+int16_t gravity_Q1 = 8;
 
 /*============================ Debug ============================*/
-
 
 void print_header(void){
 		//Print the four byte header
@@ -113,7 +125,7 @@ static bool _wait_for_int_blocking(){
 
 //Check to see if there is any new data available
 //Read the contents of the incoming packet into the shtpData array
-bool _receive_packet(void){
+static bool _receive_packet(void){
 
 	if (!bno_data_available())
 		return (false); //Data is not available
@@ -157,8 +169,7 @@ bool _receive_packet(void){
 
 	return (true); //We're done!
 }
-
-bool _send_packet(uint8_t channelNumber, uint8_t dataLength)
+static bool _send_packet(uint8_t channelNumber, uint8_t dataLength)
 {
 	uint8_t packetLength = dataLength + 4; //Add four bytes for the header
 
@@ -185,11 +196,10 @@ bool _send_packet(uint8_t channelNumber, uint8_t dataLength)
 
 	return (true);
 }
-
-void _set_feature_command(uint8_t reportID, uint16_t timeBetweenReports, uint32_t specificConfig){
+static void _set_feature_command(uint8_t reportID, uint16_t timeBetweenReports, uint32_t specificConfig){
 	long microsBetweenReports = (long)timeBetweenReports * (long)1000;
 
-	shtpData[0] = SHTP_REPORT_SET_FEATURE_COMMAND;	 //Set feature command. Reference page 55
+	shtpData[0] = BNO_SHTP_REPORT_SET_FEATURE_COMMAND;	 //Set feature command. Reference page 55
 	shtpData[1] = reportID;							   //Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
 	shtpData[2] = 0;								   //Feature flags
 	shtpData[3] = 0;								   //Change sensitivity (LSB)
@@ -208,9 +218,16 @@ void _set_feature_command(uint8_t reportID, uint16_t timeBetweenReports, uint32_
 	shtpData[16] = (specificConfig >> 24) & 0xFF;	  //Sensor-specific config (MSB)
 
 	//Transmit packet on channel 2, 17 bytes
-	sendPacket(CHANNEL_CONTROL, 17);
+	_send_packet(CHANNEL_CONTROL, 17);
 }
 
+static float _quaternion_to_float(int16_t fixedPointValue, uint8_t qPoint){
+	float qFloat = fixedPointValue;
+	qFloat *= pow(2, -qPoint);
+	return (qFloat);
+}
+
+/*============================ High Level ============================*/
 
 bool bno_setup(void){
 
@@ -233,7 +250,7 @@ bool bno_setup(void){
 	_receive_packet();
 
 	//Check communication with device
-	shtpData[0] = BNO_REG_SHTP_REPORT_PRODUCT_ID_REQUEST; //Request the product ID and reset info
+	shtpData[0] = BNO_SHTP_REPORT_PRODUCT_ID_REQUEST; //Request the product ID and reset info
 	shtpData[1] = 0;							  //Reserved
 
 	//Transmit packet on channel 2, 2 bytes
@@ -244,7 +261,7 @@ bool bno_setup(void){
 
 	//Now we wait for response
 	if(!_wait_for_int_blocking()) return false;
-	if (_receive_packet() && shtpData[0] == BNO_REG_SHTP_REPORT_PRODUCT_ID_RESPONSE){
+	if (_receive_packet() && shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
 		if (_debug){
 			printf("SW Version Major: 0x%04X", shtpData[2]);
 			printf(" SW Version Minor: 0x%04X \n", shtpData[3]);
@@ -260,10 +277,30 @@ bool bno_setup(void){
 	return (false); //Something went wrong
 }
 
-
-
 void bno_enable_rotation_vector(uint16_t timeBetweenReports){
-	_set_feature_command(SENSOR_REPORTID_ROTATION_VECTOR, timeBetweenReports, 0);
+	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, timeBetweenReports, 0);
 }
 
+ float bno_getYaw(){
+	 // get quaternion arguments
+	float dqw = _quaternion_to_float(rawQuatReal, rotationVector_Q1);
+	float dqx = _quaternion_to_float(rawQuatI, rotationVector_Q1);
+	float dqy = _quaternion_to_float(rawQuatJ, rotationVector_Q1);
+	float dqz = _quaternion_to_float(rawQuatK, rotationVector_Q1);
+
+	float norm = sqrt(dqw*dqw + dqx*dqx + dqy*dqy + dqz*dqz);
+	dqw = dqw/norm;
+	dqx = dqx/norm;
+	dqy = dqy/norm;
+	dqz = dqz/norm;
+
+	float ysqr = dqy * dqy;
+
+	// yaw (z-axis rotation)
+	float t3 = +2.0 * (dqw * dqz + dqx * dqy);
+	float t4 = +1.0 - 2.0 * (ysqr + dqz * dqz);
+	float yaw = atan2(t3, t4);
+
+	return (yaw);
+}
 
