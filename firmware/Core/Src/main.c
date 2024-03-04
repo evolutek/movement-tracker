@@ -122,7 +122,7 @@ int main(void)
   adnsInit();
 
   if(!bno_setup()) printf("=== Could NOT initialize the BNO085 ! ===\n");
-  bno_enable_rotation_vector(40);
+  bno_enable_rotation_vector(50);
   setup();
   printf("=== User init done, proceeding ... ===\n");
   double x = 0, y = 0;
@@ -133,7 +133,7 @@ int main(void)
   while (1)
   {
 	  loop();
-	  if(bno_get_readings()) bno_get_yaw();// printf("%.4f \n",bno_get_yaw());
+	  if(bno_get_readings() != 0) printf("yaw %.4f \n",bno_get_yaw());
 	  //if(adnsUpdate()){ x += adnsX(); y += adnsY(); printf("%.2f %.2f \n",x,y);}
     /* USER CODE END WHILE */
 
@@ -422,18 +422,25 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(STATUS_GPIO_Port, STATUS_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : RST_IMU_Pin CS_IMU_Pin CS_ADNS_Pin */
-  GPIO_InitStruct.Pin = RST_IMU_Pin|CS_IMU_Pin|CS_ADNS_Pin;
+  /*Configure GPIO pin : RST_IMU_Pin */
+  GPIO_InitStruct.Pin = RST_IMU_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(RST_IMU_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : AU_INT_Pin */
   GPIO_InitStruct.Pin = AU_INT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(AU_INT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : CS_IMU_Pin CS_ADNS_Pin */
+  GPIO_InitStruct.Pin = CS_IMU_Pin|CS_ADNS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : INT_ANDS_Pin */
   GPIO_InitStruct.Pin = INT_ANDS_Pin;

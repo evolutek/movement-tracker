@@ -8,4 +8,4 @@
 ../Core/Src/main.c:328:13:MX_USART2_UART_Init	5
 ../Core/Src/main.c:376:13:MX_USB_PCD_Init	2
 ../Core/Src/main.c:409:13:MX_GPIO_Init	1
-../Core/Src/main.c:469:6:Error_Handler	1
+../Core/Src/main.c:476:6:Error_Handler	1

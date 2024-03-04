@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-static short _debug = 0;
+static short _debug = 1;
 // 1 for minimal
 // 2 for all (including tranfer reports, LOTS of stuff)
 
@@ -71,13 +71,12 @@ void print_packet(void){
 			printf("0");
 		printf("%01X",shtpData[x]);
 	}
-	printf("\n");
 	if (packetLength & 1 << 15){
-		printf(" [Continued packet] ");
+		printf(" [Continued packet]");
 		packetLength &= ~(1 << 15);
 	}
 
-	printf("Length: %u\n", packetLength);
+	printf(" Length: %u ", packetLength);
 
 	printf("Channel: ");
 	switch (shtpHeader[2]){
@@ -137,7 +136,14 @@ static bool _receive_packet(void){
 	_enable_slave();
 
 	//Get the first four bytes, aka the packet header
-	HAL_SPI_Receive(&hspi1, shtpHeader, 4, 100);
+	HAL_SPI_Receive(&hspi1, shtpHeader, 4, 500);
+
+	/*Note :
+	shtpHeader[0] : packetLSB;
+	shtpHeader[1] : packetMSB;
+	shtpHeader[2] : channelNumber;
+	shtpHeader[3] : sequenceNumber;
+	*/
 
 	//Calculate the number of data bytes in this packet
 	uint16_t dataLength = (((uint16_t)shtpHeader[1]/*MSB*/) << 8) | ((uint16_t)shtpHeader[0]/*LSB*/);
@@ -153,12 +159,14 @@ static bool _receive_packet(void){
 
 	dataLength -= 4; //Remove the header bytes from the data count
 	//Read incoming data into the shtpData array
+	//uint8_t transmit_buffer = 0xFF;
 	if (dataLength > BNO_MAX_PACKET_SIZE)  dataLength = BNO_MAX_PACKET_SIZE;
-	HAL_SPI_Receive(&hspi1, shtpData, dataLength, 500);
+	//HAL_SPI_TransmitReceive(&hspi1, &transmit_buffer,shtpData, dataLength, 500);
+	HAL_SPI_Receive(&hspi1,shtpData, dataLength, 500);
 
 	_disable_slave(); //Release BNO080
 
-	if(_debug == 1){printf("Packet successfully retrieved \n");print_packet();}
+	if(_debug == 2){printf("New packet retrieved :\n");print_packet();}
 
 	// Quickly check for reset complete packet. No need for a seperate parser.
 	// This function is also called after soft reset, so we need to catch this
@@ -166,13 +174,13 @@ static bool _receive_packet(void){
 	// places.
 	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE)
 	{
+		printf("OUCH !!! The sensor has just been reset ! \n");
 		//_hasReset = true;
 	}
 
 	return (true); //We're done!
 }
-static bool _send_packet(uint8_t channelNumber, uint8_t dataLength)
-{
+static bool _send_packet(uint8_t channelNumber, uint8_t dataLength){
 	uint8_t packetLength = dataLength + 4; //Add four bytes for the header
 
 	//Wait for BNO080 to indicate it is available for communication
@@ -189,18 +197,19 @@ static bool _send_packet(uint8_t channelNumber, uint8_t dataLength)
 	header_buffer[1] = (packetLength >> 8); //Packet length MSB
 	header_buffer[2] = channelNumber;
 	header_buffer[3] = (sequenceNumber[channelNumber]++); //Send the sequence number, increments with each packet sent, different counter for each channel
-	HAL_SPI_Transmit(&hspi1, header_buffer, 4, 200);
+	HAL_SPI_Transmit(&hspi1, header_buffer, 4, 500);
 
 	//Send the user's data packet
-	HAL_SPI_Transmit(&hspi1, shtpData, dataLength, 1000);
+	HAL_SPI_Transmit(&hspi1, shtpData, dataLength, 500);
 
 	_disable_slave();
 
 	return (true);
 }
 
-static void _set_feature_command(uint8_t reportID, uint16_t timeBetweenReports, uint32_t specificConfig){
-	long microsBetweenReports = (long)timeBetweenReports * (long)1000;
+static void _set_feature_command(uint8_t reportID, long millisBetweenReports, uint32_t specificConfig){
+
+	long microsBetweenReports = millisBetweenReports * 1000;
 
 	shtpData[0] = BNO_SHTP_REPORT_SET_FEATURE_COMMAND;	 //Set feature command. Reference page 55
 	shtpData[1] = reportID;							   //Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
@@ -247,7 +256,6 @@ static float _quaternion_to_float(int16_t fixedPointValue, uint8_t qPoint){
 //shtpData[10:11]: real/gyro temp/etc
 //shtpData[12:13]: Accuracy estimate
 static uint16_t _parse_input_report(void){
-	printf("parsing report...\n");
 	//Calculate the number of data bytes in this packet
 	int16_t dataLength = ((uint16_t)shtpHeader[1] << 8 | shtpHeader[0]);
 	dataLength &= ~(1 << 15); //Clear the MSbit. This bit indicates if this package is a continuation of the last.
@@ -414,7 +422,6 @@ static uint16_t _parse_input_report(void){
 //shtpData[5 + 7]: R7
 //shtpData[5 + 8]: R8
 static uint16_t _parse_command_report(void){
-	printf("parsing command...\n");
 	if (shtpData[0] == BNO_SHTP_REPORT_COMMAND_RESPONSE){
 		//The BNO080 responds with this report to command requests. It's up to use to remember which command we issued.
 		uint8_t command = shtpData[2]; //This is the Command byte of the response
@@ -483,26 +490,28 @@ bool bno_setup(void){
 	return (false); //Something went wrong
 }
 
-void bno_enable_rotation_vector(uint16_t timeBetweenReports){
-	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, timeBetweenReports, 0);
+void bno_enable_rotation_vector(long millisBetweenReports){
+	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, millisBetweenReports, 0);
+	HAL_Delay(100);
 }
 
 uint16_t bno_get_readings(void){
 
 	if (!_sensor_awaiting())
 		return (0); //Data is not available
-	printf("%d",shtpHeader[2]);
+
+	//printf("%d",shtpHeader[2]);
 	if (_receive_packet() == true){
 		//Check to see if this packet is a sensor reporting its data to us
 		if (shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
-			return _parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
+			_parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
 		} else if (shtpHeader[2] == CHANNEL_CONTROL){
-			return _parse_command_report(); //This will update responses to commands, calibrationStatus, etc.
+			_parse_command_report(); //This will update responses to commands, calibrationStatus, etc.
 		} else if (shtpHeader[2] == CHANNEL_GYRO){
-			return _parse_input_report();
-		}
-	}
-	return 0;
+			_parse_input_report();
+		} else return 0; //data is irrelevant
+	} else return 0; // data packet isn't ready
+	return 1;
 }
 
 float bno_get_yaw(void){

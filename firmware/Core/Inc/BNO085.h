@@ -84,10 +84,10 @@
 //TODO : getting packets of more than the max packet size breaks the whole receiver function
 #define BNO_MAX_PACKET_SIZE 256//128 //Packets can be up to 32k but we don't have that much RAM.
 #define BNO_MAX_METADATA_SIZE 9 //This is in words. There can be many but we mostly only care about the first 9 (Qs, range, etc)
-#define BNO_STANDARD_INT_TIMEOUT 127
+#define BNO_STANDARD_INT_TIMEOUT 125
 
 bool bno_setup(void);
-void bno_enable_rotation_vector(uint16_t timeBetweenReports);
+void bno_enable_rotation_vector(long millisBetweenReports);
 uint16_t bno_get_readings(void);
 float bno_get_yaw(void);
 
