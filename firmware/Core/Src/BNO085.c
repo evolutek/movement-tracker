@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-static short _debug = 2;
+static short _debug = 0;
 // 1 for minimal
 // 2 for all (including tranfer reports, LOTS of stuff)
 
@@ -25,6 +25,9 @@ static uint8_t commandSequenceNumber = 0;				//Commands have a seqNum as well. T
 static uint32_t metaData[BNO_MAX_METADATA_SIZE];			//There is more than 10 words in a metadata record but we'll stop at Q point 3
 
 uint16_t rawQuatI, rawQuatJ, rawQuatK, rawQuatReal, rawQuatRadianAccuracy, quatAccuracy;
+uint16_t rawFastGyroX, rawFastGyroY, rawFastGyroZ;
+uint32_t timeStamp;
+uint8_t calibrationStatus; //Byte R0 of ME Calibration Response
 
 //These Q values are defined in the datasheet but can also be obtained by querying the meta data records
 //See the read metadata example for more info
@@ -102,7 +105,7 @@ static inline void _reset_slave_blocking(){
 	HAL_Delay(2);
 	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
 }
-bool bno_data_available(){
+static inline bool _sensor_awaiting(){
 	return !HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin);
 }
 
@@ -127,22 +130,21 @@ static bool _wait_for_int_blocking(){
 //Read the contents of the incoming packet into the shtpData array
 static bool _receive_packet(void){
 
-	if (!bno_data_available())
+	if (!_sensor_awaiting())
 		return (false); //Data is not available
 
 	//Get first four bytes to find out how much data we need to read
 	_enable_slave();
 
 	//Get the first four bytes, aka the packet header
-	HAL_SPI_Receive(&hspi1, shtpHeader, 4, 100); // untested but should work . . . ?
+	HAL_SPI_Receive(&hspi1, shtpHeader, 4, 100);
 
 	//Calculate the number of data bytes in this packet
 	uint16_t dataLength = (((uint16_t)shtpHeader[1]/*MSB*/) << 8) | ((uint16_t)shtpHeader[0]/*LSB*/);
 	dataLength &= ~(1 << 15); //Clear the MSbit.
 	//This bit indicates if this package is a continuation of the last. Ignore it for now.
 	//TODO catch this as an error and exit
-	if (dataLength == 0)
-	{
+	if (dataLength == 0){
 		//Packet is empty
 		if (_debug) printf("Packet empty !");
 		if (_debug == 2) print_header();
@@ -152,11 +154,11 @@ static bool _receive_packet(void){
 	dataLength -= 4; //Remove the header bytes from the data count
 	//Read incoming data into the shtpData array
 	if (dataLength > BNO_MAX_PACKET_SIZE)  dataLength = BNO_MAX_PACKET_SIZE;
-	HAL_SPI_Receive(&hspi1, shtpData, dataLength, 100);
+	HAL_SPI_Receive(&hspi1, shtpData, dataLength, 500);
 
 	_disable_slave(); //Release BNO080
 
-	if(_debug == 2){printf("Packet successfully retrieved \n");print_packet();}
+	if(_debug == 1){printf("Packet successfully retrieved \n");print_packet();}
 
 	// Quickly check for reset complete packet. No need for a seperate parser.
 	// This function is also called after soft reset, so we need to catch this
@@ -196,6 +198,7 @@ static bool _send_packet(uint8_t channelNumber, uint8_t dataLength)
 
 	return (true);
 }
+
 static void _set_feature_command(uint8_t reportID, uint16_t timeBetweenReports, uint32_t specificConfig){
 	long microsBetweenReports = (long)timeBetweenReports * (long)1000;
 
@@ -223,10 +226,213 @@ static void _set_feature_command(uint8_t reportID, uint16_t timeBetweenReports, 
 
 static float _quaternion_to_float(int16_t fixedPointValue, uint8_t qPoint){
 	float qFloat = fixedPointValue;
-	qFloat *= pow(2, -qPoint);
+	qFloat *= pow(2, qPoint * -1);
 	return (qFloat);
 }
 
+
+//This function pulls the data from the input report
+//The input reports vary in length so this function stores the various 16-bit values as globals
+
+//Unit responds with packet that contains the following:
+//shtpHeader[0:3]: First, a 4 byte header
+//shtpData[0:4]: Then a 5 byte timestamp of microsecond clicks since reading was taken
+//shtpData[5 + 0]: Then a feature report ID (0x01 for Accel, 0x05 for Rotation Vector)
+//shtpData[5 + 1]: Sequence number (See 6.5.18.2)
+//shtpData[5 + 2]: Status
+//shtpData[3]: Delay
+//shtpData[4:5]: i/accel x/gyro x/etc
+//shtpData[6:7]: j/accel y/gyro y/etc
+//shtpData[8:9]: k/accel z/gyro z/etc
+//shtpData[10:11]: real/gyro temp/etc
+//shtpData[12:13]: Accuracy estimate
+static uint16_t _parse_input_report(void){
+	printf("parsing report...\n");
+	//Calculate the number of data bytes in this packet
+	int16_t dataLength = ((uint16_t)shtpHeader[1] << 8 | shtpHeader[0]);
+	dataLength &= ~(1 << 15); //Clear the MSbit. This bit indicates if this package is a continuation of the last.
+	//Ignore it for now. TODO catch this as an error and exit
+
+	dataLength -= 4; //Remove the header bytes from the data count
+
+	timeStamp = ((uint32_t)shtpData[4] << (8 * 3)) | ((uint32_t)shtpData[3] << (8 * 2)) | ((uint32_t)shtpData[2] << (8 * 1)) | ((uint32_t)shtpData[1] << (8 * 0));
+
+	// The gyro-integrated input reports are sent via the special gyro channel and do no include the usual ID, sequence, and status fields
+	if(shtpHeader[2] == CHANNEL_GYRO) {
+		rawQuatI = (uint16_t)shtpData[1] << 8 | shtpData[0];
+		rawQuatJ = (uint16_t)shtpData[3] << 8 | shtpData[2];
+		rawQuatK = (uint16_t)shtpData[5] << 8 | shtpData[4];
+		rawQuatReal = (uint16_t)shtpData[7] << 8 | shtpData[6];
+		rawFastGyroX = (uint16_t)shtpData[9] << 8 | shtpData[8];
+		rawFastGyroY = (uint16_t)shtpData[11] << 8 | shtpData[10];
+		rawFastGyroZ = (uint16_t)shtpData[13] << 8 | shtpData[12];
+
+		return BNO_REPORTID_GYRO_INTEGRATED_ROTATION_VECTOR;
+	}
+
+	uint8_t status = shtpData[5 + 2] & 0x03; //Get status bits
+	uint16_t data1 = (uint16_t)shtpData[5 + 5] << 8 | shtpData[5 + 4];
+	uint16_t data2 = (uint16_t)shtpData[5 + 7] << 8 | shtpData[5 + 6];
+	uint16_t data3 = (uint16_t)shtpData[5 + 9] << 8 | shtpData[5 + 8];
+	uint16_t data4 = 0;
+	uint16_t data5 = 0; //We would need to change this to uin32_t to capture time stamp value on Raw Accel/Gyro/Mag reports
+	uint16_t data6 = 0;
+
+	if (dataLength - 5 > 9){
+		data4 = (uint16_t)shtpData[5 + 11] << 8 | shtpData[5 + 10];
+	}
+	if (dataLength - 5 > 11){
+		data5 = (uint16_t)shtpData[5 + 13] << 8 | shtpData[5 + 12];
+	}
+	if (dataLength - 5 > 13){
+		data6 = (uint16_t)shtpData[5 + 15] << 8 | shtpData[5 + 14];
+	}
+
+	//Store these generic values to their proper global variable
+	switch (shtpData[5]){
+	/*case (BNO_REPORTID_ACCELEROMETER):
+		accelAccuracy = status;
+		rawAccelX = data1;
+		rawAccelY = data2;
+		rawAccelZ = data3;
+		break;
+	case (BNO_REPORTID_LINEAR_ACCELERATION):
+		accelLinAccuracy = status;
+		rawLinAccelX = data1;
+		rawLinAccelY = data2;
+		rawLinAccelZ = data3;
+		break;
+	case (BNO_REPORTID_GYROSCOPE):
+		gyroAccuracy = status;
+		rawGyroX = data1;
+		rawGyroY = data2;
+		rawGyroZ = data3;
+		break;
+	case (BNO_REPORTID_UNCALIBRATED_GYRO):
+		UncalibGyroAccuracy = status;
+		rawUncalibGyroX = data1;
+		rawUncalibGyroY = data2;
+		rawUncalibGyroZ = data3;
+		rawBiasX  = data4;
+		rawBiasY  = data5;
+		rawBiasZ  = data6;
+		break;
+	case (BNO_REPORTID_MAGNETIC_FIELD):
+		magAccuracy = status;
+		rawMagX = data1;
+		rawMagY = data2;
+		rawMagZ = data3;
+		break;*/
+	case (BNO_REPORTID_AR_VR_STABILIZED_GAME_ROTATION_VECTOR):
+	case (BNO_REPORTID_AR_VR_STABILIZED_ROTATION_VECTOR):
+	case (BNO_REPORTID_GAME_ROTATION_VECTOR):
+	case (BNO_REPORTID_ROTATION_VECTOR):
+		quatAccuracy = status;
+		rawQuatI = data1;
+		rawQuatJ = data2;
+		rawQuatK = data3;
+		rawQuatReal = data4;
+		//Only available on rotation vector and ar/vr stabilized rotation vector,
+		// not game rot vector and not ar/vr stabilized rotation vector
+		rawQuatRadianAccuracy = data5;
+		break;
+	/*case (BNO_REPORTID_TAP_DETECTOR):
+		tapDetector = shtpData[5 + 4]; //Byte 4 only
+		break;
+	case (BNO_REPORTID_STEP_COUNTER):
+		stepCount = data3; //Bytes 8/9
+		break;
+	case (BNO_REPORTID_STABILITY_CLASSIFIER):
+		stabilityClassifier = shtpData[5 + 4]; //Byte 4 only
+		break;
+	case (BNO_REPORTID_PERSONAL_ACTIVITY_CLASSIFIER):
+		activityClassifier = shtpData[5 + 5]; //Most likely state
+
+		//Load activity classification confidences into the array
+		for (uint8_t x = 0; x < 9; x++)					   //Hardcoded to max of 9. TODO - bring in array size
+			_activityConfidences[x] = shtpData[5 + 6 + x]; //5 bytes of timestamp, byte 6 is first confidence byte
+		break;
+	case (BNO_REPORTID_RAW_ACCELEROMETER):
+		memsRawAccelX = data1;
+		memsRawAccelY = data2;
+		memsRawAccelZ = data3;
+		break;
+	case (BNO_REPORTID_RAW_GYROSCOPE):
+		memsRawGyroX = data1;
+		memsRawGyroY = data2;
+		memsRawGyroZ = data3;
+		break;
+	case (BN0_REPORTID_RAW_MAGNETOMETER):
+		memsRawMagX = data1;
+		memsRawMagY = data2;
+		memsRawMagZ = data3;
+		break;
+	case (BNO_SHTP_REPORT_COMMAND_RESPONSE):
+		if (_printDebug == true){
+			_debugPort->println(F("!"));
+		}
+		//The BNO080 responds with this report to command requests. It's up to use to remember which command we issued.
+		uint8_t command = shtpData[5 + 2]; //This is the Command byte of the response
+
+		if (command == COMMAND_ME_CALIBRATE){
+			if (_printDebug == true){
+				_debugPort->println(F("ME Cal report found!"));
+			}
+			calibrationStatus = shtpData[5 + 5]; //R0 - Status (0 = success, non-zero = fail)
+		}
+		break;
+	case(BNO_REPORTID_GRAVITY):
+		gravityAccuracy = status;
+		gravityX = data1;
+		gravityY = data2;
+		gravityZ = data3;
+		break;*/
+	default :
+		return 0;
+	}
+	//TODO additional feature reports may be strung together. Parse them all.
+
+	return shtpData[5];
+}
+
+//This function pulls the data from the command response report
+
+//Unit responds with packet that contains the following:
+//shtpHeader[0:3]: First, a 4 byte header
+//shtpData[0]: The Report ID
+//shtpData[1]: Sequence number (See 6.5.18.2)
+//shtpData[2]: Command
+//shtpData[3]: Command Sequence Number
+//shtpData[4]: Response Sequence Number
+//shtpData[5 + 0]: R0
+//shtpData[5 + 1]: R1
+//shtpData[5 + 2]: R2
+//shtpData[5 + 3]: R3
+//shtpData[5 + 4]: R4
+//shtpData[5 + 5]: R5
+//shtpData[5 + 6]: R6
+//shtpData[5 + 7]: R7
+//shtpData[5 + 8]: R8
+static uint16_t _parse_command_report(void){
+	printf("parsing command...\n");
+	if (shtpData[0] == BNO_SHTP_REPORT_COMMAND_RESPONSE){
+		//The BNO080 responds with this report to command requests. It's up to use to remember which command we issued.
+		uint8_t command = shtpData[2]; //This is the Command byte of the response
+
+		if (command == BNO_COMMANDID_ME_CALIBRATE){
+			calibrationStatus = shtpData[5 + 0]; //R0 - Status (0 = success, non-zero = fail)
+		}
+		return shtpData[0];
+	}
+	else
+	{
+		//This sensor report ID is unhandled.
+		//See reference manual to add additional feature reports as needed
+	}
+
+	//TODO additional feature reports may be strung together. Parse them all.
+	return 0;
+}
 /*============================ High Level ============================*/
 
 bool bno_setup(void){
@@ -281,12 +487,32 @@ void bno_enable_rotation_vector(uint16_t timeBetweenReports){
 	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, timeBetweenReports, 0);
 }
 
- float bno_getYaw(){
+uint16_t bno_get_readings(void){
+
+	if (!_sensor_awaiting())
+		return (0); //Data is not available
+	printf("%d",shtpHeader[2]);
+	if (_receive_packet() == true){
+		//Check to see if this packet is a sensor reporting its data to us
+		if (shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
+			return _parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
+		} else if (shtpHeader[2] == CHANNEL_CONTROL){
+			return _parse_command_report(); //This will update responses to commands, calibrationStatus, etc.
+		} else if (shtpHeader[2] == CHANNEL_GYRO){
+			return _parse_input_report();
+		}
+	}
+	return 0;
+}
+
+float bno_get_yaw(void){
 	 // get quaternion arguments
 	float dqw = _quaternion_to_float(rawQuatReal, rotationVector_Q1);
 	float dqx = _quaternion_to_float(rawQuatI, rotationVector_Q1);
 	float dqy = _quaternion_to_float(rawQuatJ, rotationVector_Q1);
 	float dqz = _quaternion_to_float(rawQuatK, rotationVector_Q1);
+
+	//printf("%d %d %d %d \n", rawQuatReal,rawQuatI,rawQuatJ,rawQuatK);
 
 	float norm = sqrt(dqw*dqw + dqx*dqx + dqy*dqy + dqz*dqz);
 	dqw = dqw/norm;
@@ -303,4 +529,5 @@ void bno_enable_rotation_vector(uint16_t timeBetweenReports){
 
 	return (yaw);
 }
+
 

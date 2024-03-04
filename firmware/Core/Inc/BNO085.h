@@ -55,7 +55,7 @@
 #define BNO_COMMANDID_BNO_REG_TARE 3
 #define BNO_COMMANDID_INITIALIZE 4
 #define BNO_COMMANDID_DCD 6
-#define BNO_COMMANDID_ME_BNO_REG_CALIBRATE 7
+#define BNO_COMMANDID_ME_CALIBRATE 7
 #define BNO_COMMANDID_DCD_PERIOD_SAVE 9
 #define BNO_COMMANDID_OSCILLATOR 10
 #define BNO_COMMANDID_CLEAR_DCD 11
@@ -86,8 +86,9 @@
 #define BNO_MAX_METADATA_SIZE 9 //This is in words. There can be many but we mostly only care about the first 9 (Qs, range, etc)
 #define BNO_STANDARD_INT_TIMEOUT 127
 
-bool setup_bno(void);
-bool bno_data_available(void);
+bool bno_setup(void);
 void bno_enable_rotation_vector(uint16_t timeBetweenReports);
+uint16_t bno_get_readings(void);
+float bno_get_yaw(void);
 
 #endif /* INC_BNO085_H_ */
