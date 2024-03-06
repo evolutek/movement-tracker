@@ -122,7 +122,7 @@ int main(void)
   adnsInit();
 
   if(!bno_setup()) printf("=== Could NOT initialize the BNO085 ! ===\n");
-  bno_enable_rotation_vector(50);
+  bno_enable_rotation_vector(5);
   setup();
   printf("=== User init done, proceeding ... ===\n");
   double x = 0, y = 0;

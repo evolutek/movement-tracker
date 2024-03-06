@@ -24,10 +24,25 @@ static uint8_t sequenceNumber[6] = {0, 0, 0, 0, 0, 0}; //There are 6 com channel
 static uint8_t commandSequenceNumber = 0;				//Commands have a seqNum as well. These are inside command packet, the header uses its own seqNum per channel
 static uint32_t metaData[BNO_MAX_METADATA_SIZE];			//There is more than 10 words in a metadata record but we'll stop at Q point 3
 
+//These are the raw sensor values (without Q applied) pulled from the user requested Input Report
+uint16_t rawAccelX, rawAccelY, rawAccelZ, accelAccuracy;
+uint16_t rawLinAccelX, rawLinAccelY, rawLinAccelZ, accelLinAccuracy;
+uint16_t rawGyroX, rawGyroY, rawGyroZ, gyroAccuracy;
+uint16_t rawUncalibGyroX, rawUncalibGyroY, rawUncalibGyroZ, rawBiasX, rawBiasY, rawBiasZ, UncalibGyroAccuracy;
+uint16_t rawMagX, rawMagY, rawMagZ, magAccuracy;
 uint16_t rawQuatI, rawQuatJ, rawQuatK, rawQuatReal, rawQuatRadianAccuracy, quatAccuracy;
 uint16_t rawFastGyroX, rawFastGyroY, rawFastGyroZ;
+uint16_t gravityX, gravityY, gravityZ, gravityAccuracy;
+uint8_t tapDetector;
+uint16_t stepCount;
 uint32_t timeStamp;
-uint8_t calibrationStatus; //Byte R0 of ME Calibration Response
+uint8_t stabilityClassifier;
+uint8_t activityClassifier;
+uint8_t *_activityConfidences;						  //Array that store the confidences of the 9 possible activities
+uint8_t calibrationStatus;							  //Byte R0 of ME Calibration Response
+uint16_t memsRawAccelX, memsRawAccelY, memsRawAccelZ; //Raw readings from MEMS sensor
+uint16_t memsRawGyroX, memsRawGyroY, memsRawGyroZ;	//Raw readings from MEMS sensor
+uint16_t memsRawMagX, memsRawMagY, memsRawMagZ;		  //Raw readings from MEMS sensor
 
 //These Q values are defined in the datasheet but can also be obtained by querying the meta data records
 //See the read metadata example for more info
@@ -147,7 +162,7 @@ static bool _receive_packet(void){
 
 	//Calculate the number of data bytes in this packet
 	uint16_t dataLength = (((uint16_t)shtpHeader[1]/*MSB*/) << 8) | ((uint16_t)shtpHeader[0]/*LSB*/);
-	dataLength &= ~(1 << 15); //Clear the MSbit.
+	dataLength &= 0x7fff; //Clear the MSbit.
 	//This bit indicates if this package is a continuation of the last. Ignore it for now.
 	//TODO catch this as an error and exit
 	if (dataLength == 0){
@@ -159,9 +174,8 @@ static bool _receive_packet(void){
 
 	dataLength -= 4; //Remove the header bytes from the data count
 	//Read incoming data into the shtpData array
-	//uint8_t transmit_buffer = 0xFF;
+
 	if (dataLength > BNO_MAX_PACKET_SIZE)  dataLength = BNO_MAX_PACKET_SIZE;
-	//HAL_SPI_TransmitReceive(&hspi1, &transmit_buffer,shtpData, dataLength, 500);
 	HAL_SPI_Receive(&hspi1,shtpData, dataLength, 500);
 
 	_disable_slave(); //Release BNO080
@@ -174,7 +188,7 @@ static bool _receive_packet(void){
 	// places.
 	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE)
 	{
-		printf("OUCH !!! The sensor has just been reset ! \n");
+		printf("OUCH !!! The sensor has just been reset ! %d \n",shtpData[1]);
 		//_hasReset = true;
 	}
 
@@ -207,9 +221,9 @@ static bool _send_packet(uint8_t channelNumber, uint8_t dataLength){
 	return (true);
 }
 
-static void _set_feature_command(uint8_t reportID, long millisBetweenReports, uint32_t specificConfig){
+static void _set_feature_command(uint8_t reportID, uint32_t millisBetweenReports, uint32_t specificConfig){
 
-	long microsBetweenReports = millisBetweenReports * 1000;
+	uint32_t microsBetweenReports = millisBetweenReports * (uint32_t)1000;
 
 	shtpData[0] = BNO_SHTP_REPORT_SET_FEATURE_COMMAND;	 //Set feature command. Reference page 55
 	shtpData[1] = reportID;							   //Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
@@ -298,7 +312,7 @@ static uint16_t _parse_input_report(void){
 
 	//Store these generic values to their proper global variable
 	switch (shtpData[5]){
-	/*case (BNO_REPORTID_ACCELEROMETER):
+	case (BNO_REPORTID_ACCELEROMETER):
 		accelAccuracy = status;
 		rawAccelX = data1;
 		rawAccelY = data2;
@@ -330,7 +344,7 @@ static uint16_t _parse_input_report(void){
 		rawMagX = data1;
 		rawMagY = data2;
 		rawMagZ = data3;
-		break;*/
+		break;
 	case (BNO_REPORTID_AR_VR_STABILIZED_GAME_ROTATION_VECTOR):
 	case (BNO_REPORTID_AR_VR_STABILIZED_ROTATION_VECTOR):
 	case (BNO_REPORTID_GAME_ROTATION_VECTOR):
@@ -344,7 +358,7 @@ static uint16_t _parse_input_report(void){
 		// not game rot vector and not ar/vr stabilized rotation vector
 		rawQuatRadianAccuracy = data5;
 		break;
-	/*case (BNO_REPORTID_TAP_DETECTOR):
+	case (BNO_REPORTID_TAP_DETECTOR):
 		tapDetector = shtpData[5 + 4]; //Byte 4 only
 		break;
 	case (BNO_REPORTID_STEP_COUNTER):
@@ -370,22 +384,23 @@ static uint16_t _parse_input_report(void){
 		memsRawGyroY = data2;
 		memsRawGyroZ = data3;
 		break;
-	case (BN0_REPORTID_RAW_MAGNETOMETER):
+	case (BNO_REPORTID_RAW_MAGNETOMETER):
 		memsRawMagX = data1;
 		memsRawMagY = data2;
 		memsRawMagZ = data3;
 		break;
 	case (BNO_SHTP_REPORT_COMMAND_RESPONSE):
+		/*
 		if (_printDebug == true){
 			_debugPort->println(F("!"));
-		}
+		}*/
 		//The BNO080 responds with this report to command requests. It's up to use to remember which command we issued.
 		uint8_t command = shtpData[5 + 2]; //This is the Command byte of the response
 
-		if (command == COMMAND_ME_CALIBRATE){
-			if (_printDebug == true){
+		if (command == BNO_COMMANDID_ME_CALIBRATE){
+			/*if (_printDebug == true){
 				_debugPort->println(F("ME Cal report found!"));
-			}
+			}*/
 			calibrationStatus = shtpData[5 + 5]; //R0 - Status (0 = success, non-zero = fail)
 		}
 		break;
@@ -394,7 +409,7 @@ static uint16_t _parse_input_report(void){
 		gravityX = data1;
 		gravityY = data2;
 		gravityZ = data3;
-		break;*/
+		break;
 	default :
 		return 0;
 	}
@@ -476,6 +491,7 @@ bool bno_setup(void){
 	if(!_wait_for_int_blocking()) return false;
 	if (_receive_packet() && shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
 		if (_debug){
+			printf("Reset has occured (as experted according to startup procedure): %d\n", shtpData[1]);
 			printf("SW Version Major: 0x%04X", shtpData[2]);
 			printf(" SW Version Minor: 0x%04X \n", shtpData[3]);
 			uint32_t SW_Part_Number = ((uint32_t)shtpData[7] << 24) | ((uint32_t)shtpData[6] << 16) | ((uint32_t)shtpData[5] << 8) | ((uint32_t)shtpData[4]);
@@ -490,9 +506,10 @@ bool bno_setup(void){
 	return (false); //Something went wrong
 }
 
-void bno_enable_rotation_vector(long millisBetweenReports){
+void bno_enable_rotation_vector(uint16_t millisBetweenReports){
+	HAL_Delay(200);
 	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, millisBetweenReports, 0);
-	HAL_Delay(100);
+	HAL_Delay(200);
 }
 
 uint16_t bno_get_readings(void){
@@ -503,15 +520,16 @@ uint16_t bno_get_readings(void){
 	//printf("%d",shtpHeader[2]);
 	if (_receive_packet() == true){
 		//Check to see if this packet is a sensor reporting its data to us
+		if (shtpHeader[2] != 0)printf("channel %d \n",shtpHeader[2] );
 		if (shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
-			_parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
+			return _parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
 		} else if (shtpHeader[2] == CHANNEL_CONTROL){
-			_parse_command_report(); //This will update responses to commands, calibrationStatus, etc.
+			return _parse_command_report(); //This will update responses to commands, calibrationStatus, etc.
 		} else if (shtpHeader[2] == CHANNEL_GYRO){
-			_parse_input_report();
-		} else return 0; //data is irrelevant
-	} else return 0; // data packet isn't ready
-	return 1;
+			return _parse_input_report();
+		}
+	}
+	return 0;
 }
 
 float bno_get_yaw(void){
@@ -539,4 +557,18 @@ float bno_get_yaw(void){
 	return (yaw);
 }
 
+int8_t get_reset_reason(void){
+	shtpData[0] = BNO_SHTP_REPORT_PRODUCT_ID_REQUEST; //Request the product ID and reset info
+	shtpData[1] = 0;							  //Reserved
 
+	//Transmit packet on channel 2, 2 bytes
+	_send_packet(CHANNEL_CONTROL, 2);
+
+	//Now we wait for response
+	if(!_wait_for_int_blocking()) return -1;
+	if (_receive_packet() && shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
+		return (shtpData[1]);
+	}
+
+	return (-2);
+}
