@@ -92,4 +92,6 @@ uint16_t bno_get_readings(void);
 float bno_get_yaw(void);
 int8_t get_reset_reason(void);
 
+bool _receive_packet(void);
+
 #endif /* INC_BNO085_H_ */

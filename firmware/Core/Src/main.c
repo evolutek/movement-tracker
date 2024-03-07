@@ -85,6 +85,8 @@ int __io_putchar(char ch)
   * @brief  The application entry point.
   * @retval int
   */
+int bno_setup_done = 0;
+
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -117,14 +119,17 @@ int main(void)
   /* USER CODE BEGIN 2 */
   DWT_Init();
   printf("=== HAL init done, proceeding ... ===\n");
+  HAL_GPIO_WritePin(CS_ADNS_GPIO_Port, CS_ADNS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
 
   //adnsEnableDebugReports();
   adnsInit();
 
   if(!bno_setup()) printf("=== Could NOT initialize the BNO085 ! ===\n");
-  bno_enable_rotation_vector(5);
+  bno_enable_rotation_vector(50);
   setup();
   printf("=== User init done, proceeding ... ===\n");
+  bno_setup_done = 1;
   double x = 0, y = 0;
   /* USER CODE END 2 */
 
@@ -133,7 +138,8 @@ int main(void)
   while (1)
   {
 	  loop();
-	  if(bno_get_readings() != 0) printf("yaw %.4f \n",bno_get_yaw());
+	  //printf("%d ",_receive_packet());
+	  //if(bno_get_readings() != 0) printf("yaw %.4f \n",bno_get_yaw());
 	  //if(adnsUpdate()){ x += adnsX(); y += adnsY(); printf("%.2f %.2f \n",x,y);}
     /* USER CODE END WHILE */
 
@@ -303,7 +309,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -450,7 +456,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : INT_IMU_Pin */
   GPIO_InitStruct.Pin = INT_IMU_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(INT_IMU_GPIO_Port, &GPIO_InitStruct);
 
@@ -461,12 +467,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(STATUS_GPIO_Port, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if(bno_setup_done){
+		printf("%d ",_receive_packet());
+	}
+}
 /* USER CODE END 4 */
 
 /**

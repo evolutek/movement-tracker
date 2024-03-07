@@ -78,6 +78,10 @@ void print_packet(void){
 	uint16_t printLength = packetLength - 4;
 	if (printLength > 40){printLength = 40; printf("(Shortened) ");} //Artificial limit. We don't want the phone book.
 
+	if (packetLength & 1 << 15){
+			printf("[Continued] ");
+			packetLength &= ~(1 << 15);
+		}
 	printf("Body:");
 	for (uint8_t x = 0; x < printLength; x++)
 	{
@@ -86,12 +90,10 @@ void print_packet(void){
 			printf("0");
 		printf("%01X",shtpData[x]);
 	}
-	if (packetLength & 1 << 15){
-		printf(" [Continued packet]");
-		packetLength &= ~(1 << 15);
-	}
 
-	printf(" Length: %u ", packetLength);
+	printf("\n");
+
+	printf("Length: %u ", packetLength);
 
 	printf("Channel: ");
 	switch (shtpHeader[2]){
@@ -142,11 +144,14 @@ static bool _wait_for_int_blocking(){
 
 //Check to see if there is any new data available
 //Read the contents of the incoming packet into the shtpData array
-static bool _receive_packet(void){
+bool _receive_packet(void){
 
+	/*
 	if (!_sensor_awaiting())
 		return (false); //Data is not available
-
+	 */
+	if (_wait_for_int_blocking() == false)
+			return false;
 	//Get first four bytes to find out how much data we need to read
 	_enable_slave();
 
@@ -165,10 +170,11 @@ static bool _receive_packet(void){
 	dataLength &= 0x7fff; //Clear the MSbit.
 	//This bit indicates if this package is a continuation of the last. Ignore it for now.
 	//TODO catch this as an error and exit
+
 	if (dataLength == 0){
 		//Packet is empty
 		if (_debug) printf("Packet empty !");
-		if (_debug == 2) print_header();
+		_disable_slave();
 		return (false); //All done
 	}
 
@@ -188,7 +194,7 @@ static bool _receive_packet(void){
 	// places.
 	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE)
 	{
-		printf("OUCH !!! The sensor has just been reset ! %d \n",shtpData[1]);
+		printf("OUCH !!! The sensor has just been reset ! Reason : %d (if this message spams, only take into account the first reset reason)\n",shtpData[1]);
 		//_hasReset = true;
 	}
 
@@ -471,7 +477,6 @@ bool bno_setup(void){
 	//Read it and dump it
 	if(!_wait_for_int_blocking()) return false; //Wait for assertion of INT before reading advert message.
 	_receive_packet();
-
 	//The BNO080 will then transmit an unsolicited Initialize Response (see 6.4.5.2)
 	//Read it and dump it
 	if(!_wait_for_int_blocking()) return false; //Wait for assertion of INT before reading Init response
@@ -491,7 +496,7 @@ bool bno_setup(void){
 	if(!_wait_for_int_blocking()) return false;
 	if (_receive_packet() && shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
 		if (_debug){
-			printf("Reset has occured (as experted according to startup procedure): %d\n", shtpData[1]);
+			printf("Reset has occured (as expected at startup): %d\n", shtpData[1]);
 			printf("SW Version Major: 0x%04X", shtpData[2]);
 			printf(" SW Version Minor: 0x%04X \n", shtpData[3]);
 			uint32_t SW_Part_Number = ((uint32_t)shtpData[7] << 24) | ((uint32_t)shtpData[6] << 16) | ((uint32_t)shtpData[5] << 8) | ((uint32_t)shtpData[4]);
@@ -507,21 +512,20 @@ bool bno_setup(void){
 }
 
 void bno_enable_rotation_vector(uint16_t millisBetweenReports){
-	HAL_Delay(200);
 	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, millisBetweenReports, 0);
-	HAL_Delay(200);
+	//HAL_Delay(100);
 }
 
 uint16_t bno_get_readings(void){
-
+/* handled by _receive_packet
 	if (!_sensor_awaiting())
 		return (0); //Data is not available
-
+*/
 	//printf("%d",shtpHeader[2]);
 	if (_receive_packet() == true){
 		//Check to see if this packet is a sensor reporting its data to us
-		if (shtpHeader[2] != 0)printf("channel %d \n",shtpHeader[2] );
-		if (shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
+		if (shtpHeader[2] != 0) printf("channel %d \n",shtpHeader[2] );
+		if (shtpHeader[2] == CHANNEL_REPORTS){//&& shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
 			return _parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
 		} else if (shtpHeader[2] == CHANNEL_CONTROL){
 			return _parse_command_report(); //This will update responses to commands, calibrationStatus, etc.
@@ -557,18 +561,3 @@ float bno_get_yaw(void){
 	return (yaw);
 }
 
-int8_t get_reset_reason(void){
-	shtpData[0] = BNO_SHTP_REPORT_PRODUCT_ID_REQUEST; //Request the product ID and reset info
-	shtpData[1] = 0;							  //Reserved
-
-	//Transmit packet on channel 2, 2 bytes
-	_send_packet(CHANNEL_CONTROL, 2);
-
-	//Now we wait for response
-	if(!_wait_for_int_blocking()) return -1;
-	if (_receive_packet() && shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
-		return (shtpData[1]);
-	}
-
-	return (-2);
-}
