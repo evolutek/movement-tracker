@@ -117,9 +117,12 @@ static inline void _disable_slave(){
 	HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
 }
 static inline void _reset_slave_blocking(){
-	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_RESET);
-	HAL_Delay(2);
 	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
+	HAL_Delay(10);
+	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_RESET);
+	HAL_Delay(100);
+	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
+	HAL_Delay(1000);
 }
 static inline bool _sensor_awaiting(){
 	return !HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin);
@@ -146,12 +149,9 @@ static bool _wait_for_int_blocking(){
 //Read the contents of the incoming packet into the shtpData array
 bool _receive_packet(void){
 
-	/*
 	if (!_sensor_awaiting())
 		return (false); //Data is not available
-	 */
-	if (_wait_for_int_blocking() == false)
-			return false;
+
 	//Get first four bytes to find out how much data we need to read
 	_enable_slave();
 
@@ -167,7 +167,7 @@ bool _receive_packet(void){
 
 	//Calculate the number of data bytes in this packet
 	uint16_t dataLength = (((uint16_t)shtpHeader[1]/*MSB*/) << 8) | ((uint16_t)shtpHeader[0]/*LSB*/);
-	dataLength &= 0x7fff; //Clear the MSbit.
+	dataLength &= ~(1 << 15); //Clear the MSbit.
 	//This bit indicates if this package is a continuation of the last. Ignore it for now.
 	//TODO catch this as an error and exit
 
@@ -192,11 +192,18 @@ bool _receive_packet(void){
 	// This function is also called after soft reset, so we need to catch this
 	// packet here otherwise we need to check for the reset packet in multiple
 	// places.
-	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE)
+	/*
+	static bool has_reset = 0;
+	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE && !has_reset)
 	{
-		printf("OUCH !!! The sensor has just been reset ! Reason : %d (if this message spams, only take into account the first reset reason)\n",shtpData[1]);
+		has_reset = 1;
+		printf("OUCH !!! The sensor has just been reset ! Reason : %d \n",shtpData[1]);
 		//_hasReset = true;
+	} else if (has_reset){
+		has_reset = 0;
+		printf("Sensor is back up and running \n");
 	}
+	*/
 
 	return (true); //We're done!
 }
@@ -227,9 +234,9 @@ static bool _send_packet(uint8_t channelNumber, uint8_t dataLength){
 	return (true);
 }
 
-static void _set_feature_command(uint8_t reportID, uint32_t millisBetweenReports, uint32_t specificConfig){
+static void _set_feature_command(uint8_t reportID, uint16_t millisBetweenReports, uint32_t specificConfig){
 
-	uint32_t microsBetweenReports = millisBetweenReports * (uint32_t)1000;
+	long microsBetweenReports = (long)millisBetweenReports * 1000L;
 
 	shtpData[0] = BNO_SHTP_REPORT_SET_FEATURE_COMMAND;	 //Set feature command. Reference page 55
 	shtpData[1] = reportID;							   //Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
@@ -464,22 +471,22 @@ static uint16_t _parse_command_report(void){
 /*============================ High Level ============================*/
 
 bool bno_setup(void){
-
 	_disable_slave();
 	_reset_slave_blocking();
 
 	//Wait for first assertion of INT before using WAK pin. Can take ~104ms
-	if(!_wait_for_int_blocking()) return false;
+	//_wait_for_int_blocking();
 
 	//At system startup, the hub must send its full advertisement message (see 5.2 and 5.3) to the
 	//host. It must not send any other data until this step is complete.
 	//When BNO080 first boots it broadcasts big startup packet
 	//Read it and dump it
-	if(!_wait_for_int_blocking()) return false; //Wait for assertion of INT before reading advert message.
+	while(HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin));
+	//_wait_for_int_blocking(); //Wait for assertion of INT before reading advert message.
 	_receive_packet();
 	//The BNO080 will then transmit an unsolicited Initialize Response (see 6.4.5.2)
 	//Read it and dump it
-	if(!_wait_for_int_blocking()) return false; //Wait for assertion of INT before reading Init response
+	_wait_for_int_blocking(); //Wait for assertion of INT before reading Init response
 	_receive_packet();
 
 	//Check communication with device
@@ -493,7 +500,7 @@ bool bno_setup(void){
 	}
 
 	//Now we wait for response
-	if(!_wait_for_int_blocking()) return false;
+	_wait_for_int_blocking();
 	if (_receive_packet() && shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
 		if (_debug){
 			printf("Reset has occured (as expected at startup): %d\n", shtpData[1]);
@@ -524,8 +531,8 @@ uint16_t bno_get_readings(void){
 	//printf("%d",shtpHeader[2]);
 	if (_receive_packet() == true){
 		//Check to see if this packet is a sensor reporting its data to us
-		if (shtpHeader[2] != 0) printf("channel %d \n",shtpHeader[2] );
-		if (shtpHeader[2] == CHANNEL_REPORTS){//&& shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
+		//if (shtpHeader[2] != 0) printf("channel %d \n",shtpHeader[2] );
+		if (shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
 			return _parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
 		} else if (shtpHeader[2] == CHANNEL_CONTROL){
 			return _parse_command_report(); //This will update responses to commands, calibrationStatus, etc.

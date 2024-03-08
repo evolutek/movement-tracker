@@ -123,7 +123,7 @@ int main(void)
   HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
 
   //adnsEnableDebugReports();
-  adnsInit();
+  //adnsInit();
 
   if(!bno_setup()) printf("=== Could NOT initialize the BNO085 ! ===\n");
   bno_enable_rotation_vector(50);
@@ -138,9 +138,11 @@ int main(void)
   while (1)
   {
 	  loop();
-	  //printf("%d ",_receive_packet());
-	  //if(bno_get_readings() != 0) printf("yaw %.4f \n",bno_get_yaw());
+	  HAL_Delay(20);
+	  if(bno_get_readings()) printf("yaw %.4f \n",bno_get_yaw());
+
 	  //if(adnsUpdate()){ x += adnsX(); y += adnsY(); printf("%.2f %.2f \n",x,y);}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -477,9 +479,10 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(bno_setup_done){
+	/*if(bno_setup_done){
 		printf("%d ",_receive_packet());
 	}
+	*/
 }
 /* USER CODE END 4 */
 
