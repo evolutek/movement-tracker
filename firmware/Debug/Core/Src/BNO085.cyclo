@@ -13,6 +13,6 @@
 ../Core/Src/BNO085.c:285:17:_parse_input_report	24
 ../Core/Src/BNO085.c:452:17:_parse_command_report	3
 ../Core/Src/BNO085.c:473:6:bno_setup	4
-../Core/Src/BNO085.c:521:6:bno_enable_rotation_vector	1
-../Core/Src/BNO085.c:526:10:bno_get_readings	6
-../Core/Src/BNO085.c:546:7:bno_get_yaw	1
+../Core/Src/BNO085.c:520:6:bno_enable_rotation_vector	1
+../Core/Src/BNO085.c:525:10:bno_get_readings	6
+../Core/Src/BNO085.c:545:7:bno_get_yaw	1

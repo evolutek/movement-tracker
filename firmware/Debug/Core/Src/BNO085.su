@@ -13,6 +13,6 @@
 ../Core/Src/BNO085.c:285:17:_parse_input_report	32	static
 ../Core/Src/BNO085.c:452:17:_parse_command_report	16	static
 ../Core/Src/BNO085.c:473:6:bno_setup	24	static
-../Core/Src/BNO085.c:521:6:bno_enable_rotation_vector	16	static
-../Core/Src/BNO085.c:526:10:bno_get_readings	8	static
-../Core/Src/BNO085.c:546:7:bno_get_yaw	56	static
+../Core/Src/BNO085.c:520:6:bno_enable_rotation_vector	16	static
+../Core/Src/BNO085.c:525:10:bno_get_readings	8	static
+../Core/Src/BNO085.c:545:7:bno_get_yaw	56	static

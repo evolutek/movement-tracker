@@ -480,6 +480,8 @@ bool bno_setup(void){
 	//Read it and dump it
 	_wait_for_int_blocking(); //Wait for assertion of INT before reading advert message.
 	_receive_packet();
+	_wait_for_int_blocking(); //Advert message is too long to be handled at once, repeat
+	_receive_packet();
 	//The BNO080 will then transmit an unsolicited Initialize Response (see 6.4.5.2)
 	//Read it and dump it
 	_wait_for_int_blocking(); //Wait for assertion of INT before reading Init response
