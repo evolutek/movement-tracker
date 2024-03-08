@@ -126,7 +126,7 @@ int main(void)
   //adnsInit();
 
   if(!bno_setup()) printf("=== Could NOT initialize the BNO085 ! ===\n");
-  bno_enable_rotation_vector(50);
+  bno_enable_rotation_vector(30);
   setup();
   printf("=== User init done, proceeding ... ===\n");
   bno_setup_done = 1;
@@ -138,7 +138,7 @@ int main(void)
   while (1)
   {
 	  loop();
-	  HAL_Delay(20);
+	  HAL_Delay(15);
 	  if(bno_get_readings()) printf("yaw %.4f \n",bno_get_yaw());
 
 	  //if(adnsUpdate()){ x += adnsX(); y += adnsY(); printf("%.2f %.2f \n",x,y);}

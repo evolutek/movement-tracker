@@ -3346,8 +3346,8 @@ int main(void)
  8001e94:	d002      	beq.n	8001e9c <main+0x60>
  8001e96:	4819      	ldr	r0, [pc, #100]	; (8001efc <main+0xc0>)
  8001e98:	f005 fa60 	bl	800735c <puts>
-  bno_enable_rotation_vector(50);
- 8001e9c:	2032      	movs	r0, #50	; 0x32
+  bno_enable_rotation_vector(30);
+ 8001e9c:	201e      	movs	r0, #30
  8001e9e:	f7ff fe81 	bl	8001ba4 <bno_enable_rotation_vector>
   setup();
  8001ea2:	f000 fa5f 	bl	8002364 <setup>
@@ -3372,8 +3372,8 @@ int main(void)
   {
 	  loop();
  8001eca:	f000 fa52 	bl	8002372 <loop>
-	  HAL_Delay(20);
- 8001ece:	2014      	movs	r0, #20
+	  HAL_Delay(15);
+ 8001ece:	200f      	movs	r0, #15
  8001ed0:	f000 fd9e 	bl	8002a10 <HAL_Delay>
 	  if(bno_get_readings()) printf("yaw %.4f \n",bno_get_yaw());
  8001ed4:	f7ff fe76 	bl	8001bc4 <bno_get_readings>
