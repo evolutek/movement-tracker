@@ -120,9 +120,9 @@ static inline void _reset_slave_blocking(){
 	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_RESET);
-	HAL_Delay(100);
+	HAL_Delay(10);
 	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
-	HAL_Delay(1000);
+	HAL_Delay(10);
 }
 static inline bool _sensor_awaiting(){
 	return !HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin);
@@ -131,8 +131,8 @@ static inline bool _sensor_awaiting(){
 //Blocking wait for BNO080 to assert (pull low) the INT pin
 //indicating it's ready for comm. Can take more than 104ms
 //after a hardware reset
-static bool _wait_for_int_blocking_timeout(uint8_t timeout){
-	for (uint8_t counter = 0; counter < timeout; counter++){
+static bool _wait_for_int_blocking_timeout(uint16_t timeout){
+	for (uint16_t counter = 0; counter < timeout; counter++){
 		if (!HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin))
 			return (true);
 		HAL_Delay(1);
@@ -474,15 +474,11 @@ bool bno_setup(void){
 	_disable_slave();
 	_reset_slave_blocking();
 
-	//Wait for first assertion of INT before using WAK pin. Can take ~104ms
-	//_wait_for_int_blocking();
-
 	//At system startup, the hub must send its full advertisement message (see 5.2 and 5.3) to the
 	//host. It must not send any other data until this step is complete.
 	//When BNO080 first boots it broadcasts big startup packet
 	//Read it and dump it
-	while(HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin));
-	//_wait_for_int_blocking(); //Wait for assertion of INT before reading advert message.
+	_wait_for_int_blocking(); //Wait for assertion of INT before reading advert message.
 	_receive_packet();
 	//The BNO080 will then transmit an unsolicited Initialize Response (see 6.4.5.2)
 	//Read it and dump it
@@ -501,7 +497,8 @@ bool bno_setup(void){
 
 	//Now we wait for response
 	_wait_for_int_blocking();
-	if (_receive_packet() && shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
+	_receive_packet();
+	if (shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
 		if (_debug){
 			printf("Reset has occured (as expected at startup): %d\n", shtpData[1]);
 			printf("SW Version Major: 0x%04X", shtpData[2]);

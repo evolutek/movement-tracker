@@ -82,9 +82,9 @@
 #define BNO_ID_TARE_AR_VR_STABILIZED_GAME_ROTATION_VECTOR 5
 
 //TODO : getting packets of more than the max packet size breaks the whole receiver function
-#define BNO_MAX_PACKET_SIZE 256//128 //Packets can be up to 32k but we don't have that much RAM.
+#define BNO_MAX_PACKET_SIZE 300//128 //Packets can be up to 32k but we don't have that much RAM.
 #define BNO_MAX_METADATA_SIZE 9 //This is in words. There can be many but we mostly only care about the first 9 (Qs, range, etc)
-#define BNO_STANDARD_INT_TIMEOUT 250
+#define BNO_STANDARD_INT_TIMEOUT 250 // standard timeout for the _wait_for_int_blocking function, ms
 
 bool bno_setup(void);
 void bno_enable_rotation_vector(uint16_t millisBetweenReports);
