@@ -5,55 +5,57 @@
 #include <stdbool.h>
 #include <math.h>
 
-static short _debug = 1;
+static short _debug = 0;
 // 1 for minimal
 // 2 for all (including tranfer reports, LOTS of stuff)
 
+// Commented unused stuff in the case of the movement tracker, but left it there in case we use this libbrary for other purposes
+
 //Registers
-static const uint8_t CHANNEL_COMMAND = 0;
+//static const uint8_t CHANNEL_COMMAND = 0;
 static const uint8_t CHANNEL_EXECUTABLE = 1;
 static const uint8_t CHANNEL_CONTROL = 2;
 static const uint8_t CHANNEL_REPORTS = 3;
-static const uint8_t CHANNEL_WAKE_REPORTS = 4;
+//static const uint8_t CHANNEL_WAKE_REPORTS = 4;
 static const uint8_t CHANNEL_GYRO = 5;
 
 //Global Variables
 static uint8_t shtpHeader[4]; //Each packet has a header of 4 bytes
 static uint8_t shtpData[BNO_MAX_PACKET_SIZE];
-static uint8_t sequenceNumber[6] = {0, 0, 0, 0, 0, 0}; //There are 6 com channels. Each channel has its own seqnum
-static uint8_t commandSequenceNumber = 0;				//Commands have a seqNum as well. These are inside command packet, the header uses its own seqNum per channel
-static uint32_t metaData[BNO_MAX_METADATA_SIZE];			//There is more than 10 words in a metadata record but we'll stop at Q point 3
+static uint8_t sequenceNumber[6] = {0, 0, 0, 0, 0, 0};//There are 6 com channels. Each channel has its own seqnum
+//static uint8_t commandSequenceNumber = 0;//Commands have a seqNum as well. These are inside command packet, the header uses its own seqNum per channel
+//static uint32_t metaData[BNO_MAX_METADATA_SIZE];//There is more than 10 words in a metadata record but we'll stop at Q point 3
 
-//These are the raw sensor values (without Q applied) pulled from the user requested Input Report
-uint16_t rawAccelX, rawAccelY, rawAccelZ, accelAccuracy;
-uint16_t rawLinAccelX, rawLinAccelY, rawLinAccelZ, accelLinAccuracy;
-uint16_t rawGyroX, rawGyroY, rawGyroZ, gyroAccuracy;
-uint16_t rawUncalibGyroX, rawUncalibGyroY, rawUncalibGyroZ, rawBiasX, rawBiasY, rawBiasZ, UncalibGyroAccuracy;
-uint16_t rawMagX, rawMagY, rawMagZ, magAccuracy;
-uint16_t rawQuatI, rawQuatJ, rawQuatK, rawQuatReal, rawQuatRadianAccuracy, quatAccuracy;
-uint16_t rawFastGyroX, rawFastGyroY, rawFastGyroZ;
-uint16_t gravityX, gravityY, gravityZ, gravityAccuracy;
-uint8_t tapDetector;
-uint16_t stepCount;
-uint32_t timeStamp;
-uint8_t stabilityClassifier;
-uint8_t activityClassifier;
-uint8_t *_activityConfidences;						  //Array that store the confidences of the 9 possible activities
-uint8_t calibrationStatus;							  //Byte R0 of ME Calibration Response
-uint16_t memsRawAccelX, memsRawAccelY, memsRawAccelZ; //Raw readings from MEMS sensor
-uint16_t memsRawGyroX, memsRawGyroY, memsRawGyroZ;	//Raw readings from MEMS sensor
-uint16_t memsRawMagX, memsRawMagY, memsRawMagZ;		  //Raw readings from MEMS sensor
+////These are the raw sensor values (without Q applied) pulled from the user requested Input Report
+//static uint16_t rawAccelX, rawAccelY, rawAccelZ, accelAccuracy;
+//static uint16_t rawLinAccelX, rawLinAccelY, rawLinAccelZ, accelLinAccuracy;
+//static uint16_t rawGyroX, rawGyroY, rawGyroZ, gyroAccuracy;
+//static uint16_t rawUncalibGyroX, rawUncalibGyroY, rawUncalibGyroZ, rawBiasX, rawBiasY, rawBiasZ, UncalibGyroAccuracy;
+//static uint16_t rawMagX, rawMagY, rawMagZ, magAccuracy;
+static uint16_t rawQuatI, rawQuatJ, rawQuatK, rawQuatReal, rawQuatRadianAccuracy, quatAccuracy;
+static uint16_t rawFastGyroX, rawFastGyroY, rawFastGyroZ;
+//static uint16_t gravityX, gravityY, gravityZ, gravityAccuracy;
+//static uint8_t tapDetector;
+//static uint16_t stepCount;
+static uint32_t timeStamp;
+//static uint8_t stabilityClassifier;
+//static uint8_t activityClassifier;
+//static uint8_t *_activityConfidences; //Array that store the confidences of the 9 possible activities
+static uint8_t calibrationStatus;//Byte R0 of ME Calibration Response
+//static uint16_t memsRawAccelX, memsRawAccelY, memsRawAccelZ;//Raw readings from MEMS sensor
+//static uint16_t memsRawGyroX, memsRawGyroY, memsRawGyroZ;//Raw readings from MEMS sensor
+//static uint16_t memsRawMagX, memsRawMagY, memsRawMagZ;//Raw readings from MEMS sensor
 
 //These Q values are defined in the datasheet but can also be obtained by querying the meta data records
 //See the read metadata example for more info
-int16_t rotationVector_Q1 = 14;
-int16_t rotationVectorAccuracy_Q1 = 12; //Heading accuracy estimate in radians. The Q point is 12.
-int16_t accelerometer_Q1 = 8;
-int16_t linear_accelerometer_Q1 = 8;
-int16_t gyro_Q1 = 9;
-int16_t magnetometer_Q1 = 4;
-int16_t angular_velocity_Q1 = 10;
-int16_t gravity_Q1 = 8;
+static int16_t rotationVector_Q1 = 14;
+//static int16_t rotationVectorAccuracy_Q1 = 12; //Heading accuracy estimate in radians. The Q point is 12.
+//static int16_t accelerometer_Q1 = 8;
+//static int16_t linear_accelerometer_Q1 = 8;
+//static int16_t gyro_Q1 = 9;
+//static int16_t magnetometer_Q1 = 4;
+//static int16_t angular_velocity_Q1 = 10;
+//static int16_t gravity_Q1 = 8;
 
 /*============================ Debug ============================*/
 
@@ -147,7 +149,7 @@ static bool _wait_for_int_blocking(){
 
 //Check to see if there is any new data available
 //Read the contents of the incoming packet into the shtpData array
-bool _receive_packet(void){
+static bool _receive_packet(void){
 
 	if (!_sensor_awaiting())
 		return (false); //Data is not available
@@ -172,15 +174,14 @@ bool _receive_packet(void){
 	//TODO catch this as an error and exit
 
 	if (dataLength == 0){
-		//Packet is empty
 		if (_debug) printf("Packet empty !");
 		_disable_slave();
 		return (false); //All done
 	}
 
 	dataLength -= 4; //Remove the header bytes from the data count
-	//Read incoming data into the shtpData array
 
+	//Read incoming data into the shtpData array
 	if (dataLength > BNO_MAX_PACKET_SIZE)  dataLength = BNO_MAX_PACKET_SIZE;
 	HAL_SPI_Receive(&hspi1,shtpData, dataLength, 500);
 
@@ -192,18 +193,11 @@ bool _receive_packet(void){
 	// This function is also called after soft reset, so we need to catch this
 	// packet here otherwise we need to check for the reset packet in multiple
 	// places.
-	/*
-	static bool has_reset = 0;
-	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE && !has_reset)
-	{
-		has_reset = 1;
-		printf("OUCH !!! The sensor has just been reset ! Reason : %d \n",shtpData[1]);
-		//_hasReset = true;
-	} else if (has_reset){
-		has_reset = 0;
-		printf("Sensor is back up and running \n");
+
+	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE && _debug){
+		printf("OUCH !!! The IMU has just been reset ! Reason : %d \n",shtpData[1]);
 	}
-	*/
+
 
 	return (true); //We're done!
 }
@@ -220,7 +214,7 @@ static bool _send_packet(uint8_t channelNumber, uint8_t dataLength){
 
 	//Send the 4 byte packet header
 	uint8_t header_buffer[4];
-	header_buffer[0] = (packetLength & 0xFF); //Packet length LSB // uhhhhhh & 0xFF ?
+	header_buffer[0] = (packetLength & 0xFF); //Packet length LSB
 	header_buffer[1] = (packetLength >> 8); //Packet length MSB
 	header_buffer[2] = channelNumber;
 	header_buffer[3] = (sequenceNumber[channelNumber]++); //Send the sequence number, increments with each packet sent, different counter for each channel
@@ -262,10 +256,9 @@ static void _set_feature_command(uint8_t reportID, uint16_t millisBetweenReports
 
 static float _quaternion_to_float(int16_t fixedPointValue, uint8_t qPoint){
 	float qFloat = fixedPointValue;
-	qFloat *= pow(2, qPoint * -1);
+	qFloat *= pow(2, -qPoint);
 	return (qFloat);
 }
-
 
 //This function pulls the data from the input report
 //The input reports vary in length so this function stores the various 16-bit values as globals
@@ -290,7 +283,7 @@ static uint16_t _parse_input_report(void){
 
 	dataLength -= 4; //Remove the header bytes from the data count
 
-	timeStamp = ((uint32_t)shtpData[4] << (8 * 3)) | ((uint32_t)shtpData[3] << (8 * 2)) | ((uint32_t)shtpData[2] << (8 * 1)) | ((uint32_t)shtpData[1] << (8 * 0));
+	timeStamp = ((uint32_t)shtpData[4] << (24)) | ((uint32_t)shtpData[3] << (16)) | ((uint32_t)shtpData[2] << (8)) | ((uint32_t)shtpData[1]);
 
 	// The gyro-integrated input reports are sent via the special gyro channel and do no include the usual ID, sequence, and status fields
 	if(shtpHeader[2] == CHANNEL_GYRO) {
@@ -305,26 +298,25 @@ static uint16_t _parse_input_report(void){
 		return BNO_REPORTID_GYRO_INTEGRATED_ROTATION_VECTOR;
 	}
 
-	uint8_t status = shtpData[5 + 2] & 0x03; //Get status bits
-	uint16_t data1 = (uint16_t)shtpData[5 + 5] << 8 | shtpData[5 + 4];
-	uint16_t data2 = (uint16_t)shtpData[5 + 7] << 8 | shtpData[5 + 6];
-	uint16_t data3 = (uint16_t)shtpData[5 + 9] << 8 | shtpData[5 + 8];
+	uint8_t status = shtpData[7] & 0x03; //Get status bits
+	uint16_t data1 = (uint16_t)shtpData[10] << 8 | shtpData[9];
+	uint16_t data2 = (uint16_t)shtpData[12] << 8 | shtpData[11];
+	uint16_t data3 = (uint16_t)shtpData[14] << 8 | shtpData[13];
 	uint16_t data4 = 0;
 	uint16_t data5 = 0; //We would need to change this to uin32_t to capture time stamp value on Raw Accel/Gyro/Mag reports
 	uint16_t data6 = 0;
 
-	if (dataLength - 5 > 9){
-		data4 = (uint16_t)shtpData[5 + 11] << 8 | shtpData[5 + 10];
-	}
-	if (dataLength - 5 > 11){
-		data5 = (uint16_t)shtpData[5 + 13] << 8 | shtpData[5 + 12];
-	}
-	if (dataLength - 5 > 13){
-		data6 = (uint16_t)shtpData[5 + 15] << 8 | shtpData[5 + 14];
-	}
+	if (dataLength > 14)
+		data4 = (uint16_t)shtpData[16] << 8 | shtpData[15];
+	if (dataLength > 16)
+		data5 = (uint16_t)shtpData[18] << 8 | shtpData[17];
+	if (dataLength > 18)
+		data6 = (uint16_t)shtpData[20] << 8 | shtpData[19];
+
 
 	//Store these generic values to their proper global variable
 	switch (shtpData[5]){
+	/* We only need yaw for the Movement Tracker, but getting other reports is pretty simple
 	case (BNO_REPORTID_ACCELEROMETER):
 		accelAccuracy = status;
 		rawAccelX = data1;
@@ -358,6 +350,7 @@ static uint16_t _parse_input_report(void){
 		rawMagY = data2;
 		rawMagZ = data3;
 		break;
+	*/
 	case (BNO_REPORTID_AR_VR_STABILIZED_GAME_ROTATION_VECTOR):
 	case (BNO_REPORTID_AR_VR_STABILIZED_ROTATION_VECTOR):
 	case (BNO_REPORTID_GAME_ROTATION_VECTOR):
@@ -371,6 +364,7 @@ static uint16_t _parse_input_report(void){
 		// not game rot vector and not ar/vr stabilized rotation vector
 		rawQuatRadianAccuracy = data5;
 		break;
+	/*
 	case (BNO_REPORTID_TAP_DETECTOR):
 		tapDetector = shtpData[5 + 4]; //Byte 4 only
 		break;
@@ -403,17 +397,12 @@ static uint16_t _parse_input_report(void){
 		memsRawMagZ = data3;
 		break;
 	case (BNO_SHTP_REPORT_COMMAND_RESPONSE):
-		/*
-		if (_printDebug == true){
-			_debugPort->println(F("!"));
-		}*/
+		if (_debug) printf("!");
 		//The BNO080 responds with this report to command requests. It's up to use to remember which command we issued.
 		uint8_t command = shtpData[5 + 2]; //This is the Command byte of the response
 
 		if (command == BNO_COMMANDID_ME_CALIBRATE){
-			/*if (_printDebug == true){
-				_debugPort->println(F("ME Cal report found!"));
-			}*/
+			if(_debug) printf ("ME Cal report found!");
 			calibrationStatus = shtpData[5 + 5]; //R0 - Status (0 = success, non-zero = fail)
 		}
 		break;
@@ -423,10 +412,10 @@ static uint16_t _parse_input_report(void){
 		gravityY = data2;
 		gravityZ = data3;
 		break;
+	*/
 	default :
 		return 0;
 	}
-	//TODO additional feature reports may be strung together. Parse them all.
 
 	return shtpData[5];
 }
@@ -450,7 +439,8 @@ static uint16_t _parse_input_report(void){
 //shtpData[5 + 7]: R7
 //shtpData[5 + 8]: R8
 static uint16_t _parse_command_report(void){
-	if (shtpData[0] == BNO_SHTP_REPORT_COMMAND_RESPONSE){
+	switch(shtpData[0]){
+	case BNO_SHTP_REPORT_COMMAND_RESPONSE :
 		//The BNO080 responds with this report to command requests. It's up to use to remember which command we issued.
 		uint8_t command = shtpData[2]; //This is the Command byte of the response
 
@@ -458,22 +448,23 @@ static uint16_t _parse_command_report(void){
 			calibrationStatus = shtpData[5 + 0]; //R0 - Status (0 = success, non-zero = fail)
 		}
 		return shtpData[0];
-	}
-	else
-	{
+
+	default :
 		//This sensor report ID is unhandled.
 		//See reference manual to add additional feature reports as needed
+		break;
 	}
+
 
 	//TODO additional feature reports may be strung together. Parse them all.
 	return 0;
 }
-/*============================ High Level ============================*/
+
+/*============================ High Level (Public) ============================*/
 
 bool bno_setup(void){
 	_disable_slave();
 	_reset_slave_blocking();
-
 	//At system startup, the hub must send its full advertisement message (see 5.2 and 5.3) to the
 	//host. It must not send any other data until this step is complete.
 	//When BNO080 first boots it broadcasts big startup packet
@@ -493,7 +484,7 @@ bool bno_setup(void){
 
 	//Transmit packet on channel 2, 2 bytes
 	if(!_send_packet(CHANNEL_CONTROL, 2)){
-		printf("Send command to the BNO085 failed");
+		if(_debug) printf("Send command to the BNO085 failed");
 		return false;
 	}
 
@@ -519,25 +510,16 @@ bool bno_setup(void){
 
 void bno_enable_rotation_vector(uint16_t millisBetweenReports){
 	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, millisBetweenReports, 0);
-	//HAL_Delay(100);
 }
 
 uint16_t bno_get_readings(void){
-/* handled by _receive_packet
-	if (!_sensor_awaiting())
-		return (0); //Data is not available
-*/
-	//printf("%d",shtpHeader[2]);
+
 	if (_receive_packet() == true){
 		//Check to see if this packet is a sensor reporting its data to us
-		//if (shtpHeader[2] != 0) printf("channel %d \n",shtpHeader[2] );
-		if (shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP){
+		if ((shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == BNO_SHTP_REPORT_BASE_TIMESTAMP) || shtpHeader[2] == CHANNEL_GYRO)
 			return _parse_input_report(); //This will update the rawAccelX, etc variables depending on which feature report is found
-		} else if (shtpHeader[2] == CHANNEL_CONTROL){
+		else if (shtpHeader[2] == CHANNEL_CONTROL)
 			return _parse_command_report(); //This will update responses to commands, calibrationStatus, etc.
-		} else if (shtpHeader[2] == CHANNEL_GYRO){
-			return _parse_input_report();
-		}
 	}
 	return 0;
 }

@@ -1,2 +1,2 @@
-../Core/Src/movement_tracker.c:1:6:setup	4	static
-../Core/Src/movement_tracker.c:5:6:loop	4	static
+../Core/Src/movement_tracker.c:13:6:setup	8	static
+../Core/Src/movement_tracker.c:24:6:loop	72	static

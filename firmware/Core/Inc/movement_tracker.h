@@ -4,5 +4,4 @@
 void setup(void);
 void loop(void);
 
-
 #endif /* INC_MOVEMENT_TRACKER_H_ */
