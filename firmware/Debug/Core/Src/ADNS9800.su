@@ -12,5 +12,5 @@
 ../Core/Src/ADNS9800.c:181:6:adnsSetCoef	16	static
 ../Core/Src/ADNS9800.c:185:6:adnsEnableDebugReports	8	static
 ../Core/Src/ADNS9800.c:189:6:adnsSetDebugReports	16	static
-../Core/Src/ADNS9800.c:194:8:adnsX	4	static
-../Core/Src/ADNS9800.c:198:8:adnsY	4	static
+../Core/Src/ADNS9800.c:194:7:adnsX	4	static
+../Core/Src/ADNS9800.c:198:7:adnsY	4	static

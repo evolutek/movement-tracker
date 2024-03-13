@@ -8,7 +8,7 @@
 
 static long raw_data[2]; // raw sensor data
 static long raw_delta[2]; // delta from last read in dots
-static double mm_delta[2]; // delta from last read in mm
+static float mm_delta[2]; // delta from last read in mm
 
 static float _units_per_millimeter = DEFAULT_COEF;
 
@@ -191,11 +191,11 @@ void adnsSetDebugReports(bool state){
 	_debug = state;
 }
 
-double adnsX(void){
+float adnsX(void){
 	return mm_delta[0];
 }
 
-double adnsY(void){
+float adnsY(void){
 	return mm_delta[1];
 }
 

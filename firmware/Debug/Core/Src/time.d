@@ -1,5 +1,5 @@
-Core/Src/movement_tracker.o: ../Core/Src/movement_tracker.c \
- ../Core/Inc/BNO085.h ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
+Core/Src/time.o: ../Core/Src/time.c \
+ ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
  ../Core/Inc/stm32g4xx_hal_conf.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h \
@@ -34,9 +34,7 @@ Core/Src/movement_tracker.o: ../Core/Src/movement_tracker.c \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../Core/Inc/main.h ../Core/Inc/ADNS9800.h ../Core/Inc/movement_tracker.h \
- ../Core/Inc/main.h ../Core/Inc/time.h
-../Core/Inc/BNO085.h:
+ ../Core/Inc/time.h
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
 ../Core/Inc/stm32g4xx_hal_conf.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h:
@@ -72,8 +70,4 @@ Core/Src/movement_tracker.o: ../Core/Src/movement_tracker.c \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
-../Core/Inc/main.h:
-../Core/Inc/ADNS9800.h:
-../Core/Inc/movement_tracker.h:
-../Core/Inc/main.h:
 ../Core/Inc/time.h:

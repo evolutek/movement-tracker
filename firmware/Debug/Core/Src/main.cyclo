@@ -8,4 +8,7 @@
 ../Core/Src/main.c:321:13:MX_USART2_UART_Init	5
 ../Core/Src/main.c:369:13:MX_USB_PCD_Init	2
 ../Core/Src/main.c:402:13:MX_GPIO_Init	1
-../Core/Src/main.c:473:6:Error_Handler	1
+../Core/Src/main.c:467:6:HAL_I2C_SlaveTxCpltCallback	1
+../Core/Src/main.c:471:6:HAL_I2C_SlaveRxCpltCallback	1
+../Core/Src/main.c:476:6:HAL_I2C_AddrCallback	1
+../Core/Src/main.c:486:6:Error_Handler	1

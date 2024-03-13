@@ -1,2 +1,2 @@
-../Core/Src/movement_tracker.c:13:6:setup	2
-../Core/Src/movement_tracker.c:24:6:loop	5
+../Core/Src/movement_tracker.c:30:6:setup	2
+../Core/Src/movement_tracker.c:42:6:loop	6

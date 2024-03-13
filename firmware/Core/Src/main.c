@@ -242,7 +242,7 @@ static void MX_I2C2_Init(void)
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
   hi2c2.Init.Timing = 0x2010091A;
-  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.OwnAddress1 = 132;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
   hi2c2.Init.OwnAddress2 = 0;
@@ -463,6 +463,19 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_I2C_SlaveTxCpltCallback (I2C_HandleTypeDef * hi2c)
+{
+  // TX Done .. Do Something!
+}
+void HAL_I2C_SlaveRxCpltCallback (I2C_HandleTypeDef * hi2c)
+{
+  // RX Done .. Do Something!
+}
+
+void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode){
+
+}
 
 /* USER CODE END 4 */
 

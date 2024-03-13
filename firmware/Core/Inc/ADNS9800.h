@@ -60,7 +60,7 @@ bool adnsUpdate(void);
 void adnsSetDebugReports(bool);
 void adnsEnableDebugReports(void);
 
-double adnsX(void);
-double adnsY(void);
+float adnsX(void);
+float adnsY(void);
 
 #endif /* INC_ADNS9800_H_ */
