@@ -79,6 +79,14 @@ int __io_putchar(char ch)
 	HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
 	return ch;
 }
+
+int __io_getchar(void)
+{
+	char ch;
+	HAL_UART_Receive(&huart2, (uint8_t *)&ch, 1, 1);
+	return ch;
+}
+
 /* USER CODE END 0 */
 
 /**
