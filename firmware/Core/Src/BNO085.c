@@ -1,4 +1,5 @@
 #include "BNO085.h"
+#include "BNO085_registers.h"
 #include "stm32g4xx_hal.h"
 #include "main.h"
 #include <stdio.h>

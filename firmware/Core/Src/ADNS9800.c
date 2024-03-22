@@ -1,5 +1,6 @@
 #include "ADNS9800.h"
 #include "ADNS9800_firmware.h"
+#include "ADNS9800_registers.h"
 #include "stm32g4xx_hal.h"
 #include "main.h"
 #include "micros.h"
@@ -121,6 +122,7 @@ static long _convert_from_comp(long b){
 static void _update_pointer(void){
 	_enable_slave();
 	raw_data[0] = (_read_register(ADNS_REG_delta_x_L) | (_read_register(ADNS_REG_delta_x_H) << 8));
+	//;delay_us(100);
 	raw_data[1] = (_read_register(ADNS_REG_delta_y_L) | (_read_register(ADNS_REG_delta_y_H) << 8));
 	_disable_slave();
 }
@@ -199,3 +201,10 @@ float adnsY(void){
 	return mm_delta[1];
 }
 
+float adns_raw_x(void){
+	return raw_delta[0];
+}
+
+float adns_raw_y(void){
+	return raw_delta[1];
+}

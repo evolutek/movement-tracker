@@ -63,18 +63,12 @@ void loop(void){
 				delta_y = delta_adns_x*sin(theta+MVT_RELATIVE_ANGLE) + delta_adns_y*cos(theta+MVT_RELATIVE_ANGLE);
 				x += delta_x;
 				y += delta_y;
-				printf("x %.2f y %.2f t %.2f \n",x,y,theta);
+
+				//if((x < 3 && x > -3) || (y < 3 && y > -3))
+				printf("x %.2f y %.2f t %.2f rx %.2f ry %.2f\n",x,y,theta, adns_raw_x(), adns_raw_y());
 			}
 		}
 	}
-	//if(x < 3 || y < 3) if (delta_x != 0 || delta_y != 0) printf("x %.2f y %.2f t %.2f dx %.2f dy %.2f rt %.2f dt %.2f \n",x,y,theta,delta_x,delta_y,raw_theta, delta_theta);
-	//if((x < 3 && x > -3) || (y < 3 && y > -3))
-
-	/*
-	int n;
-	if(scanf("%d", &n))
-		printf("R %d\n", n);
-	*/
 
 	//HAL_I2C_Slave_Transmit_IT(hi2c2, 0x52, data_buffer, 10);
 
