@@ -7,5 +7,3 @@
 ../Core/Src/stm32g4xx_hal_msp.c:285:6:HAL_SPI_MspDeInit	16	static
 ../Core/Src/stm32g4xx_hal_msp.c:315:6:HAL_UART_MspInit	128	static
 ../Core/Src/stm32g4xx_hal_msp.c:362:6:HAL_UART_MspDeInit	16	static
-../Core/Src/stm32g4xx_hal_msp.c:391:6:HAL_PCD_MspInit	104	static
-../Core/Src/stm32g4xx_hal_msp.c:424:6:HAL_PCD_MspDeInit	16	static

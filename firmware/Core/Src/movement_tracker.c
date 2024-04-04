@@ -1,15 +1,10 @@
 #include "BNO085.h"
 #include "ADNS9800.h"
-#include "movement_tracker.h"
 #include "stm32g4xx_hal.h"
 #include "main.h"
 #include <stdio.h>
 #include <math.h>
-#include <time.h>
-
-#define POLL_RATE 39 //ms, approx (non interrupt), only applicable to the IMU
-#define MVT_RELATIVE_ANGLE -0.0577//relative to the robot, radians
-
+#include "time.h"
 
 static timestamp_t last_poll_time = 0;
 
@@ -19,33 +14,10 @@ float delta_x = 0, delta_y = 0, x = 0, y = 0;
 
 bool first_read = true;
 
-uint8_t data_buffer;
+#define MVT_RELATIVE_ANGLE -0.0577//relative to the robot, radians
 
-/*	bytes order :
-	data[0] : number of bytes to be received/sent
-	data[1] : MSB is operation type (eg. read/write)
-			  other bytes are operation identifier
-	data[2...] : actual data
-*/
-
-
-
-//TODO : remove the interrupt capability for IMU_INT
-
-void setup(void){
-	//adnsEnableDebugReports();
-	adnsInit();
-	printf("ADNS should now be initialized\n");
-
-	if(bno_setup()) printf("IMU initialized successfully\n");
-	else printf("=== Could NOT initialize the BNO085 ! ===\n");
-	bno_enable_rotation_vector(40);
-
-	last_poll_time = getCurrentTime();
-}
-
-void loop(void){
-	if (isTimeDeltaElapsed(last_poll_time, POLL_RATE)){
+void computePosition(int poll_rate){
+	if (isTimeDeltaElapsed(last_poll_time, poll_rate)){
 		last_poll_time = getCurrentTime();
 		if(bno_get_readings()){
 			if (first_read) {delta_theta = bno_get_yaw();first_read = false;}
@@ -69,7 +41,8 @@ void loop(void){
 			}
 		}
 	}
+}
 
-	//HAL_I2C_Slave_Transmit_IT(hi2c2, 0x52, data_buffer, 10);
-
+float getHeading(void){
+	return theta;
 }
