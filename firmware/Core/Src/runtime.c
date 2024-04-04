@@ -50,11 +50,13 @@ void loop(void){
 
 	float theta = getHeading();
 
-	char *theta_split = (char *)&theta;
-	I2C_REGISTERS[0]=theta_split[0]&0xff;
-	I2C_REGISTERS[1]=theta_split[0]>>8;
-	I2C_REGISTERS[2]=theta_split[1]&0xff;
-	I2C_REGISTERS[3]=theta_split[1]>>8;
+	uint8_t *theta_split = (uint8_t *)&theta;
+	I2C_REGISTERS[0]=(theta_split[0]);
+	I2C_REGISTERS[1]=(theta_split[1]);
+	I2C_REGISTERS[2]=(theta_split[2]);
+	I2C_REGISTERS[3]=(theta_split[3]);
+
+	printf("theta %.2f %d %d %d %d \n",theta, I2C_REGISTERS[0],I2C_REGISTERS[1],I2C_REGISTERS[2],I2C_REGISTERS[3]);
 
 	//HAL_I2C_Slave_Transmit_IT(hi2c2, 0x52, data_buffer, 10);
 
