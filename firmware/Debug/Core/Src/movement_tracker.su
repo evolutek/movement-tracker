@@ -1,1 +1,2 @@
 ../Core/Src/movement_tracker.c:19:6:computePosition	80	static
+../Core/Src/movement_tracker.c:46:7:getHeading	4	static

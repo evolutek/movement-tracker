@@ -8,6 +8,26 @@
 #include <runtime.h>
 #include <time.h>
 
+uint8_t I2C_REGISTERS[50] = {1,2,3,4,5,6,7,8,9,10};
+
+/*
+ * 0 réservé
+ * 1 heading (1/4)
+ * 2 heading (2/4)
+ * 3 heading (3/4)
+ * 4 heading (4/4)
+ */
+
+extern I2C_HandleTypeDef hi2c1;
+
+#define RxSIZE  11
+uint8_t RxData[RxSIZE];
+uint8_t rxcount=0;
+uint8_t txcount=0;
+
+uint8_t startPosition = 0;
+uint8_t bytesRrecvd = 0;
+uint8_t bytesTransd = 0;
 
 #define POLL_RATE 39 //ms, approx (non interrupt), only applicable to the IMU
 
@@ -29,36 +49,16 @@ void loop(void){
 
 
 	float theta = getHeading();
-	I2C_REGISTERS[0] = ((theta & 0xF000) >> 24);
-	I2C_REGISTERS[1] = ((theta & 0x0F00) >> 16);
-	I2C_REGISTERS[2] = ((theta & 0x00F0) >> 8);
-	I2C_REGISTERS[3] = (theta & 0x000F);
+
+	char *theta_split = (char *)&theta;
+	I2C_REGISTERS[0]=theta_split[0]&0xff;
+	I2C_REGISTERS[1]=theta_split[0]>>8;
+	I2C_REGISTERS[2]=theta_split[1]&0xff;
+	I2C_REGISTERS[3]=theta_split[1]>>8;
 
 	//HAL_I2C_Slave_Transmit_IT(hi2c2, 0x52, data_buffer, 10);
 
 }
-
-
-uint8_t I2C_REGISTERS[50] = {1,2,3,4,5,6,7,8,9,10};
-
-/*
- * 0 réservé
- * 1 heading (1/4)
- * 2 heading (2/4)
- * 3 heading (3/4)
- * 4 heading (4/4)
- */
-
-extern I2C_HandleTypeDef hi2c1;
-
-#define RxSIZE  11
-uint8_t RxData[RxSIZE];
-uint8_t rxcount=0;
-uint8_t txcount=0;
-
-uint8_t startPosition = 0;
-uint8_t bytesRrecvd = 0;
-uint8_t bytesTransd = 0;
 
 /*
  * Voir https://controllerstech.com/stm32-as-i2c-slave-part-6/#info_box
