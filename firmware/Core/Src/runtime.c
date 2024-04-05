@@ -20,6 +20,8 @@ uint8_t I2C_REGISTERS[50] = {1,2,3,4,5,6,7,8,9,10};
 
 extern I2C_HandleTypeDef hi2c1;
 
+bool debug_i2c = false;
+
 #define RxSIZE  11
 uint8_t RxData[RxSIZE];
 uint8_t rxcount=0;
@@ -41,6 +43,8 @@ void setup(void){
 	if(bno_setup()) printf("IMU initialized successfully\n");
 	else printf("=== Could NOT initialize the BNO085 ! ===\n");
 	bno_enable_rotation_vector(40);
+
+	HAL_I2C_EnableListen_IT(&hi2c2);
 }
 
 void loop(void){
@@ -55,8 +59,7 @@ void loop(void){
 	I2C_REGISTERS[1]=(theta_split[1]);
 	I2C_REGISTERS[2]=(theta_split[2]);
 	I2C_REGISTERS[3]=(theta_split[3]);
-
-	printf("theta %.2f %d %d %d %d \n",theta, I2C_REGISTERS[0],I2C_REGISTERS[1],I2C_REGISTERS[2],I2C_REGISTERS[3]);
+	//printf("theta %.2f %d %d %d %d \n",theta, I2C_REGISTERS[0],I2C_REGISTERS[1],I2C_REGISTERS[2],I2C_REGISTERS[3]);
 
 	//HAL_I2C_Slave_Transmit_IT(hi2c2, 0x52, data_buffer, 10);
 
@@ -75,12 +78,16 @@ void loop(void){
 
 void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c){
 	HAL_I2C_EnableListen_IT(hi2c);
+	if(debug_i2c)printf("listen cplt\n");
 }
 
 void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode){
+	if(debug_i2c){
+	printf("adress match \n");
 	for(int i = 0; i <rxcount-1; i++){
 		printf("%d ",RxData[i]);
 	} printf("\n");
+	}
 
 	if (TransferDirection == I2C_DIRECTION_TRANSMIT){  // if the master wants to transmit the data
 
@@ -102,13 +109,13 @@ void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	//will try to send the last byte, which will fail because the master already received the right number of bytes
 	HAL_I2C_Slave_Seq_Transmit_IT(hi2c, &I2C_REGISTERS[startPosition+txcount], 1, I2C_NEXT_FRAME);
-	printf("sent adress %d equals to %d \n",startPosition+txcount, I2C_REGISTERS[startPosition+txcount]);
+	if(debug_i2c)printf("sent adress %d equals to %d \n",startPosition+txcount, I2C_REGISTERS[startPosition+txcount]);
 	txcount++; // WARNING : txcount will always be greater than the actual number of bytes received by the master
 }
 
 void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c){
 	if (rxcount < RxSIZE){
-		printf("received %d \n",rxcount);
+		if(debug_i2c)printf("received %d \n",rxcount);
 		if (rxcount == RxSIZE-1){
 			HAL_I2C_Slave_Seq_Receive_IT(hi2c, &RxData[rxcount], 1, I2C_LAST_FRAME);
 		} else {
@@ -121,14 +128,15 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c){
 
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c){
 	uint32_t error_code = HAL_I2C_GetError(hi2c);
+	if(debug_i2c){
 	printf("I2C error %ld", error_code);
 	if(error_code == 4) printf(" (Master has terminated the communication)");
 	printf("\n");
-
+	}
 	if(txcount != 0){
 
 	}
-	printf("rx %d tx %d \n", rxcount, txcount);
+	if(debug_i2c)printf("rx %d tx %d \n", rxcount, txcount);
 	HAL_I2C_EnableListen_IT(hi2c);
 }
 
