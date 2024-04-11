@@ -46,3 +46,11 @@ void computePosition(int poll_rate){
 float getHeading(void){
 	return theta;
 }
+
+float getX(void){
+	return x;
+}
+
+float getY(void){
+	return y;
+}

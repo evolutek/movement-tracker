@@ -11,5 +11,7 @@
 void computePosition(int poll_rate);
 
 float getHeading(void);
+float getX(void);
+float getY(void);
 
 #endif /* INC_MOVEMENT_TRACKER_H_ */
