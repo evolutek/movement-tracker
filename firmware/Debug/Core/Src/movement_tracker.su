@@ -2,3 +2,5 @@
 ../Core/Src/movement_tracker.c:46:7:getHeading	4	static
 ../Core/Src/movement_tracker.c:50:7:getX	4	static
 ../Core/Src/movement_tracker.c:54:7:getY	4	static
+../Core/Src/movement_tracker.c:58:6:resetX	4	static
+../Core/Src/movement_tracker.c:61:6:resetY	4	static

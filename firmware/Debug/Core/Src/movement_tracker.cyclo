@@ -2,3 +2,5 @@
 ../Core/Src/movement_tracker.c:46:7:getHeading	1
 ../Core/Src/movement_tracker.c:50:7:getX	1
 ../Core/Src/movement_tracker.c:54:7:getY	1
+../Core/Src/movement_tracker.c:58:6:resetX	1
+../Core/Src/movement_tracker.c:61:6:resetY	1

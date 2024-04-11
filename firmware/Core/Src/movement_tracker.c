@@ -54,3 +54,10 @@ float getX(void){
 float getY(void){
 	return y;
 }
+
+void resetX(void){
+	x = 0;
+}
+void resetY(void){
+	y = 0;
+}

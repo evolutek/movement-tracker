@@ -21,8 +21,9 @@ uint8_t I2C_REGISTERS[50] = {1,2,3,4,5,6,7,8,9,10};
 extern I2C_HandleTypeDef hi2c1;
 
 // CAREFUL ! messages take an awefully long time to send, and can interfere with I2C comms, expect problems when enabling it (don't have time to debug this for now)
-// EDIT : shrunk down most of the messages, seem to handle well now
-bool debug_i2c = true;
+bool debug_i2c = false;
+
+bool data_ready = false;
 
 #define RxSIZE  11
 uint8_t RxData[RxSIZE];
@@ -88,7 +89,16 @@ void loop(void){
  */
 
 void process_data(){
+	if(RxData[0] == 0) { // commands
+		switch(RxData[1]){
+		case 0x01:
+			resetX();
+			resetY();
+		break;
+		}
+	} else { // mem write
 
+	}
 }
 
 
@@ -98,30 +108,30 @@ void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c){
 }
 
 void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode){
+	if(debug_i2c) printf("add match\n");
 	if (TransferDirection == I2C_DIRECTION_TRANSMIT){  // if the master wants to transmit the data
-
 		//RxData[0] = 0;  // reset the RxData[0] to clear any residue address from previous call
+		data_ready = true;
 		rxcount = 0;
 		HAL_I2C_Slave_Seq_Receive_IT(hi2c, RxData, 1, I2C_FIRST_FRAME);
 		rxcount++;
 	} else {
+		data_ready = false;
 		txcount = 0;
 		startPosition = RxData[0]; // transmission can only happen if the slave has received an order to send specific data
 		//RxData[0] = 0;  // Reset the start register as we have already copied it
 		HAL_I2C_Slave_Seq_Transmit_IT(hi2c, &I2C_REGISTERS[startPosition+txcount], 1, I2C_FIRST_FRAME);
-		if(debug_i2c)printf("sent %d : %d \n",startPosition+txcount, I2C_REGISTERS[startPosition+txcount]);
+		if(debug_i2c)printf("fsent %d : %d \n",startPosition+txcount, I2C_REGISTERS[startPosition+txcount]);
 		txcount++;
 	}
-
-	if(debug_i2c) printf("add match\n");
-
+	if(debug_i2c) printf("start\n");
 }
 
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	//will try to send the last byte, which will fail because the master already received the right number of bytes
 	HAL_I2C_Slave_Seq_Transmit_IT(hi2c, &I2C_REGISTERS[startPosition+txcount], 1, I2C_NEXT_FRAME);
-	if(debug_i2c)printf("sent %d : %d \n",startPosition+txcount, I2C_REGISTERS[startPosition+txcount]);
+	if(debug_i2c) printf("sent %d : %d \n",startPosition+txcount, I2C_REGISTERS[startPosition+txcount]);
 	txcount++; // WARNING : txcount will always be greater than the actual number of bytes received by the master
 }
 
@@ -143,9 +153,10 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c){
 		printf("I2C error %ld \n", error_code);
 	}
 
-	if(txcount == 0){ // means we have only received data when the error was triggered
-		printf("processing ... \n");
+	if(data_ready && error_code == 4){ // means we have only received data when the error was triggered
+		printf("rx\n");
 		process_data();
+		data_ready = false;
 	}
 
 	if(debug_i2c)printf("rx %d tx %d \n", rxcount, txcount);

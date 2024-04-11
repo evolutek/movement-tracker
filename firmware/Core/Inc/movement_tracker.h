@@ -14,4 +14,7 @@ float getHeading(void);
 float getX(void);
 float getY(void);
 
+void resetX(void);
+void resetY(void);
+
 #endif /* INC_MOVEMENT_TRACKER_H_ */
