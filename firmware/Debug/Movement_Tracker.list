@@ -4848,26 +4848,26 @@ void loop(void){
 	uint8_t *theta_split = (uint8_t *)&theta;
  8002844:	463b      	mov	r3, r7
  8002846:	607b      	str	r3, [r7, #4]
-	I2C_REGISTERS[0]=(theta_split[0]);
+	I2C_REGISTERS[1]=(theta_split[0]);
  8002848:	687b      	ldr	r3, [r7, #4]
  800284a:	781a      	ldrb	r2, [r3, #0]
  800284c:	4b08      	ldr	r3, [pc, #32]	; (8002870 <loop+0x44>)
- 800284e:	701a      	strb	r2, [r3, #0]
-	I2C_REGISTERS[1]=(theta_split[1]);
+ 800284e:	705a      	strb	r2, [r3, #1]
+	I2C_REGISTERS[2]=(theta_split[1]);
  8002850:	687b      	ldr	r3, [r7, #4]
  8002852:	785a      	ldrb	r2, [r3, #1]
  8002854:	4b06      	ldr	r3, [pc, #24]	; (8002870 <loop+0x44>)
- 8002856:	705a      	strb	r2, [r3, #1]
-	I2C_REGISTERS[2]=(theta_split[2]);
+ 8002856:	709a      	strb	r2, [r3, #2]
+	I2C_REGISTERS[3]=(theta_split[2]);
  8002858:	687b      	ldr	r3, [r7, #4]
  800285a:	789a      	ldrb	r2, [r3, #2]
  800285c:	4b04      	ldr	r3, [pc, #16]	; (8002870 <loop+0x44>)
- 800285e:	709a      	strb	r2, [r3, #2]
-	I2C_REGISTERS[3]=(theta_split[3]);
+ 800285e:	70da      	strb	r2, [r3, #3]
+	I2C_REGISTERS[4]=(theta_split[3]);
  8002860:	687b      	ldr	r3, [r7, #4]
  8002862:	78da      	ldrb	r2, [r3, #3]
  8002864:	4b02      	ldr	r3, [pc, #8]	; (8002870 <loop+0x44>)
- 8002866:	70da      	strb	r2, [r3, #3]
+ 8002866:	711a      	strb	r2, [r3, #4]
 	//printf("theta %.2f %d %d %d %d \n",theta, I2C_REGISTERS[0],I2C_REGISTERS[1],I2C_REGISTERS[2],I2C_REGISTERS[3]);
 
 	//HAL_I2C_Slave_Transmit_IT(hi2c2, 0x52, data_buffer, 10);
