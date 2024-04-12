@@ -169,8 +169,8 @@ bool adnsUpdate(void) {
 
 	_update_pointer();
 
-	raw_delta[0] = _convert_from_comp(raw_data[0]);
-	raw_delta[1] = - _convert_from_comp(raw_data[1]);
+	raw_delta[0] = - _convert_from_comp(raw_data[0]);
+	raw_delta[1] = _convert_from_comp(raw_data[1]);
 
 	if (raw_delta[0] == 0 && raw_delta[1] == 0) return 0;
 

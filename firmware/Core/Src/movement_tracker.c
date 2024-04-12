@@ -35,11 +35,12 @@ void computePosition(int poll_rate){
 
 				delta_x = delta_adns_x*cos(theta+MVT_RELATIVE_ANGLE) - delta_adns_y*sin(theta+MVT_RELATIVE_ANGLE);
 				delta_y = delta_adns_x*sin(theta+MVT_RELATIVE_ANGLE) + delta_adns_y*cos(theta+MVT_RELATIVE_ANGLE);
-				x += delta_x;
-				y += delta_y;
 
-				//if((x < 3 && x > -3) || (y < 3 && y > -3))
-				printf("x %.2f y %.2f t %.2f rx %.2f ry %.2f\n",x,y,theta, adns_raw_x(), adns_raw_y());
+				//adaptation des valeurs à la table EVO
+				y -= delta_x;
+				x += delta_y;
+
+				//printf("x %.2f y %.2f t %.2f rx %.2f ry %.2f\n",x,y,theta, adns_raw_x(), adns_raw_y());
 			}
 		}
 	}
