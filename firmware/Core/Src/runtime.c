@@ -23,8 +23,6 @@ extern I2C_HandleTypeDef hi2c1;
 // CAREFUL ! messages take an awefully long time to send, and can interfere with I2C comms, expect problems when enabling it (don't have time to debug this for now)
 bool debug_i2c = false;
 
-bool data_ready = false;
-
 #define RxSIZE  11
 uint8_t RxData[RxSIZE];
 uint8_t rxcount=0;
@@ -111,12 +109,10 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, ui
 	if(debug_i2c) printf("add match\n");
 	if (TransferDirection == I2C_DIRECTION_TRANSMIT){  // if the master wants to transmit the data
 		//RxData[0] = 0;  // reset the RxData[0] to clear any residue address from previous call
-		data_ready = true;
 		rxcount = 0;
 		HAL_I2C_Slave_Seq_Receive_IT(hi2c, RxData, 1, I2C_FIRST_FRAME);
 		rxcount++;
 	} else {
-		data_ready = false;
 		txcount = 0;
 		startPosition = RxData[0]; // transmission can only happen if the slave has received an order to send specific data
 		//RxData[0] = 0;  // Reset the start register as we have already copied it
@@ -149,14 +145,15 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c){
 
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c){
 	uint32_t error_code = HAL_I2C_GetError(hi2c);
-	if(debug_i2c){
-		printf("I2C error %ld \n", error_code);
-	}
+	if(debug_i2c)printf("I2C error %ld \n", error_code);
 
-	if(data_ready && error_code == 4){ // means we have only received data when the error was triggered
-		printf("rx\n");
-		process_data();
-		data_ready = false;
+	if(error_code == 4){
+		if(txcount == 0){ // error triggered after only receiving
+			printf("trtmt\n");
+			process_data();
+		} else {
+			txcount = 0;
+		}
 	}
 
 	if(debug_i2c)printf("rx %d tx %d \n", rxcount, txcount);
