@@ -9,6 +9,7 @@
 #include <time.h>
 
 uint8_t I2C_REGISTERS[50] = {1,2,3,4,5,6,7,8,9,10};
+// Note : adress 0 is used to indicate commands, no data should be put there
 
 /*
  * 0 réservé
@@ -23,7 +24,7 @@ extern I2C_HandleTypeDef hi2c1;
 // CAREFUL ! messages take an awefully long time to send, and can interfere with I2C comms, expect problems when enabling it (don't have time to debug this for now)
 bool debug_i2c = false;
 
-#define RxSIZE  11
+#define RxSIZE  51
 uint8_t RxData[RxSIZE];
 uint8_t rxcount=0;
 uint8_t txcount=0;
@@ -32,7 +33,7 @@ uint8_t startPosition = 0;
 uint8_t bytesRrecvd = 0;
 uint8_t bytesTransd = 0;
 
-#define POLL_RATE 39 //ms, approx (non interrupt), only applicable to the IMU
+#define POLL_RATE 39 //ms, approx (non interrupt)
 
 //TODO : remove the interrupt capability for IMU_INT
 
@@ -76,26 +77,31 @@ void loop(void){
 	I2C_REGISTERS[12]=(y_split[3]);
 }
 
-/*
- * Voir https://controllerstech.com/stm32-as-i2c-slave-part-6/#info_box
- * (j'ai déjà téléchargé le code, pas la peine de le refaire)
- *
- * il fait concrêtement exactement ce que je veux, à l'exception qu'il fait QUE des registres, et que j'aurais besoin dans mon cas de commandes également
- * pour ça, prévoir une addresse en dehors des registres (juste avant ? 0x00 ? a voir) qui le passe en "mode commande",
- * dans lequel le but n'est pas de foutre la data reçue dans le tableau des registres mais de le mettre dans un endroit accessible plus tard
- * par un parser
- */
-
 void process_data(){
 	if(RxData[0] == 0) { // commands
 		switch(RxData[1]){
-		case 0x01:
-			resetX();
-			resetY();
-		break;
+			case 0x01:
+				printf("resetXY\n");
+				setX(0);
+				setY(0);
+				break;
+
+			case 0x02:
+				printf("setTXY\n");
+				float *theta_split = (float *)&RxData[2];
+				float theta = *theta_split;
+				setT(theta);
+				float *x_split = (float *)&RxData[6];
+				float x = *x_split;
+				setX(x);
+				float *y_split = (float *)&RxData[10];
+				float y = *y_split;
+				setY(y);
+				break;
 		}
 	} else { // mem write
-
+		//for(uint8_t i = 0; i < rxcount; i++)
+		//	I2C_REGISTERS[i + RxData[0]] = RxData[i];
 	}
 }
 

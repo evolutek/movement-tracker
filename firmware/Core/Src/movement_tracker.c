@@ -9,7 +9,7 @@
 static timestamp_t last_poll_time = 0;
 
 float delta_adns_x = 0, delta_adns_y = 0;
-float theta = 0, raw_theta = 0, delta_theta = 0;
+float theta = 0, raw_theta = 0, theta_reference = 0;
 float delta_x = 0, delta_y = 0, x = 0, y = 0;
 
 bool first_read = true;
@@ -20,10 +20,12 @@ void computePosition(int poll_rate){
 	if (isTimeDeltaElapsed(last_poll_time, poll_rate)){
 		last_poll_time = getCurrentTime();
 		if(bno_get_readings()){
-			if (first_read) {delta_theta = bno_get_yaw();first_read = false;}
+			if (first_read) {theta_reference = bno_get_yaw();first_read = false;}
 			else raw_theta = bno_get_yaw();
 
-			theta = raw_theta - delta_theta;
+			theta = raw_theta - theta_reference;
+			if(theta > M_PI) theta -= 2*M_PI;
+			if(theta <= -M_PI) theta += 2*M_PI;
 
 			if(adnsUpdate() != 0){
 
@@ -55,9 +57,15 @@ float getY(void){
 	return y;
 }
 
-void resetX(void){
-	x = 0;
+void setX(float value){
+	x = value;
 }
-void resetY(void){
-	y = 0;
+void setY(float value){
+	y = value;
+}
+void setT(float value){
+	theta_reference = raw_theta - value;
+	if(theta_reference > M_PI) theta_reference -= 2*M_PI;
+	if(theta_reference <= -M_PI) theta_reference += 2*M_PI;
+
 }

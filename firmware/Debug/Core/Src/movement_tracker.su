@@ -1,6 +1,7 @@
 ../Core/Src/movement_tracker.c:19:6:computePosition	80	static
-../Core/Src/movement_tracker.c:46:7:getHeading	4	static
-../Core/Src/movement_tracker.c:50:7:getX	4	static
-../Core/Src/movement_tracker.c:54:7:getY	4	static
-../Core/Src/movement_tracker.c:58:6:resetX	4	static
-../Core/Src/movement_tracker.c:61:6:resetY	4	static
+../Core/Src/movement_tracker.c:48:7:getHeading	4	static
+../Core/Src/movement_tracker.c:52:7:getX	4	static
+../Core/Src/movement_tracker.c:56:7:getY	4	static
+../Core/Src/movement_tracker.c:60:6:setX	16	static
+../Core/Src/movement_tracker.c:63:6:setY	16	static
+../Core/Src/movement_tracker.c:66:6:setT	16	static

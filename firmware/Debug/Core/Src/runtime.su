@@ -1,8 +1,8 @@
-../Core/Src/runtime.c:39:6:setup	8	static
-../Core/Src/runtime.c:51:6:loop	32	static
-../Core/Src/runtime.c:89:6:process_data	8	static
-../Core/Src/runtime.c:103:6:HAL_I2C_ListenCpltCallback	16	static
-../Core/Src/runtime.c:108:6:HAL_I2C_AddrCallback	16	static
-../Core/Src/runtime.c:126:6:HAL_I2C_SlaveTxCpltCallback	16	static
-../Core/Src/runtime.c:134:6:HAL_I2C_SlaveRxCpltCallback	16	static
-../Core/Src/runtime.c:146:6:HAL_I2C_ErrorCallback	24	static
+../Core/Src/runtime.c:40:6:setup	8	static
+../Core/Src/runtime.c:52:6:loop	32	static
+../Core/Src/runtime.c:80:6:process_data	32	static
+../Core/Src/runtime.c:109:6:HAL_I2C_ListenCpltCallback	16	static
+../Core/Src/runtime.c:114:6:HAL_I2C_AddrCallback	16	static
+../Core/Src/runtime.c:132:6:HAL_I2C_SlaveTxCpltCallback	16	static
+../Core/Src/runtime.c:140:6:HAL_I2C_SlaveRxCpltCallback	16	static
+../Core/Src/runtime.c:152:6:HAL_I2C_ErrorCallback	24	static
