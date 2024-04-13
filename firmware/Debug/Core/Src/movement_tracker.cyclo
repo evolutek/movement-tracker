@@ -5,3 +5,4 @@
 ../Core/Src/movement_tracker.c:61:6:setX	1
 ../Core/Src/movement_tracker.c:64:6:setY	1
 ../Core/Src/movement_tracker.c:67:6:setT	3
+../Core/Src/movement_tracker.c:73:6:setRelativeAngle	1

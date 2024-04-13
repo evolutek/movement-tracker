@@ -9,7 +9,7 @@
 static timestamp_t last_poll_time = 0;
 
 float delta_adns_x = 0, delta_adns_y = 0;
-float theta = 0, raw_theta = 0, theta_reference = 0;
+float theta = 0, raw_theta = 0, theta_reference = 0, mvt_relative_angle = 0;
 float delta_x = 0, delta_y = 0, x = 0, y = 0;
 
 bool first_read = true;
@@ -33,8 +33,8 @@ void computePosition(int poll_rate){
 
 				delta_adns_x = adnsX(); delta_adns_y = adnsY();
 
-				delta_x = delta_adns_x*cos(theta+MVT_RELATIVE_ANGLE) - delta_adns_y*sin(theta+MVT_RELATIVE_ANGLE);
-				delta_y = delta_adns_x*sin(theta+MVT_RELATIVE_ANGLE) + delta_adns_y*cos(theta+MVT_RELATIVE_ANGLE);
+				delta_x = delta_adns_x*cos(theta+mvt_relative_angle) - delta_adns_y*sin(theta+mvt_relative_angle);
+				delta_y = delta_adns_x*sin(theta+mvt_relative_angle) + delta_adns_y*cos(theta+mvt_relative_angle);
 
 				//adaptation des valeurs à la table EVO
 				y -= delta_x;
@@ -68,5 +68,8 @@ void setT(float value){
 	theta_reference = raw_theta - value;
 	if(theta_reference > M_PI) theta_reference -= 2*M_PI;
 	if(theta_reference <= -M_PI) theta_reference += 2*M_PI;
+}
 
+void setRelativeAngle(float delta){
+	mvt_relative_angle = delta;
 }

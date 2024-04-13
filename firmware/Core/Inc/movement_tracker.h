@@ -17,6 +17,6 @@ float getY(void);
 void setX(float value);
 void setY(float value);
 void setT(float value);
-
+void setRelativeAngle(float delta);
 
 #endif /* INC_MOVEMENT_TRACKER_H_ */

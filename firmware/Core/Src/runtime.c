@@ -97,6 +97,9 @@ void process_data(){
 				float *y_split = (float *)&RxData[10];
 				float y = *y_split;
 				setY(y);
+				float *relative_split = (float *)&RxData[14];
+				float relative = *relative_split;
+				setRelativeAngle(relative);
 				break;
 		}
 	} else { // mem write
