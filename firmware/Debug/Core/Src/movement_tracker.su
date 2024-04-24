@@ -1,8 +1,8 @@
-../Core/Src/movement_tracker.c:19:6:computePosition	32	static
-../Core/Src/movement_tracker.c:49:7:getHeading	4	static
-../Core/Src/movement_tracker.c:53:7:getX	4	static
-../Core/Src/movement_tracker.c:57:7:getY	4	static
-../Core/Src/movement_tracker.c:61:6:setX	16	static
-../Core/Src/movement_tracker.c:64:6:setY	16	static
-../Core/Src/movement_tracker.c:67:6:setT	16	static
-../Core/Src/movement_tracker.c:73:6:setRelativeAngle	16	static
+../Core/Src/movement_tracker.c:19:6:computePosition	48	static
+../Core/Src/movement_tracker.c:53:7:getHeading	4	static
+../Core/Src/movement_tracker.c:57:7:getX	4	static
+../Core/Src/movement_tracker.c:61:7:getY	4	static
+../Core/Src/movement_tracker.c:65:6:setX	16	static
+../Core/Src/movement_tracker.c:68:6:setY	16	static
+../Core/Src/movement_tracker.c:71:6:setT	16	static
+../Core/Src/movement_tracker.c:79:6:setRelativeAngle	16	static

@@ -33,7 +33,7 @@ uint8_t startPosition = 0;
 uint8_t bytesRrecvd = 0;
 uint8_t bytesTransd = 0;
 
-#define POLL_RATE 39 //ms, approx (non interrupt)
+#define POLL_RATE 30 //ms, approx (non interrupt)
 
 //TODO : remove the interrupt capability for IMU_INT
 
@@ -44,7 +44,7 @@ void setup(void){
 
 	if(bno_setup()) printf("IMU initialized successfully\n");
 	else printf("=== Could NOT initialize the BNO085 ! ===\n");
-	bno_enable_rotation_vector(40);
+	bno_enable_rotation_vector(POLL_RATE - 1);
 
 	HAL_I2C_EnableListen_IT(&hi2c2);
 }
@@ -75,6 +75,8 @@ void loop(void){
 	I2C_REGISTERS[10]=(y_split[1]);
 	I2C_REGISTERS[11]=(y_split[2]);
 	I2C_REGISTERS[12]=(y_split[3]);
+
+	printf("theta %.3f \n",theta);
 }
 
 void process_data(){
@@ -100,6 +102,9 @@ void process_data(){
 				float *relative_split = (float *)&RxData[14];
 				float relative = *relative_split;
 				setRelativeAngle(relative);
+				float *gain_split = (float *)&RxData[18];
+				float gain = *gain_split;
+				if(gain != 0) adnsSetCoef(gain);
 				break;
 		}
 	} else { // mem write

@@ -195,8 +195,8 @@ static bool _receive_packet(void){
 	// packet here otherwise we need to check for the reset packet in multiple
 	// places.
 
-	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE && _debug){
-		printf("OUCH !!! The IMU has just been reset ! Reason : %d \n",shtpData[1]);
+	if (shtpHeader[2] == CHANNEL_EXECUTABLE && shtpData[0] == BNO_EXECUTABLE_RESET_COMPLETE){
+		printf("WARNING ! The IMU has just been reset ! Reason : %d \n",shtpData[1]);
 	}
 
 
@@ -416,6 +416,7 @@ static uint16_t _parse_input_report(void){
 	*/
 	default :
 		return 0;
+		break;
 	}
 
 	return shtpData[5];
@@ -510,10 +511,15 @@ bool bno_setup(void){
 }
 
 void bno_enable_rotation_vector(uint16_t millisBetweenReports){
-	_set_feature_command(BNO_REPORTID_ROTATION_VECTOR, millisBetweenReports, 0);
+	_set_feature_command(BNO_REPORTID_GAME_ROTATION_VECTOR, millisBetweenReports, 0);
 }
 
 uint16_t bno_get_readings(void){
+
+	if(!_sensor_awaiting()){
+		printf("Sensor busy (you read too fast)\n");
+		return 0;
+	}
 
 	if (_receive_packet() == true){
 		//Check to see if this packet is a sensor reporting its data to us
@@ -548,5 +554,12 @@ float bno_get_yaw(void){
 	float yaw = atan2(t3, t4);
 
 	return (yaw);
+}
+
+float bno_get_raw_accuracy(){
+	return _quaternion_to_float(rawQuatRadianAccuracy, rotationVector_Q1);
+}
+uint8_t bno_get_accuracy(){
+	return quatAccuracy;
 }
 

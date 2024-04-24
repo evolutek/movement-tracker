@@ -11,8 +11,10 @@
 ../Core/Src/BNO085.c:232:13:_set_feature_command	24	static
 ../Core/Src/BNO085.c:258:14:_quaternion_to_float	32	static
 ../Core/Src/BNO085.c:279:17:_parse_input_report	24	static
-../Core/Src/BNO085.c:442:17:_parse_command_report	16	static
-../Core/Src/BNO085.c:466:6:bno_setup	24	static
-../Core/Src/BNO085.c:512:6:bno_enable_rotation_vector	16	static
-../Core/Src/BNO085.c:516:10:bno_get_readings	8	static
-../Core/Src/BNO085.c:528:7:bno_get_yaw	56	static
+../Core/Src/BNO085.c:443:17:_parse_command_report	16	static
+../Core/Src/BNO085.c:467:6:bno_setup	24	static
+../Core/Src/BNO085.c:513:6:bno_enable_rotation_vector	16	static
+../Core/Src/BNO085.c:517:10:bno_get_readings	8	static
+../Core/Src/BNO085.c:534:7:bno_get_yaw	56	static
+../Core/Src/BNO085.c:559:7:bno_get_raw_accuracy	8	static
+../Core/Src/BNO085.c:562:9:bno_get_accuracy	4	static

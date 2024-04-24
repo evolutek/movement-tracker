@@ -13,5 +13,7 @@ bool bno_setup(void);
 void bno_enable_rotation_vector(uint16_t millisBetweenReports);
 uint16_t bno_get_readings(void);
 float bno_get_yaw(void);
+uint8_t bno_get_accuracy();
+float bno_get_raw_accuracy();
 
 #endif /* INC_BNO085_H_ */

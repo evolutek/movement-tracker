@@ -24,9 +24,12 @@ void computePosition(int poll_rate){
 			else raw_theta = bno_get_yaw();
 
 			theta = raw_theta - theta_reference;
-			if(theta > M_PI) theta -= 2*M_PI;
-			if(theta <= -M_PI) theta += 2*M_PI;
 
+			while(theta > M_PI) theta -= 2*M_PI;
+			while(theta <= -M_PI) theta += 2*M_PI;
+
+			printf("reference : %.3f raw theta %.3f accuracy %d \n",theta_reference,raw_theta,bno_get_accuracy());
+/*
 			if(adnsUpdate() != 0){
 
 				//j'ai l'impression qu'il drop des packets de l'adns
@@ -40,8 +43,9 @@ void computePosition(int poll_rate){
 				y -= delta_x;
 				x += delta_y;
 
-				//printf("x %.2f y %.2f t %.2f rx %.2f ry %.2f\n",x,y,theta, adns_raw_x(), adns_raw_y());
+				printf("x %.2f y %.2f t %.2f rx %.2f ry %.2f\n",x,y,theta, adns_raw_x(), adns_raw_y());
 			}
+*/
 		}
 	}
 }
@@ -66,6 +70,8 @@ void setY(float value){
 }
 void setT(float value){
 	theta_reference = raw_theta - value;
+
+	//TODO passer ça en while, au cas où il y ait une erreur entre la chaise et le clavier
 	if(theta_reference > M_PI) theta_reference -= 2*M_PI;
 	if(theta_reference <= -M_PI) theta_reference += 2*M_PI;
 }
