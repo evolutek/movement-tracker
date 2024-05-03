@@ -517,7 +517,7 @@ void bno_enable_rotation_vector(uint16_t millisBetweenReports){
 uint16_t bno_get_readings(void){
 
 	if(!_sensor_awaiting()){
-		printf("Sensor busy (you read too fast)\n");
+		printf("IMU busy (you read too fast)\n");
 		return 0;
 	}
 

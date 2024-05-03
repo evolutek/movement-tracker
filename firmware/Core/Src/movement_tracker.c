@@ -28,8 +28,8 @@ void computePosition(int poll_rate){
 			while(theta > M_PI) theta -= 2*M_PI;
 			while(theta <= -M_PI) theta += 2*M_PI;
 
-			printf("reference : %.3f raw theta %.3f accuracy %d \n",theta_reference,raw_theta,bno_get_accuracy());
-/*
+			//printf("reference : %.5f raw theta %.3f accuracy %d \n",theta_reference,raw_theta,bno_get_accuracy());
+
 			if(adnsUpdate() != 0){
 
 				//j'ai l'impression qu'il drop des packets de l'adns
@@ -45,7 +45,6 @@ void computePosition(int poll_rate){
 
 				printf("x %.2f y %.2f t %.2f rx %.2f ry %.2f\n",x,y,theta, adns_raw_x(), adns_raw_y());
 			}
-*/
 		}
 	}
 }
