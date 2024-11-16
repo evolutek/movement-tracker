@@ -1,4 +1,4 @@
-23275412860566692
+23288593460226881
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -6391,6 +6391,13 @@ capacitor tantalum
 2
 2
 ComponentsEvo
+1313210530000
+<b>WL-ICLED Integrated Controller within LED{return}<br><br></b>{return}Size: Side View 3210, SMT, 4pins{return}<br>LXWXH=3.2X1.5X1mm
+
+0
+4
+4
+ComponentsEvo
 450301014042
 <b>WS-SLTV</b><br> THT Mini Slide Switch, Opposite Side Connection 10x2.5 mm
 
@@ -6474,6 +6481,13 @@ ComponentsEvo
 0
 6
 6
+ComponentsEvo
+435431019830
+<b>WS-TASV SMT Washable Tact Switch 4.1 x 2.8 mm
+
+0
+5
+5
 ComponentsEvo
 435431019840
 <b>WS-TASV SMT Washable Tact Switch 4.1 x 2.8 mm
@@ -6678,13 +6692,6 @@ NodeMCU Esp32
 30
 30
 ComponentsEvo
-PAA5163E1
-
-
-0
-17
-17
-ComponentsEvo
 Pimoroni PAA5100JE
 
 
@@ -6712,6 +6719,13 @@ Powerpak SO-8 SOIC 1.27 dual
 0
 10
 6
+ComponentsEvo
+QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm-Without thermal pad
+QFN, 32 Pin (http://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/ltc-legacy-qfn/QFN_32_05-08-1693.pdf), generated with kicad-footprint-generator ipc_noLead_generator.py
+QFN NoLead
+0
+32
+32
 ComponentsEvo
 Raspberry_Pi_Zero_W_Vertical
 
@@ -6908,6 +6922,13 @@ WA-SMSI_9774160360
 0
 1
 1
+ComponentsEvo
+WIO-E5
+
+
+0
+28
+28
 ComponentsEvo
 WL-SBCW_1210
 <B>WL-SBCW SMT Bi-color Chip LED Waterclear{return}</B> <BR><BR>Size 0606, SMT, 4pins{return}<BR>3.2x2.7x0.7mm(LXWXH)
@@ -52122,6 +52143,13 @@ ConnectorsEvo
 7
 6
 ConnectorsEvo
+62701420621
+<b>WR-BHD 1.27 mm Male SMT Box Header{return}</b><br><br>Pitch: 1.27mm, 14pins, SMT
+
+0
+14
+14
+ConnectorsEvo
 629722000214
 
 
@@ -52184,6 +52212,13 @@ ConnectorsEvo
 0
 17
 17
+ConnectorsEvo
+648105131822
+<b>WR-WTB</b><br>1.50 mm SMT Male Horizontal Shrouded Header, 5 Pins
+
+0
+7
+6
 ConnectorsEvo
 691321100002
 <b>WR-TBL Serie 3211 - 3.50 mm Vertical PCB Header<br></b>Max Height = 9.2mm , Pitch 3.5mm , 2pins
@@ -52255,6 +52290,13 @@ ConnectorsEvo
 7
 7
 ConnectorsEvo
+636101111001
+<B>WR-UMRF PCB Receptacle SMT with 3 Pads{return}</B><Br><Br>SMT, 3pins
+
+0
+3
+2
+ConnectorsEvo
 649002227222
 <B>WR-MPC4 </B><BR>4.20 mm Male Dual Row Angled Header w. Mounting Pegs,2 pins
 
@@ -52289,6 +52331,13 @@ ConnectorsEvo
 0
 8
 8
+ConnectorsEvo
+693071020811
+<B>WR-CRD Micro SD Card Connector Push & Push 8 pins
+
+0
+13
+13
 ConnectorsEvo
 66200211022
 <b>WR-MPC3<br></b>3.00 mm Male Single Row Angled Header w. Plastic Pegs, 2 Pins
