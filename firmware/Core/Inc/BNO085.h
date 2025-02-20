@@ -5,7 +5,7 @@
 #include "main.h"
 #include <stdbool.h>
 
-#define BNO_MAX_PACKET_SIZE 300//128 //Packets can be up to 32k but we don't have that much RAM.
+#define BNO_MAX_PACKET_SIZE 256//128 //Packets can be up to 32k but we don't have that much RAM.
 #define BNO_MAX_METADATA_SIZE 9 //This is in words. There can be many but we mostly only care about the first 9 (Qs, range, etc)
 #define BNO_STANDARD_INT_TIMEOUT 250 // standard timeout for the _wait_for_int_blocking function, ms
 

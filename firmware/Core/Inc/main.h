@@ -58,16 +58,30 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define RST_IMU_Pin GPIO_PIN_0
-#define RST_IMU_GPIO_Port GPIOA
-#define AU_INT_Pin GPIO_PIN_1
-#define AU_INT_GPIO_Port GPIOA
-#define CS_IMU_Pin GPIO_PIN_4
+#define CS_IMU_Pin GPIO_PIN_0
 #define CS_IMU_GPIO_Port GPIOA
-#define INT_ANDS_Pin GPIO_PIN_0
-#define INT_ANDS_GPIO_Port GPIOB
-#define CS_ADNS_Pin GPIO_PIN_10
-#define CS_ADNS_GPIO_Port GPIOA
+#define RST_PAA_Pin GPIO_PIN_1
+#define RST_PAA_GPIO_Port GPIOA
+#define VCP_TX_Pin GPIO_PIN_2
+#define VCP_TX_GPIO_Port GPIOA
+#define VCP_RX_Pin GPIO_PIN_3
+#define VCP_RX_GPIO_Port GPIOA
+#define RST_IMU_Pin GPIO_PIN_4
+#define RST_IMU_GPIO_Port GPIOA
+#define SCK_Pin GPIO_PIN_5
+#define SCK_GPIO_Port GPIOA
+#define MISO_Pin GPIO_PIN_6
+#define MISO_GPIO_Port GPIOA
+#define MOSI_Pin GPIO_PIN_7
+#define MOSI_GPIO_Port GPIOA
+#define INT_PAA_Pin GPIO_PIN_0
+#define INT_PAA_GPIO_Port GPIOB
+#define SDA_Pin GPIO_PIN_8
+#define SDA_GPIO_Port GPIOA
+#define SCL_Pin GPIO_PIN_9
+#define SCL_GPIO_Port GPIOA
+#define CS_PAA_Pin GPIO_PIN_10
+#define CS_PAA_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
@@ -77,12 +91,14 @@ void Error_Handler(void);
 #define INT_IMU_EXTI_IRQn EXTI15_10_IRQn
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
-#define STATUS_Pin GPIO_PIN_4
-#define STATUS_GPIO_Port GPIOB
+#define AU_INT_Pin GPIO_PIN_4
+#define AU_INT_GPIO_Port GPIOB
 #define CAN_RX_Pin GPIO_PIN_5
 #define CAN_RX_GPIO_Port GPIOB
 #define CAN_TX_Pin GPIO_PIN_6
 #define CAN_TX_GPIO_Port GPIOB
+#define STATUS_Pin GPIO_PIN_7
+#define STATUS_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

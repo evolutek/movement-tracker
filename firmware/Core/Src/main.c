@@ -27,9 +27,6 @@
 #include "usb_device.h"
 
 #include "BNO085.h"
-#include "ADNS9800.h"
-
-#include "movement_tracker.h"
 
 #include "micros.h"
 #include <stdio.h>
@@ -97,6 +94,7 @@ int __io_getchar(void)
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -128,7 +126,7 @@ int main(void)
   DWT_Init();
 
   printf("=== HAL init done, proceeding ... ===\n");
-  HAL_GPIO_WritePin(CS_ADNS_GPIO_Port, CS_ADNS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(CS_PAA_GPIO_Port, CS_PAA_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
   setup();
   printf("=== User init done, proceeding ... ===\n");
@@ -388,42 +386,52 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, RST_IMU_Pin|CS_IMU_Pin|CS_ADNS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA, CS_IMU_Pin|RST_IMU_Pin|CS_PAA_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(RST_PAA_GPIO_Port, RST_PAA_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(STATUS_GPIO_Port, STATUS_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : RST_IMU_Pin */
-  GPIO_InitStruct.Pin = RST_IMU_Pin;
+  /*Configure GPIO pin : CS_IMU_Pin */
+  GPIO_InitStruct.Pin = CS_IMU_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RST_IMU_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(CS_IMU_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : AU_INT_Pin */
-  GPIO_InitStruct.Pin = AU_INT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  /*Configure GPIO pin : RST_PAA_Pin */
+  GPIO_InitStruct.Pin = RST_PAA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(AU_INT_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(RST_PAA_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : CS_IMU_Pin CS_ADNS_Pin */
-  GPIO_InitStruct.Pin = CS_IMU_Pin|CS_ADNS_Pin;
+  /*Configure GPIO pins : RST_IMU_Pin CS_PAA_Pin */
+  GPIO_InitStruct.Pin = RST_IMU_Pin|CS_PAA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : INT_ANDS_Pin */
-  GPIO_InitStruct.Pin = INT_ANDS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  /*Configure GPIO pin : INT_PAA_Pin */
+  GPIO_InitStruct.Pin = INT_PAA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(INT_ANDS_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(INT_PAA_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : INT_IMU_Pin */
   GPIO_InitStruct.Pin = INT_IMU_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(INT_IMU_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : AU_INT_Pin */
+  GPIO_InitStruct.Pin = AU_INT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(AU_INT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : STATUS_Pin */
   GPIO_InitStruct.Pin = STATUS_Pin;

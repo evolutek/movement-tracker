@@ -1,4 +1,4 @@
-Core/Src/ADNS9800.o: ../Core/Src/ADNS9800.c ../Core/Inc/ADNS9800.h \
+Core/Src/BNO08x.o: ../Core/Src/BNO08x.c \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
  ../Core/Inc/stm32g4xx_hal_conf.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h \
@@ -34,9 +34,8 @@ Core/Src/ADNS9800.o: ../Core/Src/ADNS9800.c ../Core/Inc/ADNS9800.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../Core/Inc/ADNS9800_firmware.h ../Core/Inc/ADNS9800_registers.h \
- ../Core/Inc/main.h ../Core/Inc/micros.h ../Core/Inc/main.h
-../Core/Inc/ADNS9800.h:
+ ../Core/Inc/main.h ../Core/Inc/BNO08x.h \
+ ../Core/Inc/BNO08x_shtp_registers.h
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
 ../Core/Inc/stm32g4xx_hal_conf.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h:
@@ -72,8 +71,6 @@ Core/Src/ADNS9800.o: ../Core/Src/ADNS9800.c ../Core/Inc/ADNS9800.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
-../Core/Inc/ADNS9800_firmware.h:
-../Core/Inc/ADNS9800_registers.h:
 ../Core/Inc/main.h:
-../Core/Inc/micros.h:
-../Core/Inc/main.h:
+../Core/Inc/BNO08x.h:
+../Core/Inc/BNO08x_shtp_registers.h:

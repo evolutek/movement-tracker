@@ -125,7 +125,7 @@ static inline void _reset_slave_blocking(){
 	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_RESET);
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
-	HAL_Delay(10);
+	HAL_Delay(100);
 }
 static inline bool _sensor_awaiting(){
 	return !HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin);
@@ -471,13 +471,13 @@ bool bno_setup(void){
 	//host. It must not send any other data until this step is complete.
 	//When BNO080 first boots it broadcasts big startup packet
 	//Read it and dump it
-	_wait_for_int_blocking(); //Wait for assertion of INT before reading advert message.
+	printf("%d\n",_wait_for_int_blocking()); //Wait for assertion of INT before reading advert message.
 	_receive_packet();
-	_wait_for_int_blocking(); //Advert message is too long to be handled at once, repeat
+	printf("%d\n",_wait_for_int_blocking()); //Advert message is too long to be handled at once, repeat
 	_receive_packet();
 	//The BNO080 will then transmit an unsolicited Initialize Response (see 6.4.5.2)
 	//Read it and dump it
-	_wait_for_int_blocking(); //Wait for assertion of INT before reading Init response
+	printf("%d\n",_wait_for_int_blocking()); //Wait for assertion of INT before reading Init response
 	_receive_packet();
 
 	//Check communication with device
@@ -491,7 +491,7 @@ bool bno_setup(void){
 	}
 
 	//Now we wait for response
-	_wait_for_int_blocking();
+	printf("%d\n",_wait_for_int_blocking());
 	_receive_packet();
 	if (shtpData[0] == BNO_SHTP_REPORT_PRODUCT_ID_RESPONSE){
 		if (_debug){

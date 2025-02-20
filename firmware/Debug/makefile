@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (11.3.rel1)
+# Toolchain: GNU Tools for STM32 (12.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -64,8 +64,8 @@ all: main-build
 main-build: Movement_Tracker.elf secondary-outputs
 
 # Tool invocations
-Movement_Tracker.elf Movement_Tracker.map: $(OBJS) $(USER_OBJS) C:\Users\danyj\Desktop\Projets\Evolutek\module-optique\firmware\STM32G491KEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Movement_Tracker.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\danyj\Desktop\Projets\Evolutek\module-optique\firmware\STM32G491KEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Movement_Tracker.map" -Wl,--gc-sections -static -u _printf_float -u _scanf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Movement_Tracker.elf Movement_Tracker.map: $(OBJS) $(USER_OBJS) C:\Users\Dany\Documents\Github\movement-tracker\firmware\STM32G491KEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Movement_Tracker.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Dany\Documents\Github\movement-tracker\firmware\STM32G491KEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Movement_Tracker.map" -Wl,--gc-sections -static -u _printf_float -u _scanf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

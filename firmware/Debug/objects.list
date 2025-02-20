@@ -1,7 +1,6 @@
-"./Core/Src/ADNS9800.o"
 "./Core/Src/BNO085.o"
+"./Core/Src/BNO08x.o"
 "./Core/Src/main.o"
-"./Core/Src/movement_tracker.o"
 "./Core/Src/runtime.o"
 "./Core/Src/stm32g4xx_hal_msp.o"
 "./Core/Src/stm32g4xx_it.o"
