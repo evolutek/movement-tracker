@@ -1,0 +1,10 @@
+../Core/Inc/micros.h:39:22:DWT_Init	4	static
+../Core/Inc/micros.h:45:22:delay_us	24	static
+../Core/Src/PAA5163.c:15:20:_select	16	static
+../Core/Src/PAA5163.c:19:20:_deselect	16	static
+../Core/Src/PAA5163.c:23:16:_paaRead	24	static
+../Core/Src/PAA5163.c:38:13:_paaWrite	24	static
+../Core/Src/PAA5163.c:50:13:_paaMotion	16	static
+../Core/Src/PAA5163.c:54:13:_paaPerfOpti	16	static
+../Core/Src/PAA5163.c:217:6:paaReadMotion	32	static
+../Core/Src/PAA5163.c:231:11:paaInit	32	static

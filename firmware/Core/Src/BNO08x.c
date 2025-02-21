@@ -60,7 +60,7 @@ static void _waitForInterrupt(){ // TODO : implement timeout
 }
 
 static bool _retrieve(bno_packet_t* packet){
-	if(!_awaiting) return 0; // sensor has nothing to tell us
+	if(!_awaiting()) return 0; // sensor has nothing to tell us
 
 	_enable();
 
@@ -96,8 +96,8 @@ static void _send(bno_packet_t* packet){
 
 	_enable();
 
-	HAL_SPI_Transmit(&SPI_INTERFACE, (uint8_t*)(packet->header), 4, SPI_TIMEOUT);
-	HAL_SPI_Transmit(&SPI_INTERFACE, (uint8_t*)(packet->data), packet->header.length -4, SPI_TIMEOUT);
+	HAL_SPI_Transmit(&SPI_INTERFACE, (uint8_t*)&(packet->header), 4, SPI_TIMEOUT);
+	HAL_SPI_Transmit(&SPI_INTERFACE, (uint8_t*) (packet->data), packet->header.length -4, SPI_TIMEOUT);
 
 	_disable_slave();
 }

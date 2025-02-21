@@ -1,11 +1,13 @@
-#include "BNO085.h"
-#include "stm32g4xx_hal.h"
+#include <runtime.h>
 #include "main.h"
+
 #include <stdio.h>
 #include <math.h>
-#include <runtime.h>
+
+#include "PAA5163.h"
+
 #include <time.h>
-#include "BNO08x.h"
+//#include "BNO08x.h"
 
 timestamp_t last_poll_time = 0;
 bool first_read = false;
@@ -15,9 +17,17 @@ float theta_reference = 0, raw_theta = 0, theta = 0;
 
 //TODO : remove the interrupt capability for IMU_INT
 
+paa5163_t paa = {
+	.spi = &hspi1,
+
+	.NCS_Port = CS_PAA_GPIO_Port,
+	.NCS_Pin = CS_PAA_Pin,
+};
+
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == GPIO_PIN_15){ // BNO
-		bnoInterrupt();
+		//bnoInterrupt();
 	} else { // PAA
 
 	}
@@ -25,10 +35,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 
 
 void setup(void){
+	printf("paa init %d\n", paaInit(&paa));
 
-	HAL_Delay(1000);
 
-	bnoInit();
+	//bnoInit();
 /*
 	if(bno_setup()) printf("IMU initialized successfully\n");
 	else printf("=== Could NOT initialize the BNO085 ! ===\n");
@@ -37,6 +47,7 @@ void setup(void){
 }
 
 void loop(void){
+	paaReadMotion(&paa);
 	/*
 	if (isTimeDeltaElapsed(last_poll_time, POLL_RATE+1)){
 		last_poll_time = getCurrentTime();

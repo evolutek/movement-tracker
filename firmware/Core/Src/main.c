@@ -23,13 +23,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "runtime.h"
-#include "main.h"
-#include "usb_device.h"
 
-#include "BNO085.h"
-
-#include "micros.h"
 #include <stdio.h>
+
+#include "PAA5163.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -123,11 +120,10 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USB_Device_Init();
   /* USER CODE BEGIN 2 */
-  DWT_Init();
-
   printf("=== HAL init done, proceeding ... ===\n");
   HAL_GPIO_WritePin(CS_PAA_GPIO_Port, CS_PAA_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
+
   setup();
   printf("=== User init done, proceeding ... ===\n");
   /* USER CODE END 2 */

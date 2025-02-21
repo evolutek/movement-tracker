@@ -1,0 +1,10 @@
+../Core/Src/BNO08x.c:29:20:_enable	1
+../Core/Src/BNO08x.c:33:20:_disable	1
+../Core/Src/BNO08x.c:37:20:_reset	1
+../Core/Src/BNO08x.c:46:20:_awaiting	1
+../Core/Src/BNO08x.c:53:13:_waitForAvail	2
+../Core/Src/BNO08x.c:57:13:_waitForInterrupt	2
+../Core/Src/BNO08x.c:62:13:_retrieve	4
+../Core/Src/BNO08x.c:93:13:_send	1
+../Core/Src/BNO08x.c:108:6:bnoInterrupt	2
+../Core/Src/BNO08x.c:118:6:bnoInit	1
