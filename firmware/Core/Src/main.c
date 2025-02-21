@@ -124,6 +124,8 @@ int main(void)
   HAL_GPIO_WritePin(CS_PAA_GPIO_Port, CS_PAA_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
 
+  printf("Movement Tracker V5, Firmware V2, Flashed on %s at %s\n", __DATE__, __TIME__);
+
   setup();
   printf("=== User init done, proceeding ... ===\n");
   /* USER CODE END 2 */

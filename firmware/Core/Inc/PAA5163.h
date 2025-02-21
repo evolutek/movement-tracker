@@ -3,12 +3,18 @@
 
 #include "main.h"
 
-typedef enum {
-	paa_err = 0, // unknown error
-	paa_ok = 1, // all good
+#include <stdbool.h>
 
+#define DEFAULT_RESOLUTION 20000
+
+typedef enum {
+	paa_ok = 0,
+
+	paa_err = 1, // unknown error
+
+	// Init errors :
 	paa_coms = 10, // could not communicate with the chip
-	paa_init = 11, // something when wrong during init flow
+	paa_observ = 11, // could not read the observation register properly (according to values given by the datasheet)
 } paa_err_t;
 
 typedef struct {
@@ -16,6 +22,30 @@ typedef struct {
 
 	GPIO_TypeDef *NCS_Port;
 	uint16_t NCS_Pin;
+	GPIO_TypeDef *NRST_Port;
+	uint16_t NRST_Pin;
+
+	uint16_t resolution; // cpi, between 100 and 20 000, value goes to DEFAULT_RESOLUTION if left to 0
+
+	/* Default orientation :
+	 * 		x-
+	 *		|
+	 * y- --+-- y+
+	 * 		|
+	 * 		x+
+	 */
+	bool axis_swap;
+	bool invert_x;
+	bool invert_y;
+
+	int16_t dx_cpi; // last readings
+	int16_t dy_cpi;
+
+	int32_t x_cpi; // sum of all readings
+	int32_t y_cpi;
+
+	float x; // counts per mm (sum of all readings)
+	float y;
 } paa5163_t;
 
 paa_err_t paaInit(paa5163_t* p);

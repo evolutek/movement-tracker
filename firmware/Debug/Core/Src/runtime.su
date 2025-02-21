@@ -1,3 +1,4 @@
-../Core/Src/runtime.c:28:6:HAL_GPIO_EXTI_Callback	16	static
-../Core/Src/runtime.c:37:6:setup	8	static
-../Core/Src/runtime.c:49:6:loop	8	static
+../Drivers/CMSIS/Include/core_cm4.h:1933:34:__NVIC_SystemReset	4	static,ignoring_inline_asm
+../Core/Src/runtime.c:40:6:HAL_GPIO_EXTI_Callback	16	static
+../Core/Src/runtime.c:50:6:setup	16	static
+../Core/Src/runtime.c:70:6:loop	4	static

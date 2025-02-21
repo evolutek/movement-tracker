@@ -1,4 +1,3 @@
-#include "stm32g4xx_hal.h"
 #include "main.h"
 #include "BNO08x.h"
 #include "BNO08x_shtp_registers.h"
@@ -6,138 +5,117 @@
 #include "stdbool.h"
 #include "stdio.h"
 
-#define SPI_INTERFACE hspi1
-#define SPI_TIMEOUT 1000
-
-#define BNO_MAX_PACKET_SIZE 300
-
-typedef struct bno_packet_s {
-	shtp_header_t header;
-	uint8_t data[BNO_MAX_PACKET_SIZE];
-} bno_packet_t;
-
-// ==================== Variables ==================== //
-
-static bool interrupt_triggered = false;
-static bool listen = false;
-static uint16_t sequence_number[6] = {0};
-
-bno_packet_t default_packet = {0};
+#define SPI_TIMEOUT 1000 // ms, timeout fed to HAL_SPI functions
+#define INT_TIMEOUT 1000 // ms, max time when waiting for the sensor to assert INT
 
 // ==================== Hardware abstraction ==================== //
 
-static inline void _enable(){
-	HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_RESET);
+static inline void _select(bno08x_t* b){
+	HAL_GPIO_WritePin(b->NCS_Port, b->NCS_Pin, GPIO_PIN_RESET);
 }
 
-static inline void _disable(){
-	HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
+static inline void _deselect(bno08x_t* b){
+	HAL_GPIO_WritePin(b->NCS_Port, b->NCS_Pin, GPIO_PIN_SET);
 }
 
-static inline void _reset(){
-	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
+static inline void _reset(bno08x_t* b){
+	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_SET);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_RESET);
 	HAL_Delay(1); // tnrst is 10us
-	HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_SET);
 	HAL_Delay(100); // t1 + t2 is about 100ms
 }
 
-static inline bool _awaiting(){
-	return !HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin);
+static inline bool _sens_rdy(bno08x_t* b){
+	return !HAL_GPIO_ReadPin(b->NINT_Port, b->NINT_Pin);
 }
 
 
 // ==================== Low Level ==================== //
 
-static void _waitForAvail(){ // TODO : implement timeout
-	while(!_awaiting());
+static bool _waitForSensRdy(bno08x_t* b){ // returns 1 if timed out
+	uint32_t t = HAL_GetTick();
+	while(!_sens_rdy(b) || HAL_GetTick() - t > INT_TIMEOUT);
+
+	if(!_sens_rdy(b)) return 1; // sensor is still not ready
+
+	return 0;
 }
 
-static void _waitForInterrupt(){ // TODO : implement timeout
-	while(!interrupt_triggered);
-	interrupt_triggered = false;
-}
+static bool _retrieve(bno08x_t* b, bno_packet_t* packet){ // returns 1 if data was read successfully
+	if(!_sens_rdy(b)) return 0; // sensor has nothing to tell us
 
-static bool _retrieve(bno_packet_t* packet){
-	if(!_awaiting()) return 0; // sensor has nothing to tell us
-
-	_enable();
+	_select(b);
 
 	uint8_t raw_header[4];
 
-	HAL_SPI_Receive(&SPI_INTERFACE, raw_header, 4, SPI_TIMEOUT);
+	HAL_SPI_Receive(b->spi, raw_header, 4, SPI_TIMEOUT);
 
 	packet->header = *((shtp_header_t*) raw_header);
 
-	sequence_number[packet->header.channel] = packet->header.seq_numb;
+	b->seq_nb[packet->header.channel] = packet->header.seq_numb;
 
 	if (packet->header.length == 0){
-		printf("fail\n");
-		_disable();
+		_deselect(b);
 		return 0;
 	}
 
-	printf("raw %2X %2X %d %d\n", raw_header[0], raw_header[1], raw_header[2], raw_header[3]);
-	printf("header %d %d %d %d\n", packet->header.length, packet->header.channel, packet->header.seq_numb, packet->header.followup);
+	//printf("header %d %d %d %d\n", packet->header.length, packet->header.channel, packet->header.seq_numb, packet->header.followup);
 
 	if(packet->header.length >= BNO_MAX_PACKET_SIZE) return 0;
 
-	HAL_SPI_Receive(&SPI_INTERFACE, packet->data, packet->header.length -4, SPI_TIMEOUT);
+	HAL_SPI_Receive(b->spi, packet->data, packet->header.length -4, SPI_TIMEOUT);
 
-	_disable();
+	_deselect(b);
+
+	packet->avail = 1;
 
 	return 1;
 }
 
-static void _send(bno_packet_t* packet){
+static void _send(bno08x_t* b, bno_packet_t* packet){
 	packet->header.followup = 0;
-	sequence_number[packet->header.channel]++;
+	b->seq_nb[packet->header.channel]++;
 
-	_enable();
+	_select(b);
 
-	HAL_SPI_Transmit(&SPI_INTERFACE, (uint8_t*)&(packet->header), 4, SPI_TIMEOUT);
-	HAL_SPI_Transmit(&SPI_INTERFACE, (uint8_t*) (packet->data), packet->header.length -4, SPI_TIMEOUT);
+	HAL_SPI_Transmit(b->spi, (uint8_t*)&(packet->header), 4, SPI_TIMEOUT);
+	HAL_SPI_Transmit(b->spi, (uint8_t*) (packet->data), packet->header.length -4, SPI_TIMEOUT);
 
-	_disable_slave();
+	_deselect(b);
 }
 
 // ==================== High Level ==================== //
 
+bool bnoProcess(bno08x_t* b){ // returns 1 if data has been read
+	if(!b->listen) return 0;
+	if(!_sens_rdy(b)) return 0;
 
-void bnoInterrupt(){
-	//printf("int\n");
-
-	if(!listen) return;
-	interrupt_triggered = true;
-	_retrieve(&default_packet);
-
-	printf("data\n");
+	return _retrieve(b, b->incoming);
 }
 
-void bnoInit(){
-	_disable();
 
-	_reset();
+bno_err_t bnoInit(bno08x_t* b){
+	_deselect(b);
 
-	printf("rst\n");
+	_reset(b);
 
-	_waitForAvail(); // shtp advertissement
-	_retrieveData(&default_packet);
+	// TODO : check for coms
 
-	printf("adv\n");
+	if(_waitForSensRdy(b)) return bno_shtp_advert; // shtp advertissement
+	_retrieve(b, b->incoming);
 
-	_waitForAvail(); // executable reset message
-	_retrieveData(&default_packet);
+	if(_waitForSensRdy(b)) return bno_exec_rst; // executable reset message
+	_retrieve(b, b->incoming);
 
-	printf("exec\n");
 
-	_waitForAvail(); // sh2 init message
-	_retrieveData(&default_packet);
+	if(_waitForSensRdy(b)) return bno_sh2_init; // sh2 init message
+	_retrieve(b, b->incoming);
 
-	printf("init\n");
+	b->listen = true;
 
-	//listen = true;
+	return bno_ok;
 }
 
 

@@ -10,6 +10,8 @@
 #define SPI_TIMEOUT HAL_MAX_DELAY
 #define OBSERVATION_INIT_RETRY 10
 
+#define IN_TO_MM 25.4
+
 // ================= Hardware abstraction ================= //
 
 static inline void _select(paa5163_t* p){
@@ -31,6 +33,7 @@ static uint8_t _paaRead(paa5163_t* p, paa5163_registers_t addr){
 	HAL_SPI_Receive(p->spi, &ret, 1, SPI_TIMEOUT);
 	delay_us(1); // should be 120 ns
 	_deselect(p);
+	delay_us(5); // tsww or tswr, taking no risk
 
 	return ret;
 }
@@ -43,9 +46,37 @@ static void _paaWrite(paa5163_t* p, paa5163_registers_t addr, uint8_t data){
 	HAL_SPI_Transmit(p->spi, buf, 2, SPI_TIMEOUT);
 	delay_us(1); // should be 120 ns
 	_deselect(p);
+	delay_us(5); // tsww or tswr, taking no risk
 }
 
 // ================= Low level ================= //
+
+/* Default orientation :
+ * 		x-
+ *		|
+ * y- --+-- y+
+ * 		|
+ * 		x+
+ */
+static void _paaSetOrientation(paa5163_t* p, bool swap_axies, bool invert_x, bool invert_y){ // swaping is done before flipping
+	uint8_t orient_reg = 0x00 | ((swap_axies & 0x01) << 0) | ((invert_x & 0x01) << 2) | ((invert_y & 0x01) << 1);
+
+	_paaWrite(p, orientation, orient_reg);
+}
+
+static void _paaSetResolution(paa5163_t* p, uint16_t res_cpi){ // between 100 and 20 000
+	if(res_cpi < 100) res_cpi = 100;
+	if(res_cpi > 20000) res_cpi = 20000;
+
+	uint8_t reg = (res_cpi/100) -1;
+
+	_paaWrite(p, resolution_y_lower, reg);
+	_paaWrite(p, resolution_y_upper, 0x00);
+	_paaWrite(p, resolution_x_lower, reg);
+	_paaWrite(p, resolution_x_upper, 0x00);
+
+	_paaWrite(p, set_resolution, 0x01);
+}
 
 static bool _paaMotion(paa5163_t* p){
 	return (_paaRead(p, motion) & 0x80);
@@ -215,16 +246,23 @@ static void _paaPerfOpti(paa5163_t* p){ 	// Check section 7.1.2 of PAA5160's dat
 // ================= High level ================= //
 
 void paaReadMotion(paa5163_t* p){
-	int16_t data16[2];
-	uint8_t* data8 = (uint8_t*) data16;
+	uint8_t* dx8 = (uint8_t*) &(p->dx_cpi);
+	uint8_t* dy8 = (uint8_t*) &(p->dy_cpi);
 
 	if(_paaMotion(p)){
-		data8[0] = _paaRead(p, delta_x_l);
-		data8[1] = _paaRead(p, delta_x_h);
-		data8[2] = _paaRead(p, delta_y_l);
-		data8[3] = _paaRead(p, delta_y_h);
+		dx8[0] = _paaRead(p, delta_x_l);
+		dx8[1] = _paaRead(p, delta_x_h);
+		dy8[0] = _paaRead(p, delta_y_l);
+		dy8[1] = _paaRead(p, delta_y_h);
 
-		printf("paa : x %d, y %d\n", data16[0], data16[1]);
+		p->x_cpi += p->dx_cpi;
+		p->y_cpi += p->dy_cpi;
+
+		p->x = ((float) p->x_cpi * (float) IN_TO_MM) / (float) p->resolution;
+		p->y = ((float) p->y_cpi * (float) IN_TO_MM) / (float) p->resolution;
+
+		// printf("paa : dx %d, dy %d, xcpi %ld, ycpi %ld, x %.3f, y %.3f\n", p->dx_cpi, p->dy_cpi, p->x_cpi, p->y_cpi, p->x, p->y);
+		printf("paa : x %.3f\ty %.3f\n", p->x, p->y);
 	}
 }
 
@@ -235,16 +273,16 @@ paa_err_t paaInit(paa5163_t* p){
 
 	// Check section 7.1.1 of PAA5160's datasheet : Initialization Flow
 
-	HAL_Delay(50);
+	HAL_GPIO_WritePin(p->NRST_Port, p->NRST_Pin, GPIO_PIN_RESET);
+	HAL_Delay(1); // should be 20us
+	HAL_GPIO_WritePin(p->NRST_Port, p->NRST_Pin, GPIO_PIN_SET);
+	HAL_Delay(2);
+
+	HAL_Delay(150); // tmot-rst, being extra careful
 
 	if(_paaRead(p, product_id) != ((~_paaRead(p, inverse_product_id)) & 0xFF)){ // check if we can communicate
 		return paa_coms;
 	}
-
-	HAL_GPIO_WritePin(RST_PAA_GPIO_Port, RST_PAA_Pin, GPIO_PIN_RESET);
-	HAL_Delay(1);
-	HAL_GPIO_WritePin(RST_PAA_GPIO_Port, RST_PAA_Pin, GPIO_PIN_SET);
-	HAL_Delay(2);
 
 	uint8_t i = 0; uint8_t observ_read;
 	do {
@@ -254,7 +292,7 @@ paa_err_t paaInit(paa5163_t* p){
 		HAL_Delay(1);
 		observ_read = _paaRead(p, observation);
 
-		if(i >= OBSERVATION_INIT_RETRY) return paa_init;
+		if(i >= OBSERVATION_INIT_RETRY) return paa_observ;
 	} while(observ_read != 0xB7 && observ_read != 0xBF);
 
 	_paaPerfOpti(p);
@@ -264,6 +302,13 @@ paa_err_t paaInit(paa5163_t* p){
 	_paaRead(p, delta_x_h);
 	_paaRead(p, delta_y_l);
 	_paaRead(p, delta_y_h);
+
+	// Init done ! Now we can set values
+
+	if(p->resolution == 0) p->resolution = DEFAULT_RESOLUTION; // if value left uninitialized
+	_paaSetResolution(p, p->resolution);
+
+	_paaSetOrientation(p, p->axis_swap, p->invert_x, p->invert_y);
 
 	return paa_ok;
 }

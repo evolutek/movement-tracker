@@ -34,7 +34,8 @@ Core/Src/runtime.o: ../Core/Src/runtime.c ../Core/Inc/runtime.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../Core/Inc/main.h ../Core/Inc/PAA5163.h ../Core/Inc/time.h
+ ../Core/Inc/main.h ../Core/Inc/PAA5163.h ../Core/Inc/BNO08x.h \
+ ../Core/Inc/BNO08x_shtp_registers.h ../Core/Inc/time.h
 ../Core/Inc/runtime.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
@@ -74,4 +75,6 @@ Core/Src/runtime.o: ../Core/Src/runtime.c ../Core/Inc/runtime.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
 ../Core/Inc/main.h:
 ../Core/Inc/PAA5163.h:
+../Core/Inc/BNO08x.h:
+../Core/Inc/BNO08x_shtp_registers.h:
 ../Core/Inc/time.h:

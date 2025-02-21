@@ -1,53 +1,81 @@
-#include <runtime.h>
+#include "runtime.h"
 #include "main.h"
 
-#include <stdio.h>
-#include <math.h>
-
 #include "PAA5163.h"
+#include "BNO08x.h"
 
+#include <stdio.h>
+#include <stdbool.h>
+#include <math.h>
 #include <time.h>
-//#include "BNO08x.h"
 
-timestamp_t last_poll_time = 0;
-bool first_read = false;
-float theta_reference = 0, raw_theta = 0, theta = 0;
-
-#define POLL_RATE 50 //ms, approx (non interrupt)
-
-//TODO : remove the interrupt capability for IMU_INT
+bool interrupts_enabled = 0;
+bool data_ready = 0;
 
 paa5163_t paa = {
 	.spi = &hspi1,
 
 	.NCS_Port = CS_PAA_GPIO_Port,
 	.NCS_Pin = CS_PAA_Pin,
+	.NRST_Port = RST_PAA_GPIO_Port,
+	.NRST_Pin = RST_PAA_Pin,
+
+	.invert_x = 1,
 };
 
+bno08x_t bno = {
+	.spi = &hspi1,
+
+	.NCS_Port = CS_IMU_GPIO_Port,
+	.NCS_Pin = CS_IMU_Pin,
+	.NINT_Port = INT_IMU_GPIO_Port,
+	.NINT_Pin = INT_IMU_Pin,
+	.NRST_Port = RST_IMU_GPIO_Port,
+	.NRST_Pin = RST_IMU_Pin,
+};
+
+// Note : As the BNO triggers an interrupt evey couple of tens of ms, it is the only one actually triggering interrupts (the paa is read using polling methods)
+
+// WARNING : Both libraries could attempt to access the spi bus at the same time if read operations are done inside the interrupts !
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(GPIO_Pin == GPIO_PIN_15){ // BNO
-		//bnoInterrupt();
-	} else { // PAA
+	if(!interrupts_enabled) return;
 
+	if(GPIO_Pin == bno.NINT_Pin){ // BNO data ready
+		paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
+		bnoProcess(&bno);
+
+		data_ready = 1;
 	}
 }
 
 
 void setup(void){
-	printf("paa init %d\n", paaInit(&paa));
+	paa_err_t paa_init_exit = paaInit(&paa);
+	bno_err_t bno_init_exit = bnoInit(&bno);
 
+	printf("PAA5160 Init exit code : %d\n", paa_init_exit);
+	printf("BNO08x Init exit code : %d\n", bno_init_exit);
 
-	//bnoInit();
-/*
-	if(bno_setup()) printf("IMU initialized successfully\n");
-	else printf("=== Could NOT initialize the BNO085 ! ===\n");
+	if(paa_init_exit != paa_ok || bno_init_exit != bno_ok) { // for now, if one of the sensors could not be initialized properly, reboot to try again
+		printf("WARNING : a sensor could not be initialiezd, rebooting ...\n");
+		HAL_Delay(500);
+		NVIC_SystemReset();
+	}
+
+	/*
 	bno_enable_rotation_vector(POLL_RATE);
 	*/
+
+	interrupts_enabled = 1;
 }
 
 void loop(void){
-	paaReadMotion(&paa);
+	if(data_ready){
+
+	}
+
+
 	/*
 	if (isTimeDeltaElapsed(last_poll_time, POLL_RATE+1)){
 		last_poll_time = getCurrentTime();
