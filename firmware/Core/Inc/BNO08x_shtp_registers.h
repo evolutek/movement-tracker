@@ -3,7 +3,7 @@
 
 #include "stdbool.h"
 
-typedef struct __attribute__ ((__packed__)) shtp_header_s {
+typedef struct __attribute__ ((__packed__)) shtp_header_s { // LSB first
 	uint16_t length : 15;
 	bool followup : 1; // indicate that the message is a continuation of the previous one
 	uint8_t channel;

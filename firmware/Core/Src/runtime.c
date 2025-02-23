@@ -42,8 +42,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(!interrupts_enabled) return;
 
 	if(GPIO_Pin == bno.NINT_Pin){ // BNO data ready
-		paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
-		bnoProcess(&bno);
+
+		printf("Int : paa %d, bno %d\n", HAL_GPIO_ReadPin(INT_PAA_GPIO_Port, INT_PAA_Pin),HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin));
+
 
 		data_ready = 1;
 	}
@@ -71,6 +72,9 @@ void setup(void){
 }
 
 void loop(void){
+	paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
+	bnoProcess(&bno);
+
 	if(data_ready){
 
 	}

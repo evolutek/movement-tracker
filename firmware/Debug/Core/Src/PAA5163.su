@@ -4,9 +4,11 @@
 ../Core/Src/PAA5163.c:21:20:_deselect	16	static
 ../Core/Src/PAA5163.c:25:16:_paaRead	24	static
 ../Core/Src/PAA5163.c:41:13:_paaWrite	24	static
-../Core/Src/PAA5163.c:63:13:_paaSetOrientation	24	static
-../Core/Src/PAA5163.c:69:13:_paaSetResolution	24	static
+../Core/Src/PAA5163.c:61:13:_paaSetOrientation	24	static
+../Core/Src/PAA5163.c:67:13:_paaSetResolution	24	static
 ../Core/Src/PAA5163.c:83:13:_paaMotion	16	static
 ../Core/Src/PAA5163.c:87:13:_paaPerfOpti	16	static
-../Core/Src/PAA5163.c:250:6:paaReadMotion	40	static
-../Core/Src/PAA5163.c:271:11:paaInit	32	static
+../Core/Src/PAA5163.c:250:11:paaInit	32	static
+../Core/Src/PAA5163.c:300:6:paaReadMotion	40	static
+../Core/Src/PAA5163.c:323:7:paaGetX	16	static
+../Core/Src/PAA5163.c:327:7:paaGetY	16	static

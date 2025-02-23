@@ -1,9 +1,10 @@
 ../Core/Src/BNO08x.c:13:20:_select	16	static
 ../Core/Src/BNO08x.c:17:20:_deselect	16	static
 ../Core/Src/BNO08x.c:21:20:_reset	16	static
-../Core/Src/BNO08x.c:30:20:_sens_rdy	16	static
-../Core/Src/BNO08x.c:37:13:_waitForSensRdy	24	static
-../Core/Src/BNO08x.c:46:13:_retrieve	24	static
-../Core/Src/BNO08x.c:77:13:_send	16	static
-../Core/Src/BNO08x.c:91:6:bnoProcess	16	static
-../Core/Src/BNO08x.c:99:11:bnoInit	16	static
+../Core/Src/BNO08x.c:30:20:_sensRdy	16	static
+../Core/Src/BNO08x.c:37:13:_waitForSensRdyTimeout	24	static
+../Core/Src/BNO08x.c:45:20:_waitForSensRdy	16	static
+../Core/Src/BNO08x.c:48:13:_retrieve	32	static
+../Core/Src/BNO08x.c:85:13:_send	40	static
+../Core/Src/BNO08x.c:114:6:bnoProcess	16	static
+../Core/Src/BNO08x.c:121:11:bnoInit	24	static

@@ -25,7 +25,7 @@ typedef struct {
 	GPIO_TypeDef *NRST_Port;
 	uint16_t NRST_Pin;
 
-	uint16_t resolution; // cpi, between 100 and 20 000, value goes to DEFAULT_RESOLUTION if left to 0
+	uint16_t resolution; // cpi, between 100 and 20 000, by increments of 100. Value goes to DEFAULT_RESOLUTION if left to 0
 
 	/* Default orientation :
 	 * 		x-
@@ -46,9 +46,15 @@ typedef struct {
 
 	float x; // counts per mm (sum of all readings)
 	float y;
+
+	bool initialized;
 } paa5163_t;
 
 paa_err_t paaInit(paa5163_t* p);
+
 void paaReadMotion(paa5163_t* p);
+
+float paaGetX(paa5163_t* p);
+float paaGetY(paa5163_t* p);
 
 #endif /* INC_PAA5163_H_ */

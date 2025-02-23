@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "BNO08x_shtp_registers.h"
 
-#define BNO_MAX_PACKET_SIZE 300
+#define BNO_MAX_PACKET_SIZE 300 // biggest message we could encounter is 276 bytes long
 
 typedef struct {
 	bool avail; // packet not processed yet
@@ -19,9 +19,10 @@ typedef enum {
 
 	// Init errors :
 	bno_coms = 10, // could not communicate with the chip
-	bno_shtp_advert = 11,
-	bno_exec_rst = 12,
-	bno_sh2_init = 13,
+	bno_shtp_advert = 11, // could not retrive shtp advert message
+	bno_exec_rst = 12, // could not retrive sensor's reset message
+	bno_sh2_init = 13, // could not retrive sh2's init message
+	bno_sequence = 14, // sensor did not deliver expected data when asked
 } bno_err_t;
 
 typedef struct {
@@ -38,11 +39,12 @@ typedef struct {
 
 	// ======== READ ONLY ======== //
 
-	bool listen; // lib listenning to the sensor interrupt pin
+	uint8_t incom_seq_nb[6]; // sequence numbers for incoming packets (one for each channel)
+	uint8_t outgo_seq_nb[6]; // sequence numbers for outgoing packets (one for each channel)
 
-	uint16_t seq_nb[6];
-	bno_packet_t incoming[1];
+	bno_packet_t incoming; // default memory space for incoming packets
 
+	bool initialized;
 } bno08x_t ;
 
 bno_err_t bnoInit();

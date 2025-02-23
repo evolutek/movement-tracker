@@ -64,11 +64,13 @@ static void _paaSetOrientation(paa5163_t* p, bool swap_axies, bool invert_x, boo
 	_paaWrite(p, orientation, orient_reg);
 }
 
-static void _paaSetResolution(paa5163_t* p, uint16_t res_cpi){ // between 100 and 20 000
+static void _paaSetResolution(paa5163_t* p, uint16_t res_cpi){ // between 100 and 20 000, by increments of 100
 	if(res_cpi < 100) res_cpi = 100;
 	if(res_cpi > 20000) res_cpi = 20000;
 
 	uint8_t reg = (res_cpi/100) -1;
+
+	p->resolution = (reg + 1) * 100; // compensate any rounding done by calculation of reg
 
 	_paaWrite(p, resolution_y_lower, reg);
 	_paaWrite(p, resolution_y_upper, 0x00);
@@ -245,27 +247,6 @@ static void _paaPerfOpti(paa5163_t* p){ 	// Check section 7.1.2 of PAA5160's dat
 
 // ================= High level ================= //
 
-void paaReadMotion(paa5163_t* p){
-	uint8_t* dx8 = (uint8_t*) &(p->dx_cpi);
-	uint8_t* dy8 = (uint8_t*) &(p->dy_cpi);
-
-	if(_paaMotion(p)){
-		dx8[0] = _paaRead(p, delta_x_l);
-		dx8[1] = _paaRead(p, delta_x_h);
-		dy8[0] = _paaRead(p, delta_y_l);
-		dy8[1] = _paaRead(p, delta_y_h);
-
-		p->x_cpi += p->dx_cpi;
-		p->y_cpi += p->dy_cpi;
-
-		p->x = ((float) p->x_cpi * (float) IN_TO_MM) / (float) p->resolution;
-		p->y = ((float) p->y_cpi * (float) IN_TO_MM) / (float) p->resolution;
-
-		// printf("paa : dx %d, dy %d, xcpi %ld, ycpi %ld, x %.3f, y %.3f\n", p->dx_cpi, p->dy_cpi, p->x_cpi, p->y_cpi, p->x, p->y);
-		printf("paa : x %.3f\ty %.3f\n", p->x, p->y);
-	}
-}
-
 paa_err_t paaInit(paa5163_t* p){
 	_deselect(p);
 
@@ -310,5 +291,39 @@ paa_err_t paaInit(paa5163_t* p){
 
 	_paaSetOrientation(p, p->axis_swap, p->invert_x, p->invert_y);
 
+	p->initialized = 1;
+
 	return paa_ok;
+}
+
+// TODO : use the INT pin instead of reading the motion register (to be faster), if the motion register clears itself when reading x or y
+void paaReadMotion(paa5163_t* p){
+	if(!p->initialized) return;
+
+	uint8_t* dx8 = (uint8_t*) &(p->dx_cpi);
+	uint8_t* dy8 = (uint8_t*) &(p->dy_cpi);
+
+	if(_paaMotion(p)){
+		dx8[0] = _paaRead(p, delta_x_l);
+		dx8[1] = _paaRead(p, delta_x_h);
+		dy8[0] = _paaRead(p, delta_y_l);
+		dy8[1] = _paaRead(p, delta_y_h);
+
+		p->x_cpi += p->dx_cpi;
+		p->y_cpi += p->dy_cpi;
+
+		p->x = ((float) p->x_cpi * (float) IN_TO_MM) / (float) p->resolution;
+		p->y = ((float) p->y_cpi * (float) IN_TO_MM) / (float) p->resolution;
+
+		// printf("paa : dx %d, dy %d, xcpi %ld, ycpi %ld, x %.3f, y %.3f\n", p->dx_cpi, p->dy_cpi, p->x_cpi, p->y_cpi, p->x, p->y);
+		printf("paa : x %.3f\ty %.3f\n", p->x, p->y);
+	}
+}
+
+float paaGetX(paa5163_t* p){
+	return p->x;
+}
+
+float paaGetY(paa5163_t* p){
+	return p->y;
 }

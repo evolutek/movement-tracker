@@ -27,24 +27,26 @@ static inline void _reset(bno08x_t* b){
 	HAL_Delay(100); // t1 + t2 is about 100ms
 }
 
-static inline bool _sens_rdy(bno08x_t* b){
+static inline bool _sensRdy(bno08x_t* b){
 	return !HAL_GPIO_ReadPin(b->NINT_Port, b->NINT_Pin);
 }
 
 
 // ==================== Low Level ==================== //
 
-static bool _waitForSensRdy(bno08x_t* b){ // returns 1 if timed out
+static bool _waitForSensRdyTimeout(bno08x_t* b, uint16_t timeout){ // returns 1 if timed out
 	uint32_t t = HAL_GetTick();
-	while(!_sens_rdy(b) || HAL_GetTick() - t > INT_TIMEOUT);
+	while(!_sensRdy(b) && HAL_GetTick() - t < timeout);
 
-	if(!_sens_rdy(b)) return 1; // sensor is still not ready
+	if(!_sensRdy(b)) return 1; // sensor is still not ready
 
 	return 0;
 }
+static inline bool _waitForSensRdy(bno08x_t* b){ return _waitForSensRdyTimeout(b, INT_TIMEOUT);}
+
 
 static bool _retrieve(bno08x_t* b, bno_packet_t* packet){ // returns 1 if data was read successfully
-	if(!_sens_rdy(b)) return 0; // sensor has nothing to tell us
+	if(!_sensRdy(b)) return 0; // sensor has nothing to tell us
 
 	_select(b);
 
@@ -54,18 +56,24 @@ static bool _retrieve(bno08x_t* b, bno_packet_t* packet){ // returns 1 if data w
 
 	packet->header = *((shtp_header_t*) raw_header);
 
-	b->seq_nb[packet->header.channel] = packet->header.seq_numb;
+	b->incom_seq_nb[packet->header.channel] = packet->header.seq_numb;
 
-	if (packet->header.length == 0){
+	if (packet->header.length == 0){ // TODO : not even sure if that's possible, as the header alone is already 4 bytes
+		//printf("empty\n");
 		_deselect(b);
 		return 0;
 	}
 
-	//printf("header %d %d %d %d\n", packet->header.length, packet->header.channel, packet->header.seq_numb, packet->header.followup);
-
-	if(packet->header.length >= BNO_MAX_PACKET_SIZE) return 0;
+	if(packet->header.length -4 >= BNO_MAX_PACKET_SIZE) packet->header.length = BNO_MAX_PACKET_SIZE;
 
 	HAL_SPI_Receive(b->spi, packet->data, packet->header.length -4, SPI_TIMEOUT);
+
+	printf("< lgth %d, chan %d, seq_nb %d, contin %d ", packet->header.length, packet->header.channel, packet->header.seq_numb, packet->header.followup);
+	printf("data : ");
+	for(uint16_t i = 0; i < packet->header.length -4; i++){
+		printf("%02x ", packet->data[i]);
+	}
+	printf("\n");
 
 	_deselect(b);
 
@@ -74,14 +82,29 @@ static bool _retrieve(bno08x_t* b, bno_packet_t* packet){ // returns 1 if data w
 	return 1;
 }
 
-static void _send(bno08x_t* b, bno_packet_t* packet){
-	packet->header.followup = 0;
-	b->seq_nb[packet->header.channel]++;
+static void _send(bno08x_t* b, shtp_channel_t channel, uint8_t data[], uint16_t data_length){ // Note : data_length does not include header length
+	b->outgo_seq_nb[channel]++;
+
+	shtp_header_t header = {
+		.length = data_length + 4,
+		.channel = channel,
+		.followup = 0,
+		.seq_numb = b->outgo_seq_nb[channel],
+	};
+
+	//printf("outgoing : ");
+	//uint8_t* raw_header = (uint8_t*) &header;
+	//for(uint8_t i = 0; i < 4; i++){
+	//	printf("%02x ", raw_header[i]);
+	//}
+	//printf("\n");
+
+	printf("> lgth %d, contin %d, chan %d, nb %d\n", header.length, header.followup, header.channel, header.seq_numb);
 
 	_select(b);
 
-	HAL_SPI_Transmit(b->spi, (uint8_t*)&(packet->header), 4, SPI_TIMEOUT);
-	HAL_SPI_Transmit(b->spi, (uint8_t*) (packet->data), packet->header.length -4, SPI_TIMEOUT);
+	HAL_SPI_Transmit(b->spi, (uint8_t*)&(header), 4, SPI_TIMEOUT);
+	HAL_SPI_Transmit(b->spi, data, data_length, SPI_TIMEOUT);
 
 	_deselect(b);
 }
@@ -89,10 +112,9 @@ static void _send(bno08x_t* b, bno_packet_t* packet){
 // ==================== High Level ==================== //
 
 bool bnoProcess(bno08x_t* b){ // returns 1 if data has been read
-	if(!b->listen) return 0;
-	if(!_sens_rdy(b)) return 0;
+	if(!b->initialized) return 0;
 
-	return _retrieve(b, b->incoming);
+	return _retrieve(b,&(b->incoming));
 }
 
 
@@ -101,21 +123,35 @@ bno_err_t bnoInit(bno08x_t* b){
 
 	_reset(b);
 
-	// TODO : check for coms
-
 	if(_waitForSensRdy(b)) return bno_shtp_advert; // shtp advertissement
-	_retrieve(b, b->incoming);
+	_retrieve(b,&(b->incoming));
 
 	if(_waitForSensRdy(b)) return bno_exec_rst; // executable reset message
-	_retrieve(b, b->incoming);
-
+	_retrieve(b,&(b->incoming));
 
 	if(_waitForSensRdy(b)) return bno_sh2_init; // sh2 init message
-	_retrieve(b, b->incoming);
+	_retrieve(b,&(b->incoming));
 
-	b->listen = true;
+	HAL_Delay(20); // TODO check delays across the program
 
+	// now that the boot messages are cleared, we can test the communication to the device
+	uint8_t data[] = {
+		product_id_request,
+		0
+	};
+	_send(b, hub_control, data, sizeof(data));
+
+	if(_waitForSensRdy(b)) return bno_coms;
+	_retrieve(b,&(b->incoming));
+
+	printf("< data (lgth %d): ", b->incoming.header.length);
+	for(uint16_t i = 0; i < b->incoming.header.length -4; i++){
+		printf("%d ", b->incoming.data[i]);
+	}
+	printf("\n");
+
+	//if(b->incoming.data[0] != product_id_response) return bno_sequence;
+
+	b->initialized = 1;
 	return bno_ok;
 }
-
-
