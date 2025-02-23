@@ -1,10 +1,10 @@
 ../Core/Src/BNO08x.c:13:20:_select	1
 ../Core/Src/BNO08x.c:17:20:_deselect	1
 ../Core/Src/BNO08x.c:21:20:_reset	1
-../Core/Src/BNO08x.c:30:20:_sensRdy	1
-../Core/Src/BNO08x.c:37:13:_waitForSensRdyTimeout	4
-../Core/Src/BNO08x.c:45:20:_waitForSensRdy	1
-../Core/Src/BNO08x.c:48:13:_retrieve	5
-../Core/Src/BNO08x.c:85:13:_send	1
-../Core/Src/BNO08x.c:114:6:bnoProcess	2
-../Core/Src/BNO08x.c:121:11:bnoInit	6
+../Core/Src/BNO08x.c:31:20:_sensRdy	1
+../Core/Src/BNO08x.c:38:13:_waitForSensRdyTimeout	4
+../Core/Src/BNO08x.c:46:20:_waitForSensRdy	1
+../Core/Src/BNO08x.c:49:13:_retrieve	4
+../Core/Src/BNO08x.c:86:13:_send	1
+../Core/Src/BNO08x.c:115:6:bnoProcess	2
+../Core/Src/BNO08x.c:122:11:bnoInit	7

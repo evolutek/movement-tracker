@@ -120,7 +120,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USB_Device_Init();
   /* USER CODE BEGIN 2 */
-  printf("=== HAL init done, proceeding ... ===\n");
+  printf("\n=== HAL init done, proceeding ... ===\n");
   HAL_GPIO_WritePin(CS_PAA_GPIO_Port, CS_PAA_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
 
@@ -389,12 +389,12 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(STATUS_GPIO_Port, STATUS_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : CS_IMU_Pin */
-  GPIO_InitStruct.Pin = CS_IMU_Pin;
+  /*Configure GPIO pins : CS_IMU_Pin CS_PAA_Pin */
+  GPIO_InitStruct.Pin = CS_IMU_Pin|CS_PAA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS_IMU_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : RST_PAA_Pin */
   GPIO_InitStruct.Pin = RST_PAA_Pin;
@@ -403,12 +403,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(RST_PAA_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RST_IMU_Pin CS_PAA_Pin */
-  GPIO_InitStruct.Pin = RST_IMU_Pin|CS_PAA_Pin;
+  /*Configure GPIO pin : RST_IMU_Pin */
+  GPIO_InitStruct.Pin = RST_IMU_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(RST_IMU_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : INT_PAA_Pin */
   GPIO_InitStruct.Pin = INT_PAA_Pin;
@@ -432,7 +432,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = STATUS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(STATUS_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */

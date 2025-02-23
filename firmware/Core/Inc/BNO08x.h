@@ -22,7 +22,8 @@ typedef enum {
 	bno_shtp_advert = 11, // could not retrive shtp advert message
 	bno_exec_rst = 12, // could not retrive sensor's reset message
 	bno_sh2_init = 13, // could not retrive sh2's init message
-	bno_sequence = 14, // sensor did not deliver expected data when asked
+	bno_unknown_report = 14, // could not retrieve the additionnal unknown startup packet
+	bno_sequence = 15, // sensor did not deliver expected data
 } bno_err_t;
 
 typedef struct {

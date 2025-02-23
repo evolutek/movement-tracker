@@ -2,8 +2,8 @@
 #include "BNO08x.h"
 #include "BNO08x_shtp_registers.h"
 
-#include "stdbool.h"
-#include "stdio.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 #define SPI_TIMEOUT 1000 // ms, timeout fed to HAL_SPI functions
 #define INT_TIMEOUT 1000 // ms, max time when waiting for the sensor to assert INT
@@ -19,12 +19,13 @@ static inline void _deselect(bno08x_t* b){
 }
 
 static inline void _reset(bno08x_t* b){
+	// do not change those timings, i'm not sure why, but reducing them causes issues on reboots
 	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_SET);
-	HAL_Delay(1);
+	HAL_Delay(10);
 	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_RESET);
-	HAL_Delay(1); // tnrst is 10us
+	HAL_Delay(10);
 	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_SET);
-	HAL_Delay(100); // t1 + t2 is about 100ms
+	HAL_Delay(200);
 }
 
 static inline bool _sensRdy(bno08x_t* b){
@@ -68,12 +69,12 @@ static bool _retrieve(bno08x_t* b, bno_packet_t* packet){ // returns 1 if data w
 
 	HAL_SPI_Receive(b->spi, packet->data, packet->header.length -4, SPI_TIMEOUT);
 
-	printf("< lgth %d, chan %d, seq_nb %d, contin %d ", packet->header.length, packet->header.channel, packet->header.seq_numb, packet->header.followup);
-	printf("data : ");
-	for(uint16_t i = 0; i < packet->header.length -4; i++){
-		printf("%02x ", packet->data[i]);
-	}
-	printf("\n");
+	printf("< lgth %d, chan %d, seq_nb %d, contin %d\n", packet->header.length, packet->header.channel, packet->header.seq_numb, packet->header.followup);
+	//printf("data : ");
+	//for(uint16_t i = 0; i < packet->header.length -4; i++){
+	//	printf("%02x ", packet->data[i]);
+	//}
+	//printf("\n");
 
 	_deselect(b);
 
@@ -132,7 +133,8 @@ bno_err_t bnoInit(bno08x_t* b){
 	if(_waitForSensRdy(b)) return bno_sh2_init; // sh2 init message
 	_retrieve(b,&(b->incoming));
 
-	HAL_Delay(20); // TODO check delays across the program
+	if(_waitForSensRdy(b)) return bno_unknown_report; // unknown packet sent at startup, channel 0 length 55
+	_retrieve(b,&(b->incoming));
 
 	// now that the boot messages are cleared, we can test the communication to the device
 	uint8_t data[] = {
@@ -146,7 +148,7 @@ bno_err_t bnoInit(bno08x_t* b){
 
 	printf("< data (lgth %d): ", b->incoming.header.length);
 	for(uint16_t i = 0; i < b->incoming.header.length -4; i++){
-		printf("%d ", b->incoming.data[i]);
+		printf("%02x ", b->incoming.data[i]);
 	}
 	printf("\n");
 

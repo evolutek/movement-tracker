@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-static short _debug = 0;
+static short _debug = 2;
 // 1 for minimal
 // 2 for all (including tranfer reports, LOTS of stuff)
 

@@ -9,6 +9,8 @@
 #include <math.h>
 #include <time.h>
 
+#include "BNO085.h"
+
 bool interrupts_enabled = 0;
 bool data_ready = 0;
 
@@ -72,7 +74,7 @@ void setup(void){
 }
 
 void loop(void){
-	paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
+	//paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
 	bnoProcess(&bno);
 
 	if(data_ready){
