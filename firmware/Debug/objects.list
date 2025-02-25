@@ -8,7 +8,6 @@
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32g4xx.o"
 "./Core/Src/time.o"
-"./Core/Src/SH2_Src/euler.o"
 "./Core/Src/SH2_Src/sh2.o"
 "./Core/Src/SH2_Src/sh2_SensorValue.o"
 "./Core/Src/SH2_Src/sh2_util.o"

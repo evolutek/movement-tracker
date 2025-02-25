@@ -35,6 +35,13 @@ sh2_SensorValue_t sensorValue;
 
 // WARNING : Both libraries could attempt to access the spi bus at the same time if read operations are done inside the interrupts !
 
+void setBnoReports(){
+	printf("Setting reports\n");
+	if (! bnoEnableReport(BNO_REPORT)) {
+		printf("Could not enable game vector\n");
+	}
+}
+
 void setup(void){
 	paa_err_t paa_init_exit = paaInit(&paa);
 	bno_err_t bno_init_exit = bnoInit(&bno);
@@ -47,37 +54,41 @@ void setup(void){
 		HAL_Delay(500);
 		NVIC_SystemReset();
 	}
-/*
-	if (!bnoEnableReport(BNO_REPORT)) {
-		printf("Could not enable game vector\n");
-		HAL_Delay(100);
-	}
-	*/
+
+	setBnoReports();
 }
 
 void loop(void){
+	HAL_Delay(10);
+
 	//paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
 
 	if (bnoWasReset()) {
 		printf("Sensor RST !\n");
-		//if (!bnoEnableReport(BNO_REPORT)) {
-		//	printf("Could not enable game vector\n");
-		//}
+		setBnoReports();
+
 	}
 
-	if(bnoProcess()) {
-		printf("data\n");
-		switch (sensorValue.sensorId) {
-		case SH2_GAME_ROTATION_VECTOR:
-			printf("Vector : r %.2f, i %.2f, j %.2f, k %.2f\n",
-					sensorValue.un.gameRotationVector.real,
-					sensorValue.un.gameRotationVector.i,
-					sensorValue.un.gameRotationVector.j,
-					sensorValue.un.gameRotationVector.k
-			);
-			break;
-		}
-	}
+
+	  if (! bnoProcess(&sensorValue)) {
+	    return;
+	  }
+	  printf("data\n");
+	  switch (sensorValue.sensorId) {
+	    case SH2_GAME_ROTATION_VECTOR:
+	    	/*
+	      Serial.print("Game Rotation Vector - r: ");
+	      Serial.print(sensorValue.un.gameRotationVector.real);
+	      Serial.print(" i: ");
+	      Serial.print(sensorValue.un.gameRotationVector.i);
+	      Serial.print(" j: ");
+	      Serial.print(sensorValue.un.gameRotationVector.j);
+	      Serial.print(" k: ");
+	      Serial.println(sensorValue.un.gameRotationVector.k);
+	      */
+	      break;
+	  }
+
 }
 
 

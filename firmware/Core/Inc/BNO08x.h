@@ -5,10 +5,13 @@
 
 #include "main.h"
 
-#include "SH2_Inc/sh2_hal.h"
 #include "SH2_Inc/sh2_err.h"
 #include "SH2_Inc/sh2.h"
 #include "SH2_Inc/sh2_SensorValue.h"
+
+// Additional Activities not listed in SH-2 lib
+#define PAC_ON_STAIRS 8 ///< Activity code for being on stairs
+#define PAC_OPTION_COUNT 9 ///< The number of current options for the activity classifier
 
 // IMPORTANT NOTE : Sadly, CEVA's SH2 library was not designed with multiple sensors in mind. Thus, as this library relies on it, it only supports one sensor
 

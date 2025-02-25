@@ -34,11 +34,10 @@ Core/Src/BNO08x.o: ../Core/Src/BNO08x.c ../Core/Inc/main.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_spi_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../Core/Inc/BNO08x.h ../Core/Inc/main.h ../Core/Inc/SH2_Inc/sh2_hal.h \
- ../Core/Inc/SH2_Inc/sh2_err.h ../Core/Inc/SH2_Inc/sh2.h \
- ../Core/Inc/SH2_Inc/sh2_hal.h ../Core/Inc/SH2_Inc/sh2_SensorValue.h \
+ ../Core/Inc/BNO08x.h ../Core/Inc/main.h ../Core/Inc/SH2_Inc/sh2_err.h \
  ../Core/Inc/SH2_Inc/sh2.h ../Core/Inc/SH2_Inc/sh2_hal.h \
- ../Core/Inc/SH2_Inc/sh2.h
+ ../Core/Inc/SH2_Inc/sh2_SensorValue.h ../Core/Inc/SH2_Inc/sh2.h \
+ ../Core/Inc/SH2_Inc/sh2_hal.h ../Core/Inc/SH2_Inc/sh2.h
 ../Core/Inc/main.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
 ../Core/Inc/stm32g4xx_hal_conf.h:
@@ -77,7 +76,6 @@ Core/Src/BNO08x.o: ../Core/Src/BNO08x.c ../Core/Inc/main.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
 ../Core/Inc/BNO08x.h:
 ../Core/Inc/main.h:
-../Core/Inc/SH2_Inc/sh2_hal.h:
 ../Core/Inc/SH2_Inc/sh2_err.h:
 ../Core/Inc/SH2_Inc/sh2.h:
 ../Core/Inc/SH2_Inc/sh2_hal.h:
