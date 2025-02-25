@@ -182,16 +182,13 @@ bno_err_t bnoInit(bno08x_t* b){
 	_hardwareReset();
 
 	// Open SH2 interface (also registers non-sensor event handler.)
-	if (sh2_open(&_hal, _eventCallback, NULL) != SH2_OK) {
-		return false;
-	}
+	err = sh2_open(&_hal, _eventCallback, NULL);
+	if(err != SH2_OK) return err;
 
 	// Check connection partially by getting the product id's
 	memset(&prod_ids, 0, sizeof(prod_ids));
 	err = sh2_getProdIds(&prod_ids);
-	if (err != SH2_OK) {
-		return false;
-	}
+	if(err != SH2_OK) return err;
 
 	// Register sensor listener
 	sh2_setSensorCallback(_sensorHandler, NULL);
@@ -224,6 +221,10 @@ bool bnoWasReset(){
 	bool was_reset = _was_rst;
 	_was_rst = false;
 	return was_reset;
+}
+
+sh2_ProductIds_t* bnoGetProdIds(){
+	return &prod_ids;
 }
 
 // ==================== Setters/Getters ==================== //

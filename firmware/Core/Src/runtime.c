@@ -43,23 +43,32 @@ void setBnoReports(){
 }
 
 void setup(void){
+	printf("PAA Init...");
 	paa_err_t paa_init_exit = paaInit(&paa);
+	printf(" %d \nBNO Init...", paa_init_exit);
 	bno_err_t bno_init_exit = bnoInit(&bno);
+	printf(" %d\n",bno_init_exit);
 
-	printf("PAA5160 Init exit code : %d\n", paa_init_exit);
-	printf("BNO08x Init exit code : %d\n", bno_init_exit);
 
 	if(paa_init_exit != paa_ok || bno_init_exit != bno_ok) { // for now, if one of the sensors could not be initialized properly, reboot to try again
-		printf("WARNING : a sensor could not be initialized, rebooting ...\n");
+		printf("FATAL ERROR : a sensor could not be initialized, rebooting...\n");
 		HAL_Delay(500);
 		NVIC_SystemReset();
+	}
+
+	sh2_ProductIds_t* ids = bnoGetProdIds();
+	printf("BNO080 Sensors :\n");
+	for (int n = 0; n < ids->numEntries; n++) {
+		printf("\tPart %ld\n",ids->entry[n].swPartNumber);
+		printf("\tVersion %d.%d.%d\n",ids->entry[n].swVersionMajor,ids->entry[n].swVersionMinor,ids->entry[n].swVersionPatch);
+		printf("\tBuild %ld\n",ids->entry[n].swBuildNumber);
 	}
 
 	setBnoReports();
 }
 
 void loop(void){
-	HAL_Delay(10);
+	HAL_Delay(5);
 
 	//paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
 
@@ -70,7 +79,7 @@ void loop(void){
 	}
 
 
-	  if (! bnoProcess(&sensorValue)) {
+	  if (!bnoProcess(&sensorValue)) {
 	    return;
 	  }
 	  printf("data\n");

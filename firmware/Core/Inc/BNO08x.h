@@ -48,7 +48,7 @@ bool bnoProcess();
 // ========== State getters ========== //
 
 bool bnoWasReset();
-bno_err_t bnoGetError();
+sh2_ProductIds_t* bnoGetProdIds();
 
 // ========== Setters/Getters ========== //
 

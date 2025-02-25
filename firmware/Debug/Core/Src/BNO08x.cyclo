@@ -11,8 +11,9 @@
 ../Core/Src/BNO08x.c:147:13:_eventCallback	2
 ../Core/Src/BNO08x.c:154:13:_sensorHandler	2
 ../Core/Src/BNO08x.c:163:11:bnoInit	3
-../Core/Src/BNO08x.c:202:6:bnoProcess	3
-../Core/Src/BNO08x.c:217:6:bnoGetData	1
-../Core/Src/BNO08x.c:223:6:bnoWasReset	1
-../Core/Src/BNO08x.c:239:6:bnoEnableReportInterval	2
-../Core/Src/BNO08x.c:260:6:bnoEnableReport	1
+../Core/Src/BNO08x.c:199:6:bnoProcess	3
+../Core/Src/BNO08x.c:214:6:bnoGetData	1
+../Core/Src/BNO08x.c:220:6:bnoWasReset	1
+../Core/Src/BNO08x.c:226:19:bnoGetProdIds	1
+../Core/Src/BNO08x.c:240:6:bnoEnableReportInterval	2
+../Core/Src/BNO08x.c:261:6:bnoEnableReport	1
