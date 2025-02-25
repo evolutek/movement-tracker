@@ -23,10 +23,13 @@ uint16_t _NRST_Pin;
 
 struct sh2_Hal_s _hal;
 
-static sh2_SensorValue_t *_sensor_value = NULL;
+static sh2_SensorValue_t _sensor_value;
+bool _data_avail = false;
+bool _was_rst = false;
+bno_err_t error = bno_ok;
+
 sh2_ProductIds_t prod_ids = {0};
 
-bool _was_rst = false;
 
 // ==================== Hardware abstraction ==================== //
 
@@ -46,7 +49,7 @@ static bno_err_t _waitForSensRdy(uint16_t timeout){ // returns 1 if timed out
 	uint32_t t = HAL_GetTick();
 	while(!_sensorReady() && HAL_GetTick() - t < timeout);
 
-	//if(!_sensorReady()) return bno_timeout; // sensor is still not ready
+	if(!_sensorReady()) return bno_timeout; // sensor is still not ready
 
 	return bno_ok;
 }
@@ -61,7 +64,10 @@ static int _write(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len){
 
 	_select();
 
-	HAL_SPI_Transmit(_spi, pBuffer, len, SPI_TIMEOUT);
+	if(HAL_SPI_Transmit(_spi, pBuffer, len, SPI_TIMEOUT) != HAL_OK){
+		_deselect();
+		return 0;
+	}
 
 	_deselect();
 
@@ -75,18 +81,32 @@ static int _read(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len, uint32_t *t_us
 
 	_select();
 
-	if(HAL_SPI_Receive(_spi, pBuffer, 4, SPI_TIMEOUT) != HAL_OK) return 0;
+	if(HAL_SPI_Receive(_spi, pBuffer, 4, SPI_TIMEOUT) != HAL_OK){
+		_deselect();
+		return 0;
+	}
+
+	_deselect();
 
 	// Determine amount to read
 	packet_size = (uint16_t)pBuffer[0] | (uint16_t)pBuffer[1] << 8;
 	// Unset the "continue" bit
 	packet_size &= 0x7FFF;
 
-	if (packet_size > len) return 0;
+	if (packet_size > len){
+		return 0;
+	}
 
-	if(_waitForSensRdy(500) != bno_ok) return 0;
+	if(_waitForSensRdy(500) != bno_ok){
+		return 0;
+	}
 
-	if(HAL_SPI_Receive(_spi, pBuffer, packet_size, SPI_TIMEOUT) != HAL_OK) return 0;
+	_select();
+
+	if(HAL_SPI_Receive(_spi, pBuffer, packet_size, SPI_TIMEOUT) != HAL_OK){
+		_deselect();
+		return 0;
+	}
 
 	_deselect();
 
@@ -100,7 +120,7 @@ static int _open(sh2_Hal_t *self){
 	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_RESET);
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_SET);
-	HAL_Delay(200);
+	HAL_Delay(10);
 
 	bno_err_t err = _waitForSensRdy(1000);
 
@@ -115,24 +135,21 @@ static void _close(sh2_Hal_t *self){
 
 // ==================== Low Level ==================== //
 
+// non-sensor events
 static void _eventCallback(void *cookie, sh2_AsyncEvent_t *pEvent) {
-  // If we see a reset, set a flag so that sensors will be reconfigured.
   if (pEvent->eventId == SH2_RESET) {
-    //printf("Reset!\n");
     _was_rst = true;
   }
 }
 
-// Handle sensor events.
+// sensor events (data), with event given by the lib when sensor is serviced and _sensor_value the memory space to store the information
 static void _sensorHandler(void *cookie, sh2_SensorEvent_t *event) {
-  int rc;
-
-  rc = sh2_decodeSensorEvent(_sensor_value, event);
-  if (rc != SH2_OK) {
-    printf("BNO08x - Error decoding sensor event\n");
-    _sensor_value->timestamp = 0;
+  if (sh2_decodeSensorEvent(&_sensor_value, event) != SH2_OK) {
+    error = bno_decod;
+    //_sensor_value->timestamp = 0;
     return;
   }
+  _data_avail = true;
 }
 
 // ==================== High Level ==================== //
@@ -159,20 +176,53 @@ bno_err_t bnoInit(bno08x_t* b){
 	err = sh2_open(&(_hal), _eventCallback, NULL);
 	if(err != SH2_OK) return err;
 
-	err = sh2_getProdIds(&prod_ids);
+	err = sh2_setSensorCallback(_sensorHandler, NULL);
 	if(err != SH2_OK) return err;
 
-	err = sh2_setSensorCallback(_sensorHandler, NULL);
+
+
+	err = sh2_getProdIds(&prod_ids);
 	if(err != SH2_OK) return err;
 
 	return bno_ok;
 }
+
+bool bnoProcess() {
+  //_sensor_value = value;
+
+  //value->timestamp = 0;
+
+  sh2_service();
+
+  //if (value->timestamp == 0 && value->sensorId != SH2_GYRO_INTEGRATED_RV) {
+    // no new events
+  //  return false;
+  //}
+
+  if(_data_avail){
+	  _data_avail = false;
+	  return true;
+  }
+  return false;
+}
+
+void bnoGetData(){
+
+}
+
+// ==================== State Getters ==================== //
 
 bool bnoWasReset(){
 	bool was_reset = _was_rst;
 	_was_rst = false;
 	return was_reset;
 }
+
+bno_err_t bnoGetError(){
+	return error;
+}
+
+// ==================== Setters/Getters ==================== //
 
 bool bnoEnableReportInterval(sh2_SensorId_t sensorId, uint32_t interval_us) {
   static sh2_SensorConfig_t config;
@@ -198,19 +248,4 @@ bool bnoEnableReportInterval(sh2_SensorId_t sensorId, uint32_t interval_us) {
 
 bool bnoEnableReport(sh2_SensorId_t sensorId) {
 	return bnoEnableReportInterval(sensorId, 10000);
-}
-
-bool bnoGetSensorEvent(sh2_SensorValue_t *value) {
-  _sensor_value = value;
-
-  value->timestamp = 0;
-
-  sh2_service();
-
-  if (value->timestamp == 0 && value->sensorId != SH2_GYRO_INTEGRATED_RV) {
-    // no new events
-    return false;
-  }
-
-  return true;
 }

@@ -20,6 +20,8 @@ typedef enum {
 	bno_io = SH2_ERR_IO,
 	bno_hub = SH2_ERR_HUB,
 	bno_timeout = SH2_ERR_TIMEOUT,
+
+	bno_decod,
 } bno_err_t;
 
 typedef struct { // Note : this structure is only used as a descriptor for all used pins and interface, to be fed to bnoInit, any instance of it can be destroyed after calling the function
@@ -35,11 +37,19 @@ typedef struct { // Note : this structure is only used as a descriptor for all u
 	uint16_t NRST_Pin;
 } bno08x_t;
 
+// ========== High level ========== //
 
 bno_err_t bnoInit(bno08x_t* b);
+bool bnoProcess();
+
+// ========== State getters ========== //
+
 bool bnoWasReset();
+bno_err_t bnoGetError();
+
+// ========== Setters/Getters ========== //
+
 bool bnoEnableReportInterval(sh2_SensorId_t sensorId, uint32_t interval_us);
 bool bnoEnableReport(sh2_SensorId_t sensorId);
-bool bnoGetSensorEvent(sh2_SensorValue_t *value);
 
 #endif /* INC_BNO08X_H_ */

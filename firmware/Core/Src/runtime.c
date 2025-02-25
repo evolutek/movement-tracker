@@ -47,10 +47,12 @@ void setup(void){
 		HAL_Delay(500);
 		NVIC_SystemReset();
 	}
-
+/*
 	if (!bnoEnableReport(BNO_REPORT)) {
 		printf("Could not enable game vector\n");
+		HAL_Delay(100);
 	}
+	*/
 }
 
 void loop(void){
@@ -58,12 +60,13 @@ void loop(void){
 
 	if (bnoWasReset()) {
 		printf("Sensor RST !\n");
-		if (!bnoEnableReport(BNO_REPORT)) {
-			printf("Could not enable game vector\n");
-		}
+		//if (!bnoEnableReport(BNO_REPORT)) {
+		//	printf("Could not enable game vector\n");
+		//}
 	}
 
-	if(bnoGetSensorEvent(&sensorValue)) {
+	if(bnoProcess()) {
+		printf("data\n");
 		switch (sensorValue.sensorId) {
 		case SH2_GAME_ROTATION_VECTOR:
 			printf("Vector : r %.2f, i %.2f, j %.2f, k %.2f\n",
