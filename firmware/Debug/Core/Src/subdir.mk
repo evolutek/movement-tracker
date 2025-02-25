@@ -5,7 +5,6 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/Src/BNO085.c \
 ../Core/Src/BNO08x.c \
 ../Core/Src/PAA5163.c \
 ../Core/Src/main.c \
@@ -18,7 +17,6 @@ C_SRCS += \
 ../Core/Src/time.c 
 
 OBJS += \
-./Core/Src/BNO085.o \
 ./Core/Src/BNO08x.o \
 ./Core/Src/PAA5163.o \
 ./Core/Src/main.o \
@@ -31,7 +29,6 @@ OBJS += \
 ./Core/Src/time.o 
 
 C_DEPS += \
-./Core/Src/BNO085.d \
 ./Core/Src/BNO08x.d \
 ./Core/Src/PAA5163.d \
 ./Core/Src/main.d \
@@ -51,7 +48,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/BNO085.cyclo ./Core/Src/BNO085.d ./Core/Src/BNO085.o ./Core/Src/BNO085.su ./Core/Src/BNO08x.cyclo ./Core/Src/BNO08x.d ./Core/Src/BNO08x.o ./Core/Src/BNO08x.su ./Core/Src/PAA5163.cyclo ./Core/Src/PAA5163.d ./Core/Src/PAA5163.o ./Core/Src/PAA5163.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/runtime.cyclo ./Core/Src/runtime.d ./Core/Src/runtime.o ./Core/Src/runtime.su ./Core/Src/stm32g4xx_hal_msp.cyclo ./Core/Src/stm32g4xx_hal_msp.d ./Core/Src/stm32g4xx_hal_msp.o ./Core/Src/stm32g4xx_hal_msp.su ./Core/Src/stm32g4xx_it.cyclo ./Core/Src/stm32g4xx_it.d ./Core/Src/stm32g4xx_it.o ./Core/Src/stm32g4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32g4xx.cyclo ./Core/Src/system_stm32g4xx.d ./Core/Src/system_stm32g4xx.o ./Core/Src/system_stm32g4xx.su ./Core/Src/time.cyclo ./Core/Src/time.d ./Core/Src/time.o ./Core/Src/time.su
+	-$(RM) ./Core/Src/BNO08x.cyclo ./Core/Src/BNO08x.d ./Core/Src/BNO08x.o ./Core/Src/BNO08x.su ./Core/Src/PAA5163.cyclo ./Core/Src/PAA5163.d ./Core/Src/PAA5163.o ./Core/Src/PAA5163.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/runtime.cyclo ./Core/Src/runtime.d ./Core/Src/runtime.o ./Core/Src/runtime.su ./Core/Src/stm32g4xx_hal_msp.cyclo ./Core/Src/stm32g4xx_hal_msp.d ./Core/Src/stm32g4xx_hal_msp.o ./Core/Src/stm32g4xx_hal_msp.su ./Core/Src/stm32g4xx_it.cyclo ./Core/Src/stm32g4xx_it.d ./Core/Src/stm32g4xx_it.o ./Core/Src/stm32g4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32g4xx.cyclo ./Core/Src/system_stm32g4xx.d ./Core/Src/system_stm32g4xx.o ./Core/Src/system_stm32g4xx.su ./Core/Src/time.cyclo ./Core/Src/time.d ./Core/Src/time.o ./Core/Src/time.su
 
 .PHONY: clean-Core-2f-Src
 

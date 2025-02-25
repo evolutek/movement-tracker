@@ -1,159 +1,216 @@
 #include "main.h"
 #include "BNO08x.h"
-#include "BNO08x_shtp_registers.h"
+
+#include "SH2_Inc/sh2_hal.h"
+#include "SH2_Inc/sh2.h"
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #define SPI_TIMEOUT 1000 // ms, timeout fed to HAL_SPI functions
-#define INT_TIMEOUT 1000 // ms, max time when waiting for the sensor to assert INT
+
+SPI_HandleTypeDef* _spi;
+
+GPIO_TypeDef *_NCS_Port;
+uint16_t _NCS_Pin;
+
+GPIO_TypeDef *_NINT_Port;
+uint16_t _NINT_Pin;
+
+GPIO_TypeDef *_NRST_Port;
+uint16_t _NRST_Pin;
+
+struct sh2_Hal_s _hal;
+
+static sh2_SensorValue_t *_sensor_value = NULL;
+sh2_ProductIds_t prod_ids = {0};
+
+bool _was_rst = false;
 
 // ==================== Hardware abstraction ==================== //
 
-static inline void _select(bno08x_t* b){
-	HAL_GPIO_WritePin(b->NCS_Port, b->NCS_Pin, GPIO_PIN_RESET);
+static inline void _select(){
+	HAL_GPIO_WritePin(_NCS_Port, _NCS_Pin, GPIO_PIN_RESET);
 }
 
-static inline void _deselect(bno08x_t* b){
-	HAL_GPIO_WritePin(b->NCS_Port, b->NCS_Pin, GPIO_PIN_SET);
+static inline void _deselect(){
+	HAL_GPIO_WritePin(_NCS_Port, _NCS_Pin, GPIO_PIN_SET);
 }
 
-static inline void _reset(bno08x_t* b){
-	// do not change those timings, i'm not sure why, but reducing them causes issues on reboots
-	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_SET);
+static inline bool _sensorReady(){
+	return !HAL_GPIO_ReadPin(_NINT_Port, _NINT_Pin);
+}
+
+static bno_err_t _waitForSensRdy(uint16_t timeout){ // returns 1 if timed out
+	uint32_t t = HAL_GetTick();
+	while(!_sensorReady() && HAL_GetTick() - t < timeout);
+
+	//if(!_sensorReady()) return bno_timeout; // sensor is still not ready
+
+	return bno_ok;
+}
+
+
+uint32_t _getTimeUs(sh2_Hal_t *self){
+	return HAL_GetTick() * 1000;
+}
+
+static int _write(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len){
+	if(_waitForSensRdy(500) != bno_ok) return 0;
+
+	_select();
+
+	HAL_SPI_Transmit(_spi, pBuffer, len, SPI_TIMEOUT);
+
+	_deselect();
+
+	return len;
+}
+
+static int _read(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len, uint32_t *t_us){
+	if(_waitForSensRdy(500) != bno_ok) return 0;
+
+	uint16_t packet_size = 0;
+
+	_select();
+
+	if(HAL_SPI_Receive(_spi, pBuffer, 4, SPI_TIMEOUT) != HAL_OK) return 0;
+
+	// Determine amount to read
+	packet_size = (uint16_t)pBuffer[0] | (uint16_t)pBuffer[1] << 8;
+	// Unset the "continue" bit
+	packet_size &= 0x7FFF;
+
+	if (packet_size > len) return 0;
+
+	if(_waitForSensRdy(500) != bno_ok) return 0;
+
+	if(HAL_SPI_Receive(_spi, pBuffer, packet_size, SPI_TIMEOUT) != HAL_OK) return 0;
+
+	_deselect();
+
+	*t_us = _getTimeUs(self);
+
+	return packet_size;
+}
+
+static int _open(sh2_Hal_t *self){
+
+	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_RESET);
 	HAL_Delay(10);
-	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_RESET);
-	HAL_Delay(10);
-	HAL_GPIO_WritePin(b->NRST_Port, b->NRST_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_SET);
 	HAL_Delay(200);
+
+	bno_err_t err = _waitForSensRdy(1000);
+
+	if(err != bno_ok) return SH2_ERR_TIMEOUT;
+
+	return SH2_OK;
 }
 
-static inline bool _sensRdy(bno08x_t* b){
-	return !HAL_GPIO_ReadPin(b->NINT_Port, b->NINT_Pin);
+static void _close(sh2_Hal_t *self){
+	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_RESET);
 }
-
 
 // ==================== Low Level ==================== //
 
-static bool _waitForSensRdyTimeout(bno08x_t* b, uint16_t timeout){ // returns 1 if timed out
-	uint32_t t = HAL_GetTick();
-	while(!_sensRdy(b) && HAL_GetTick() - t < timeout);
-
-	if(!_sensRdy(b)) return 1; // sensor is still not ready
-
-	return 0;
-}
-static inline bool _waitForSensRdy(bno08x_t* b){ return _waitForSensRdyTimeout(b, INT_TIMEOUT);}
-
-
-static bool _retrieve(bno08x_t* b, bno_packet_t* packet){ // returns 1 if data was read successfully
-	if(!_sensRdy(b)) return 0; // sensor has nothing to tell us
-
-	_select(b);
-
-	uint8_t raw_header[4];
-
-	HAL_SPI_Receive(b->spi, raw_header, 4, SPI_TIMEOUT);
-
-	packet->header = *((shtp_header_t*) raw_header);
-
-	b->incom_seq_nb[packet->header.channel] = packet->header.seq_numb;
-
-	if (packet->header.length == 0){ // TODO : not even sure if that's possible, as the header alone is already 4 bytes
-		//printf("empty\n");
-		_deselect(b);
-		return 0;
-	}
-
-	if(packet->header.length -4 >= BNO_MAX_PACKET_SIZE) packet->header.length = BNO_MAX_PACKET_SIZE;
-
-	HAL_SPI_Receive(b->spi, packet->data, packet->header.length -4, SPI_TIMEOUT);
-
-	printf("< lgth %d, chan %d, seq_nb %d, contin %d\n", packet->header.length, packet->header.channel, packet->header.seq_numb, packet->header.followup);
-	//printf("data : ");
-	//for(uint16_t i = 0; i < packet->header.length -4; i++){
-	//	printf("%02x ", packet->data[i]);
-	//}
-	//printf("\n");
-
-	_deselect(b);
-
-	packet->avail = 1;
-
-	return 1;
+static void _eventCallback(void *cookie, sh2_AsyncEvent_t *pEvent) {
+  // If we see a reset, set a flag so that sensors will be reconfigured.
+  if (pEvent->eventId == SH2_RESET) {
+    //printf("Reset!\n");
+    _was_rst = true;
+  }
 }
 
-static void _send(bno08x_t* b, shtp_channel_t channel, uint8_t data[], uint16_t data_length){ // Note : data_length does not include header length
-	b->outgo_seq_nb[channel]++;
+// Handle sensor events.
+static void _sensorHandler(void *cookie, sh2_SensorEvent_t *event) {
+  int rc;
 
-	shtp_header_t header = {
-		.length = data_length + 4,
-		.channel = channel,
-		.followup = 0,
-		.seq_numb = b->outgo_seq_nb[channel],
-	};
-
-	//printf("outgoing : ");
-	//uint8_t* raw_header = (uint8_t*) &header;
-	//for(uint8_t i = 0; i < 4; i++){
-	//	printf("%02x ", raw_header[i]);
-	//}
-	//printf("\n");
-
-	printf("> lgth %d, contin %d, chan %d, nb %d\n", header.length, header.followup, header.channel, header.seq_numb);
-
-	_select(b);
-
-	HAL_SPI_Transmit(b->spi, (uint8_t*)&(header), 4, SPI_TIMEOUT);
-	HAL_SPI_Transmit(b->spi, data, data_length, SPI_TIMEOUT);
-
-	_deselect(b);
+  rc = sh2_decodeSensorEvent(_sensor_value, event);
+  if (rc != SH2_OK) {
+    printf("BNO08x - Error decoding sensor event\n");
+    _sensor_value->timestamp = 0;
+    return;
+  }
 }
 
 // ==================== High Level ==================== //
 
-bool bnoProcess(bno08x_t* b){ // returns 1 if data has been read
-	if(!b->initialized) return 0;
+bno_err_t bnoInit(bno08x_t* b){
+	_deselect();
 
-	return _retrieve(b,&(b->incoming));
+	_spi = b->spi;
+	_NCS_Port = b->NCS_Port;
+	_NCS_Pin = b->NCS_Pin;
+	_NINT_Port = b->NINT_Port;
+	_NINT_Pin = b->NINT_Pin;
+	_NRST_Port = b->NRST_Port;
+	_NRST_Pin = b->NRST_Pin;
+
+	_hal.write = _write;
+	_hal.read = _read;
+	_hal.open = _open;
+	_hal.close = _close;
+	_hal.getTimeUs = _getTimeUs;
+
+	bno_err_t err = 0;
+
+	err = sh2_open(&(_hal), _eventCallback, NULL);
+	if(err != SH2_OK) return err;
+
+	err = sh2_getProdIds(&prod_ids);
+	if(err != SH2_OK) return err;
+
+	err = sh2_setSensorCallback(_sensorHandler, NULL);
+	if(err != SH2_OK) return err;
+
+	return bno_ok;
 }
 
+bool bnoWasReset(){
+	bool was_reset = _was_rst;
+	_was_rst = false;
+	return was_reset;
+}
 
-bno_err_t bnoInit(bno08x_t* b){
-	_deselect(b);
+bool bnoEnableReportInterval(sh2_SensorId_t sensorId, uint32_t interval_us) {
+  static sh2_SensorConfig_t config;
 
-	_reset(b);
+  // These sensor options are disabled or not used in most cases
+  config.changeSensitivityEnabled = false;
+  config.wakeupEnabled = false;
+  config.changeSensitivityRelative = false;
+  config.alwaysOnEnabled = false;
+  config.changeSensitivity = 0;
+  config.batchInterval_us = 0;
+  config.sensorSpecific = 0;
 
-	if(_waitForSensRdy(b)) return bno_shtp_advert; // shtp advertissement
-	_retrieve(b,&(b->incoming));
+  config.reportInterval_us = interval_us;
+  int status = sh2_setSensorConfig(sensorId, &config);
 
-	if(_waitForSensRdy(b)) return bno_exec_rst; // executable reset message
-	_retrieve(b,&(b->incoming));
+  if (status != SH2_OK) {
+    return false;
+  }
 
-	if(_waitForSensRdy(b)) return bno_sh2_init; // sh2 init message
-	_retrieve(b,&(b->incoming));
+  return true;
+}
 
-	if(_waitForSensRdy(b)) return bno_unknown_report; // unknown packet sent at startup, channel 0 length 55
-	_retrieve(b,&(b->incoming));
+bool bnoEnableReport(sh2_SensorId_t sensorId) {
+	return bnoEnableReportInterval(sensorId, 10000);
+}
 
-	// now that the boot messages are cleared, we can test the communication to the device
-	uint8_t data[] = {
-		product_id_request,
-		0
-	};
-	_send(b, hub_control, data, sizeof(data));
+bool bnoGetSensorEvent(sh2_SensorValue_t *value) {
+  _sensor_value = value;
 
-	if(_waitForSensRdy(b)) return bno_coms;
-	_retrieve(b,&(b->incoming));
+  value->timestamp = 0;
 
-	printf("< data (lgth %d): ", b->incoming.header.length);
-	for(uint16_t i = 0; i < b->incoming.header.length -4; i++){
-		printf("%02x ", b->incoming.data[i]);
-	}
-	printf("\n");
+  sh2_service();
 
-	//if(b->incoming.data[0] != product_id_response) return bno_sequence;
+  if (value->timestamp == 0 && value->sensorId != SH2_GYRO_INTEGRATED_RV) {
+    // no new events
+    return false;
+  }
 
-	b->initialized = 1;
-	return bno_ok;
+  return true;
 }

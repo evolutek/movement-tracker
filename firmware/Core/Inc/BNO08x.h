@@ -2,31 +2,27 @@
 #define INC_BNO08X_H_
 
 #include <stdbool.h>
-#include "BNO08x_shtp_registers.h"
 
-#define BNO_MAX_PACKET_SIZE 300 // biggest message we could encounter is 276 bytes long
+#include "main.h"
 
-typedef struct {
-	bool avail; // packet not processed yet
-	shtp_header_t header;
-	uint8_t data[BNO_MAX_PACKET_SIZE];
-} bno_packet_t;
+#include "SH2_Inc/sh2_hal.h"
+#include "SH2_Inc/sh2_err.h"
+#include "SH2_Inc/sh2.h"
+#include "SH2_Inc/sh2_SensorValue.h"
+
+// IMPORTANT NOTE : Sadly, CEVA's SH2 library was not designed with multiple sensors in mind. Thus, as this library relies on it, it only supports one sensor
 
 typedef enum {
-	bno_ok = 0,
-
-	bno_err = 1, // unknown error
-
-	// Init errors :
-	bno_coms = 10, // could not communicate with the chip
-	bno_shtp_advert = 11, // could not retrive shtp advert message
-	bno_exec_rst = 12, // could not retrive sensor's reset message
-	bno_sh2_init = 13, // could not retrive sh2's init message
-	bno_unknown_report = 14, // could not retrieve the additionnal unknown startup packet
-	bno_sequence = 15, // sensor did not deliver expected data
+	bno_ok = SH2_OK,
+	bno_err = SH2_ERR,
+	bno_bad_param = SH2_ERR_BAD_PARAM,
+	bno_op_in_progress = SH2_ERR_OP_IN_PROGRESS,
+	bno_io = SH2_ERR_IO,
+	bno_hub = SH2_ERR_HUB,
+	bno_timeout = SH2_ERR_TIMEOUT,
 } bno_err_t;
 
-typedef struct {
+typedef struct { // Note : this structure is only used as a descriptor for all used pins and interface, to be fed to bnoInit, any instance of it can be destroyed after calling the function
 	SPI_HandleTypeDef* spi;
 
 	GPIO_TypeDef *NCS_Port;
@@ -37,19 +33,13 @@ typedef struct {
 
 	GPIO_TypeDef *NRST_Port;
 	uint16_t NRST_Pin;
+} bno08x_t;
 
-	// ======== READ ONLY ======== //
 
-	uint8_t incom_seq_nb[6]; // sequence numbers for incoming packets (one for each channel)
-	uint8_t outgo_seq_nb[6]; // sequence numbers for outgoing packets (one for each channel)
-
-	bno_packet_t incoming; // default memory space for incoming packets
-
-	bool initialized;
-} bno08x_t ;
-
-bno_err_t bnoInit();
-bool bnoProcess(bno08x_t* b); // returns 1 if data was read
-
+bno_err_t bnoInit(bno08x_t* b);
+bool bnoWasReset();
+bool bnoEnableReportInterval(sh2_SensorId_t sensorId, uint32_t interval_us);
+bool bnoEnableReport(sh2_SensorId_t sensorId);
+bool bnoGetSensorEvent(sh2_SensorValue_t *value);
 
 #endif /* INC_BNO08X_H_ */

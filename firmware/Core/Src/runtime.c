@@ -9,11 +9,6 @@
 #include <math.h>
 #include <time.h>
 
-#include "BNO085.h"
-
-bool interrupts_enabled = 0;
-bool data_ready = 0;
-
 paa5163_t paa = {
 	.spi = &hspi1,
 
@@ -35,23 +30,10 @@ bno08x_t bno = {
 	.NRST_Port = RST_IMU_GPIO_Port,
 	.NRST_Pin = RST_IMU_Pin,
 };
-
-// Note : As the BNO triggers an interrupt evey couple of tens of ms, it is the only one actually triggering interrupts (the paa is read using polling methods)
+sh2_SensorValue_t sensorValue;
+#define BNO_REPORT SH2_GAME_ROTATION_VECTOR
 
 // WARNING : Both libraries could attempt to access the spi bus at the same time if read operations are done inside the interrupts !
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(!interrupts_enabled) return;
-
-	if(GPIO_Pin == bno.NINT_Pin){ // BNO data ready
-
-		printf("Int : paa %d, bno %d\n", HAL_GPIO_ReadPin(INT_PAA_GPIO_Port, INT_PAA_Pin),HAL_GPIO_ReadPin(INT_IMU_GPIO_Port, INT_IMU_Pin));
-
-
-		data_ready = 1;
-	}
-}
-
 
 void setup(void){
 	paa_err_t paa_init_exit = paaInit(&paa);
@@ -61,25 +43,40 @@ void setup(void){
 	printf("BNO08x Init exit code : %d\n", bno_init_exit);
 
 	if(paa_init_exit != paa_ok || bno_init_exit != bno_ok) { // for now, if one of the sensors could not be initialized properly, reboot to try again
-		printf("WARNING : a sensor could not be initialiezd, rebooting ...\n");
+		printf("WARNING : a sensor could not be initialized, rebooting ...\n");
 		HAL_Delay(500);
 		NVIC_SystemReset();
 	}
 
-	/*
-	bno_enable_rotation_vector(POLL_RATE);
-	*/
-
-	interrupts_enabled = 1;
+	if (!bnoEnableReport(BNO_REPORT)) {
+		printf("Could not enable game vector\n");
+	}
 }
 
 void loop(void){
 	//paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
-	bnoProcess(&bno);
 
-	if(data_ready){
-
+	if (bnoWasReset()) {
+		printf("Sensor RST !\n");
+		if (!bnoEnableReport(BNO_REPORT)) {
+			printf("Could not enable game vector\n");
+		}
 	}
+
+	if(bnoGetSensorEvent(&sensorValue)) {
+		switch (sensorValue.sensorId) {
+		case SH2_GAME_ROTATION_VECTOR:
+			printf("Vector : r %.2f, i %.2f, j %.2f, k %.2f\n",
+					sensorValue.un.gameRotationVector.real,
+					sensorValue.un.gameRotationVector.i,
+					sensorValue.un.gameRotationVector.j,
+					sensorValue.un.gameRotationVector.k
+			);
+			break;
+		}
+	}
+}
+
 
 
 	/*
@@ -97,4 +94,3 @@ void loop(void){
 		}
 	}
 	*/
-}

@@ -412,14 +412,14 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : INT_PAA_Pin */
   GPIO_InitStruct.Pin = INT_PAA_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(INT_PAA_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : INT_IMU_Pin */
   GPIO_InitStruct.Pin = INT_IMU_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(INT_IMU_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : AU_INT_Pin */
