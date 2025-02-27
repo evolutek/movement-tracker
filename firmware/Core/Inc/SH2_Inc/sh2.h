@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#define MODIFIED_SHTP_SH2
+
 #include <stdint.h>
 #include <stdbool.h>
 

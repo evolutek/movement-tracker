@@ -8,8 +8,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef MODIFIED_SHTP_SH2
+#error Modification to file required ! sh2.c -> executableDeviceHdlr -> add "sh2AsyncEvent.shtpEvent = payload[1];" below "sh2AsyncEvent.eventId = SH2_RESET;" in the "EXECUTABLE_DEVICE_RESP_RESET_COMPLETE" case
+#endif
+
+
 #define SPI_TIMEOUT 1000 // ms, timeout fed to HAL_SPI functions
 #define INT_TIMEOUT 500 // ms, time before the sensor is considered unresponsive when the program expects it to assert INT
+
+// ==================== Variables ==================== //
 
 SPI_HandleTypeDef* _spi;
 
@@ -28,25 +35,28 @@ sh2_ProductIds_t prod_ids = {0};
 
 static sh2_SensorValue_t *_sensor_value = NULL;
 
-bool _was_rst = false;
+uint8_t _rst_reason = 0;
 
 // ==================== Hardware abstraction ==================== //
 
+// CS Pin
 static inline void _select(){
 	HAL_GPIO_WritePin(_NCS_Port, _NCS_Pin, GPIO_PIN_RESET);
 }
-
 static inline void _deselect(){
 	HAL_GPIO_WritePin(_NCS_Port, _NCS_Pin, GPIO_PIN_SET);
 }
 
+// INT Pin
 static inline bool _sensorReady(){
 	return !HAL_GPIO_ReadPin(_NINT_Port, _NINT_Pin);
 }
-
 static bno_err_t _waitForSensRdy(uint16_t timeout){
 	for(uint16_t i = 0; i < timeout; i++){
-		if(_sensorReady()) return bno_ok; // sensor is still not ready
+		if(_sensorReady()){
+			//printf("waited %d\n", i);
+			return bno_ok; // sensor is still not ready
+		}
 		HAL_Delay(1);
 	}
 	return bno_timeout;
@@ -60,15 +70,15 @@ static bno_err_t _waitForSensRdy(uint16_t timeout){
 	*/
 }
 
-void _hardwareReset(){
-	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_SET);
-	HAL_Delay(10);
+// RESET Pin
+static void _reset(){
 	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_RESET);
-	HAL_Delay(10);
+}
+static void _release(){
 	HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_SET);
-	HAL_Delay(10);
 }
 
+// ==================== Low Level ==================== //
 
 uint32_t _getTimeUs(sh2_Hal_t *self){
 	return HAL_GetTick() * 1000;
@@ -80,8 +90,7 @@ static int _write(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len){
 	_select();
 
 	if(HAL_SPI_Transmit(_spi, pBuffer, len, SPI_TIMEOUT) != HAL_OK){
-		_deselect();
-		return 0;
+		len = 0;
 	}
 
 	_deselect();
@@ -95,12 +104,10 @@ static int _read(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len, uint32_t *t_us
 	uint16_t packet_size = 0;
 
 	_select();
-
 	if(HAL_SPI_Receive(_spi, pBuffer, 4, SPI_TIMEOUT) != HAL_OK){
 		_deselect();
 		return 0;
 	}
-
 	_deselect();
 
 	// Determine amount to read
@@ -112,55 +119,81 @@ static int _read(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len, uint32_t *t_us
 		return 0;
 	}
 
-	if(_waitForSensRdy(INT_TIMEOUT) != bno_ok){
-		return 0;
-	}
+	if(_waitForSensRdy(INT_TIMEOUT) != bno_ok) return 0;
+
+	printf("%d\n", packet_size);
 
 	_select();
-
 	if(HAL_SPI_Receive(_spi, pBuffer, packet_size, SPI_TIMEOUT) != HAL_OK){
 		_deselect();
 		return 0;
 	}
-
 	_deselect();
 
-	//*t_us = _getTimeUs(self);
+	*t_us = _getTimeUs(self);
 
 	return packet_size;
 }
 
 static int _open(sh2_Hal_t *self){
+	uint8_t dummy[1] = {0};
+	HAL_SPI_Transmit(_spi, dummy, 1, SPI_TIMEOUT);
+	HAL_SPI_Receive(_spi, dummy, 1, SPI_TIMEOUT); // make sure the SPI interface is in a knwon state
 
-	_waitForSensRdy(500);
+	_release(); // turn on
+
+	_waitForSensRdy(500); // wait for the sensor to respond
 
 	return 0;
 }
 
 static void _close(sh2_Hal_t *self){
-	//HAL_GPIO_WritePin(_NRST_Port, _NRST_Pin, GPIO_PIN_RESET);
+	_reset(); // turn off the sensor
+	_deselect();
 }
-
-// ==================== Low Level ==================== //
 
 // non-sensor events
 static void _eventCallback(void *cookie, sh2_AsyncEvent_t *pEvent) {
-  if (pEvent->eventId == SH2_RESET) {
-    _was_rst = true;
-  }
+	// If we see a reset, set a flag so that sensors will be reconfigured.
+	switch (pEvent->eventId) {
+	case SH2_RESET :
+		printf("EventHandler : RST (%d)\n", pEvent->shtpEvent);
+		//printf("RST, %d\n",pEvent->shtpEvent);
+	    _rst_reason = pEvent->shtpEvent;
+		break;
+	case SH2_SHTP_EVENT :
+		printf("EventHandler : SHTP %d\n", pEvent->shtpEvent);
+		break;
+	case SH2_GET_FEATURE_RESP :
+		printf("EventHandler : Set feature ACK \n");
+
+		//printf("Response to set reports :");
+		//printf("id %d", pEvent->sh2SensorConfigResp.sensorId);
+		//printf("change sensitivity : %d, en %d, rela %d\n", pEvent->sh2SensorConfigResp.sensorConfig.changeSensitivity, pEvent->sh2SensorConfigResp.sensorConfig.changeSensitivityEnabled, pEvent->sh2SensorConfigResp.sensorConfig.changeSensitivityRelative);
+		//printf("wkup en %d\n", pEvent->sh2SensorConfigResp.sensorConfig.wakeupEnabled);
+		//printf("alw on en %d\n", pEvent->sh2SensorConfigResp.sensorConfig.alwaysOnEnabled);
+		//printf("rprt interval %ld, batch interval %ld (us)\n", pEvent->sh2SensorConfigResp.sensorConfig.reportInterval_us, pEvent->sh2SensorConfigResp.sensorConfig.batchInterval_us);
+		//printf("sensor specific %ld\n", pEvent->sh2SensorConfigResp.sensorConfig.sensorSpecific);
+		break;
+	default :
+		printf("EventHandler : unknown event, Id : %ld\n", pEvent->eventId);
+		break;
+	}
 }
 
 // sensor events (data), with event given by the lib when sensor is serviced and _sensor_value the memory space to store the information
-static void _sensorHandler(void *cookie, sh2_SensorEvent_t *event) {
-  if (sh2_decodeSensorEvent(_sensor_value, event) != SH2_OK) {
-    _sensor_value->timestamp = 0;
-    return;
+static void _reportHandler(void *cookie, sh2_SensorEvent_t *event) {
+	printf("report\n");
+	if (sh2_decodeSensorEvent(_sensor_value, event) != SH2_OK) {
+		_sensor_value->timestamp = 0;
+		return;
   }
 }
 
 // ==================== High Level ==================== //
 
 bno_err_t bnoInit(bno08x_t* b){
+	_reset(); // turn off the sensor for now
 	_deselect();
 
 	_spi = b->spi;
@@ -179,19 +212,18 @@ bno_err_t bnoInit(bno08x_t* b){
 
 	bno_err_t err = 0;
 
-	_hardwareReset();
+	// Register sensor listener
+	sh2_setSensorCallback(_reportHandler, NULL);
 
 	// Open SH2 interface (also registers non-sensor event handler.)
 	err = sh2_open(&_hal, _eventCallback, NULL);
 	if(err != SH2_OK) return err;
 
 	// Check connection partially by getting the product id's
-	memset(&prod_ids, 0, sizeof(prod_ids));
 	err = sh2_getProdIds(&prod_ids);
 	if(err != SH2_OK) return err;
 
-	// Register sensor listener
-	sh2_setSensorCallback(_sensorHandler, NULL);
+	_rst_reason = 0; // we get a false positive when the senor boots up
 
 	return bno_ok;
 }
@@ -217,10 +249,10 @@ void bnoGetData(){
 
 // ==================== State Getters ==================== //
 
-bool bnoWasReset(){
-	bool was_reset = _was_rst;
-	_was_rst = false;
-	return was_reset;
+uint8_t bnoWasReset(){
+	uint8_t reason = _rst_reason;
+	_rst_reason = 0;
+	return reason;
 }
 
 sh2_ProductIds_t* bnoGetProdIds(){
@@ -250,11 +282,9 @@ bool bnoEnableReportInterval(sh2_SensorId_t sensorId, uint32_t interval_us) {
   config.sensorSpecific = 0;
 
   config.reportInterval_us = interval_us;
-  int status = sh2_setSensorConfig(sensorId, &config);
 
-  if (status != SH2_OK) {
-    return false;
-  }
+  if (sh2_setSensorConfig(sensorId, &config) != SH2_OK)
+	  return false;
 
   return true;
 }

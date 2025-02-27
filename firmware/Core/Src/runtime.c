@@ -33,25 +33,29 @@ bno08x_t bno = {
 sh2_SensorValue_t sensorValue;
 #define BNO_REPORT SH2_GAME_ROTATION_VECTOR
 
+
+#define constrain(x, floor, ceiling) ((x < floor ? floor : x) > ceiling ? ceiling : x)
+
 // WARNING : Both libraries could attempt to access the spi bus at the same time if read operations are done inside the interrupts !
 
 void setBnoReports(){
-	printf("Setting reports\n");
-	if (! bnoEnableReport(BNO_REPORT)) {
-		printf("Could not enable game vector\n");
+	printf("Setting reports... ");
+	if (!bnoEnableReport(BNO_REPORT)) {
+		printf("ERROR\n");
+		return;
 	}
+	printf("OK\n");
 }
 
 void setup(void){
-	printf("PAA Init...");
-	paa_err_t paa_init_exit = paaInit(&paa);
-	printf(" %d \nBNO Init...", paa_init_exit);
+	printf("BNO Init... ");
 	bno_err_t bno_init_exit = bnoInit(&bno);
-	printf(" %d\n",bno_init_exit);
-
+	printf("%d (%s) \nPAA Init... ", bno_init_exit, (bno_init_exit == bno_ok ? "OK" : "ERROR"));
+	paa_err_t paa_init_exit = paaInit(&paa);
+	printf("%d (%s)\n",paa_init_exit, (paa_init_exit == paa_ok ? "OK" : "ERROR"));
 
 	if(paa_init_exit != paa_ok || bno_init_exit != bno_ok) { // for now, if one of the sensors could not be initialized properly, reboot to try again
-		printf("FATAL ERROR : a sensor could not be initialized, rebooting...\n");
+		printf("FATAL : a sensor could not be initialized, rebooting...\n");
 		HAL_Delay(500);
 		NVIC_SystemReset();
 	}
@@ -59,9 +63,9 @@ void setup(void){
 	sh2_ProductIds_t* ids = bnoGetProdIds();
 	printf("BNO080 Sensors :\n");
 	for (int n = 0; n < ids->numEntries; n++) {
-		printf("\tPart %ld\n",ids->entry[n].swPartNumber);
-		printf("\tVersion %d.%d.%d\n",ids->entry[n].swVersionMajor,ids->entry[n].swVersionMinor,ids->entry[n].swVersionPatch);
-		printf("\tBuild %ld\n",ids->entry[n].swBuildNumber);
+		printf("\tPart %ld, ",ids->entry[n].swPartNumber);
+		printf("Version %d.%d.%d, ",ids->entry[n].swVersionMajor,ids->entry[n].swVersionMinor,ids->entry[n].swVersionPatch);
+		printf("Build %ld\n",ids->entry[n].swBuildNumber);
 	}
 
 	setBnoReports();
@@ -72,30 +76,23 @@ void loop(void){
 
 	//paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
 
-	if (bnoWasReset()) {
-		printf("Sensor RST !\n");
+	uint8_t rst = bnoWasReset();
+	if (rst) {
+		printf("Reset : %s (%d)\n", bno_reset_reason[constrain(rst, 0, 5)], rst);
 		setBnoReports();
-
 	}
 
 
 	  if (!bnoProcess(&sensorValue)) {
 	    return;
 	  }
-	  printf("data\n");
 	  switch (sensorValue.sensorId) {
-	    case SH2_GAME_ROTATION_VECTOR:
-	    	/*
-	      Serial.print("Game Rotation Vector - r: ");
-	      Serial.print(sensorValue.un.gameRotationVector.real);
-	      Serial.print(" i: ");
-	      Serial.print(sensorValue.un.gameRotationVector.i);
-	      Serial.print(" j: ");
-	      Serial.print(sensorValue.un.gameRotationVector.j);
-	      Serial.print(" k: ");
-	      Serial.println(sensorValue.un.gameRotationVector.k);
-	      */
+	  case SH2_GAME_ROTATION_VECTOR:
+		  printf("GRV : r %.2f, i %.2f, j %.2f, k %.2f\n", sensorValue.un.gameRotationVector.real, sensorValue.un.gameRotationVector.i, sensorValue.un.gameRotationVector.j, sensorValue.un.gameRotationVector.k);
 	      break;
+	  default :
+		  printf("rprt %d\n", sensorValue.sensorId);
+		  break;
 	  }
 
 }

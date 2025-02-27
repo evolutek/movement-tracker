@@ -650,6 +650,7 @@ static void executableDeviceHdlr(void *cookie, uint8_t *payload, uint16_t len, u
             
             // Notify client that reset is complete.
             sh2AsyncEvent.eventId = SH2_RESET;
+            sh2AsyncEvent.shtpEvent = payload[1];
             if (pSh2->eventCallback) {
                 pSh2->eventCallback(pSh2->eventCookie, &sh2AsyncEvent);
             }

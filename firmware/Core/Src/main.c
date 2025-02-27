@@ -120,9 +120,12 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USB_Device_Init();
   /* USER CODE BEGIN 2 */
-  printf("\n=== HAL init done, proceeding ===\n");
+  HAL_GPIO_WritePin(RST_PAA_GPIO_Port, RST_PAA_Pin, GPIO_PIN_RESET); // turn off and deselect both sensors
+  HAL_GPIO_WritePin(RST_IMU_GPIO_Port, RST_IMU_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(CS_PAA_GPIO_Port, CS_PAA_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(CS_IMU_GPIO_Port, CS_IMU_Pin, GPIO_PIN_SET);
+
+  printf("\n=== HAL init done, proceeding ===\n");
 
   printf("Movement Tracker V5, Firmware V2, Flashed on %s at %s\n", __DATE__, __TIME__);
 
@@ -392,34 +395,27 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : CS_IMU_Pin CS_PAA_Pin */
   GPIO_InitStruct.Pin = CS_IMU_Pin|CS_PAA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : RST_PAA_Pin RST_IMU_Pin */
+  GPIO_InitStruct.Pin = RST_PAA_Pin|RST_IMU_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : RST_PAA_Pin */
-  GPIO_InitStruct.Pin = RST_PAA_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RST_PAA_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : RST_IMU_Pin */
-  GPIO_InitStruct.Pin = RST_IMU_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RST_IMU_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pin : INT_PAA_Pin */
   GPIO_InitStruct.Pin = INT_PAA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(INT_PAA_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : INT_IMU_Pin */
   GPIO_InitStruct.Pin = INT_IMU_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(INT_IMU_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : AU_INT_Pin */

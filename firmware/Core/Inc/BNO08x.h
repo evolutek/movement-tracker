@@ -27,6 +27,8 @@ typedef enum {
 	bno_decod,
 } bno_err_t;
 
+static char* bno_reset_reason[] = {"not applicable","power on","internal system reset","watchdog timeout", "external reset", "other"};
+
 typedef struct { // Note : this structure is only used as a descriptor for all used pins and interface, to be fed to bnoInit, any instance of it can be destroyed after calling the function
 	SPI_HandleTypeDef* spi;
 
@@ -47,7 +49,7 @@ bool bnoProcess();
 
 // ========== State getters ========== //
 
-bool bnoWasReset();
+uint8_t bnoWasReset(); // returns the reason, if there is one (see bno_reset_reason above)
 sh2_ProductIds_t* bnoGetProdIds();
 
 // ========== Setters/Getters ========== //
