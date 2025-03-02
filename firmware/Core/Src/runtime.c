@@ -31,8 +31,6 @@ bno08x_t bno = {
 	.NRST_Pin = RST_IMU_Pin,
 };
 sh2_SensorValue_t sensorValue;
-#define BNO_REPORT SH2_GAME_ROTATION_VECTOR
-
 
 #define constrain(x, floor, ceiling) ((x < floor ? floor : x) > ceiling ? ceiling : x)
 
@@ -40,7 +38,7 @@ sh2_SensorValue_t sensorValue;
 
 void setBnoReports(){
 	printf("Setting reports... ");
-	if (!bnoEnableReport(BNO_REPORT)) {
+	if (!bnoEnableReportInterval(SH2_ROTATION_VECTOR, 10000)) {
 		printf("ERROR\n");
 		return;
 	}
@@ -51,7 +49,7 @@ void setup(void){
 	printf("BNO Init... ");
 	bno_err_t bno_init_exit = bnoInit(&bno);
 	printf("%d (%s) \nPAA Init... ", bno_init_exit, (bno_init_exit == bno_ok ? "OK" : "ERROR"));
-	paa_err_t paa_init_exit = paaInit(&paa);
+	paa_err_t paa_init_exit = 0;//paaInit(&paa);
 	printf("%d (%s)\n",paa_init_exit, (paa_init_exit == paa_ok ? "OK" : "ERROR"));
 
 	if(paa_init_exit != paa_ok || bno_init_exit != bno_ok) { // for now, if one of the sensors could not be initialized properly, reboot to try again
@@ -72,7 +70,10 @@ void setup(void){
 }
 
 void loop(void){
-	HAL_Delay(5);
+	#warning demander un report en produit tout le temps un juste après ...
+	//setBnoReports();
+
+	//HAL_Delay(6);
 
 	//paaReadMotion(&paa); // paa read is quite fast compared to the bno processing, which is why it is done before it
 
@@ -90,6 +91,9 @@ void loop(void){
 	  case SH2_GAME_ROTATION_VECTOR:
 		  printf("GRV : r %.2f, i %.2f, j %.2f, k %.2f\n", sensorValue.un.gameRotationVector.real, sensorValue.un.gameRotationVector.i, sensorValue.un.gameRotationVector.j, sensorValue.un.gameRotationVector.k);
 	      break;
+	  case SH2_ROTATION_VECTOR :
+	  	  printf("RV : r %.2f, i %.2f, j %.2f, k %.2f\n", sensorValue.un.rotationVector.real, sensorValue.un.rotationVector.i, sensorValue.un.rotationVector.j, sensorValue.un.rotationVector.k);
+	  	  break;
 	  default :
 		  printf("rprt %d\n", sensorValue.sensorId);
 		  break;

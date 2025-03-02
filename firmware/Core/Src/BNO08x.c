@@ -119,9 +119,10 @@ static int _read(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len, uint32_t *t_us
 		return 0;
 	}
 
-	if(_waitForSensRdy(INT_TIMEOUT) != bno_ok) return 0;
-
-	printf("%d\n", packet_size);
+	if(_waitForSensRdy(INT_TIMEOUT) != bno_ok){
+		printf("no read\n");
+		return 0;
+	}
 
 	_select();
 	if(HAL_SPI_Receive(_spi, pBuffer, packet_size, SPI_TIMEOUT) != HAL_OK){
@@ -130,7 +131,9 @@ static int _read(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len, uint32_t *t_us
 	}
 	_deselect();
 
-	*t_us = _getTimeUs(self);
+	//if(packet_size > 100)printf("%d\n", packet_size);
+
+	//*t_us = _getTimeUs(self);
 
 	return packet_size;
 }
@@ -183,8 +186,9 @@ static void _eventCallback(void *cookie, sh2_AsyncEvent_t *pEvent) {
 
 // sensor events (data), with event given by the lib when sensor is serviced and _sensor_value the memory space to store the information
 static void _reportHandler(void *cookie, sh2_SensorEvent_t *event) {
-	printf("report\n");
+	//printf("report\n");
 	if (sh2_decodeSensorEvent(_sensor_value, event) != SH2_OK) {
+		printf("err reading event\n");
 		_sensor_value->timestamp = 0;
 		return;
   }
@@ -212,12 +216,12 @@ bno_err_t bnoInit(bno08x_t* b){
 
 	bno_err_t err = 0;
 
-	// Register sensor listener
-	sh2_setSensorCallback(_reportHandler, NULL);
-
 	// Open SH2 interface (also registers non-sensor event handler.)
 	err = sh2_open(&_hal, _eventCallback, NULL);
 	if(err != SH2_OK) return err;
+
+	// Register sensor listener
+	sh2_setSensorCallback(_reportHandler, NULL);
 
 	// Check connection partially by getting the product id's
 	err = sh2_getProdIds(&prod_ids);
@@ -270,7 +274,7 @@ sh2_ProductIds_t* bnoGetProdIds(){
  * @return true: success false: failure
  */
 bool bnoEnableReportInterval(sh2_SensorId_t sensorId, uint32_t interval_us) {
-  static sh2_SensorConfig_t config;
+  static sh2_SensorConfig_t config = {0};
 
   // These sensor options are disabled or not used in most cases
   config.changeSensitivityEnabled = false;
