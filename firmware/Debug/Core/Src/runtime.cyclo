@@ -1,8 +1,0 @@
-../Core/Src/runtime.c:40:6:setup	2
-../Core/Src/runtime.c:52:6:loop	1
-../Core/Src/runtime.c:83:6:process_data	5
-../Core/Src/runtime.c:118:6:HAL_I2C_ListenCpltCallback	2
-../Core/Src/runtime.c:123:6:HAL_I2C_AddrCallback	5
-../Core/Src/runtime.c:141:6:HAL_I2C_SlaveTxCpltCallback	2
-../Core/Src/runtime.c:149:6:HAL_I2C_SlaveRxCpltCallback	4
-../Core/Src/runtime.c:161:6:HAL_I2C_ErrorCallback	5
