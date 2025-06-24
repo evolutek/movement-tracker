@@ -41,7 +41,8 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+extern SPI_HandleTypeDef hspi1;
+extern I2C_HandleTypeDef hi2c2;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -73,6 +74,7 @@ void Error_Handler(void);
 #define SWCLK_GPIO_Port GPIOA
 #define INT_IMU_Pin GPIO_PIN_15
 #define INT_IMU_GPIO_Port GPIOA
+#define INT_IMU_EXTI_IRQn EXTI15_10_IRQn
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 #define STATUS_Pin GPIO_PIN_4
