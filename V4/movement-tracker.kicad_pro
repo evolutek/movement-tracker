@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.05
+          "min_clearance": 0.125
         }
       },
       "diff_pair_dimensions": [
@@ -124,22 +124,22 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.0,
-        "min_connection": 0.0,
-        "min_copper_edge_clearance": 0.2,
+        "min_clearance": 0.125,
+        "min_connection": 0.125,
+        "min_copper_edge_clearance": 0.3,
         "min_groove_width": 0.0,
         "min_hole_clearance": 0.25,
-        "min_hole_to_hole": 0.25,
+        "min_hole_to_hole": 0.3,
         "min_microvia_diameter": 0.2,
         "min_microvia_drill": 0.1,
         "min_resolved_spokes": 2,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
-        "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.0,
+        "min_through_hole_diameter": 0.25,
+        "min_track_width": 0.125,
         "min_via_annular_width": 0.1,
-        "min_via_diameter": 0.5,
+        "min_via_diameter": 0.45,
         "solder_mask_to_copper_clearance": 0.0,
         "use_height_for_length_calcs": true
       },
@@ -189,11 +189,9 @@
       ],
       "track_widths": [
         0.0,
-        0.1,
         0.15,
         0.2,
-        0.25,
-        0.35,
+        0.3,
         0.5
       ],
       "tuning_pattern_settings": {
@@ -494,26 +492,65 @@
         "via_diameter": 0.6,
         "via_drill": 0.3,
         "wire_width": 6
+      },
+      {
+        "clearance": 0.2,
+        "diff_pair_gap": 0.0,
+        "diff_pair_width": 0.0,
+        "microvia_diameter": 0.0,
+        "microvia_drill": 0.0,
+        "name": "Power",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.6,
+        "via_drill": 0.3
       }
     ],
     "meta": {
       "version": 4
     },
     "net_colors": {
-      "+3.3V": "rgb(0, 255, 10)",
-      "+5V": "rgb(242, 16, 255)",
-      "+5VL": "rgb(255, 239, 0)",
+      "+3.3V": "rgb(255, 0, 255)",
+      "+5V": "rgb(132, 0, 132)",
+      "+5VL": "rgb(132, 0, 132)",
       "/CANH": "rgb(0, 248, 255)",
       "/CANL": "rgb(0, 242, 255)",
+      "/CAN_RX": "rgb(0, 194, 0)",
+      "/CAN_TX": "rgb(0, 194, 0)",
       "/MISO": "rgb(51, 255, 61)",
       "/MOSI": "rgb(33, 255, 0)",
-      "/RST": "rgb(51, 77, 255)",
-      "/SCK": "rgb(16, 255, 61)",
+      "/RST": "rgb(77, 31, 255)",
+      "/SCK": "rgb(0, 255, 0)",
+      "/SCL": "rgb(0, 132, 0)",
+      "/SDA": "rgb(0, 132, 0)",
+      "/SWCLK": "rgb(0, 72, 0)",
+      "/SWDIO": "rgb(0, 72, 0)",
+      "/USB_D+": "rgb(0, 194, 194)",
+      "/USB_D-": "rgb(0, 194, 194)",
+      "/VCP_RX": "rgb(0, 72, 0)",
+      "/VCP_TX": "rgb(0, 72, 0)",
       "/~{RST}": "rgb(77, 31, 255)",
-      "VBUS": "rgb(60, 255, 221)"
+      "GND": "rgb(194, 194, 194)",
+      "Net-(F1-Pad1)": "rgb(72, 0, 72)",
+      "VBUS": "rgb(72, 0, 72)"
     },
     "netclass_assignments": null,
-    "netclass_patterns": []
+    "netclass_patterns": [
+      {
+        "netclass": "Power",
+        "pattern": "+*"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "VBUS"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "GND"
+      }
+    ]
   },
   "pcbnew": {
     "last_paths": {
