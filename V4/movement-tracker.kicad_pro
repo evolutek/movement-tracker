@@ -58,16 +58,7 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [
-        [
-          "copper_edge_clearance|37139523|57425000|974d1bf1-f1a6-4a49-8c28-7c5d263374be|8152a39b-f375-4037-9f09-78164c51fb88",
-          ""
-        ],
-        [
-          "copper_edge_clearance|62860478|57425000|974d1bf1-f1a6-4a49-8c28-7c5d263374be|074ec14d-2d52-4e07-85a8-44d814052930",
-          ""
-        ]
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
@@ -566,7 +557,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "Output/",
+      "plot": "Output/gerber/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "Output/movement-tracker-v4.step",
