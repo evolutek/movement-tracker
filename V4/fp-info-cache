@@ -1,4 +1,4 @@
-26713751352219532
+27040704337457438
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -6768,6 +6768,713 @@ capacitor tantalum
 0
 2
 2
+ComponentsEvo
+1313210530000
+<b>WL-ICLED Integrated Controller within LED{return}<br><br></b>{return}Size: Side View 3210, SMT, 4pins{return}<br>LXWXH=3.2X1.5X1mm
+
+0
+4
+4
+ComponentsEvo
+463092370402
+<B>WS-MITV THT Terminal with Lever Micro Switch, 12.8 x 5.8 mm
+
+0
+3
+3
+ComponentsEvo
+450301014042
+<b>WS-SLTV</b><br> THT Mini Slide Switch, Opposite Side Connection 10x2.5 mm
+
+0
+3
+3
+ComponentsEvo
+450302014072
+<B>WS-SLTU</B><BR> THT Mini Slide Switch, Opposite Side Connection Right Angled 10x2.5 mm
+
+0
+3
+3
+ComponentsEvo
+42854232081X_10POS
+<b>WS-ROSV</b><br> SMT Rotary Switch with Arrow Type Actuator 7x7 mm
+
+0
+6
+5
+ComponentsEvo
+20x20x10_DC_FAN
+
+
+0
+0
+0
+ComponentsEvo
+0031.7701.11
+
+
+0
+2
+2
+ComponentsEvo
+40x40x10_DC_FAN
+
+
+0
+0
+0
+ComponentsEvo
+440YS67082622
+<B>WS-TATL</B> <BR>Illuminated THT Tact Switch 12 x 12 mm
+
+0
+6
+6
+ComponentsEvo
+8040-PORTE-FUSIBLE
+
+
+0
+4
+2
+ComponentsEvo
+434121043836
+<B>WS-TASV</B><BR>6x3.5 mm SMD Tact Switch, 2 pins
+
+0
+2
+2
+ComponentsEvo
+430156050736
+<B>WS-TATV</B> <BR>THT Tact Switch 6x6 mm
+
+0
+4
+4
+ComponentsEvo
+430456085736
+https://www.we-online.com/components/products/datasheet/430456085736.pdf
+tact sw push 12mm
+0
+4
+4
+ComponentsEvo
+452403012014
+<b>WS-SLSV</b><br> SMD Mini Slide Switch, Same Side Connection 7.65 x 5.5 mm
+
+0
+6
+6
+ComponentsEvo
+452404020202
+<b>WS-SLTV</b><br>THT Mini Slide Switch, Same Side Connection 9.0x3.5 mm
+
+0
+6
+6
+ComponentsEvo
+435431019830
+<b>WS-TASV SMT Washable Tact Switch 4.1 x 2.8 mm
+
+0
+5
+5
+ComponentsEvo
+435431019840
+<b>WS-TASV SMT Washable Tact Switch 4.1 x 2.8 mm
+
+0
+5
+5
+ComponentsEvo
+1312020030000
+<b>WL-ICLED Integrated Controller within LED<br><br></b>Size: Chip LED 2020, SMT, 4pins<br>LXWXH=2X2X0.9mm
+
+0
+4
+4
+ComponentsEvo
+ADNS 9800
+Module optique
+MODULE_OPTIQUE_LASER_SOURIS_CAPTEUR
+0
+16
+16
+ComponentsEvo
+Adafruit BMP390
+
+
+0
+10
+8
+ComponentsEvo
+Adafruit BNO085
+
+
+0
+12
+12
+ComponentsEvo
+Adafruit PA1616D
+
+
+0
+9
+9
+ComponentsEvo
+Adafruit SD breakout
+
+
+0
+9
+9
+ComponentsEvo
+Adafruit SD breakout Low Profile
+
+
+0
+9
+9
+ComponentsEvo
+ArduinoNano
+Arduino Nano, http://www.mouser.com/pdfdocs/Gravitech_Arduino_Nano3_0.pdf
+Arduino Nano
+0
+30
+30
+ComponentsEvo
+BMP390
+
+
+0
+10
+10
+ComponentsEvo
+BNO085
+
+
+0
+28
+28
+ComponentsEvo
+BatteryHolder_Eagle_12BH611-GR-Modified
+https://eu.mouser.com/datasheet/2/209/EPD-200766-1274481.pdf
+9V Battery Holder
+0
+5
+3
+ComponentsEvo
+Buzzer 9x5.5mm
+Generic Buzzer, D12mm height 9.5mm with RM7.6mm
+buzzer
+0
+2
+2
+ComponentsEvo
+DO-214AB
+Jedec DO-214AB diode package. Designed according to Vishay datasheet.
+DO-214AB diode
+0
+2
+2
+ComponentsEvo
+ESC_Emax_Bullet_15A
+
+
+0
+7
+7
+ComponentsEvo
+ESC_Emax_Bullet_35A
+
+
+0
+12
+12
+ComponentsEvo
+FUSE_3557-2
+
+
+0
+4
+2
+ComponentsEvo
+FUSE_01530007Z
+
+
+0
+2
+2
+ComponentsEvo
+G2-18v25
+
+
+0
+17
+12
+ComponentsEvo
+G2-18v25-reversed
+
+
+0
+17
+12
+ComponentsEvo
+GC9A01
+
+
+0
+8
+8
+ComponentsEvo
+GC9A01-LowProfile
+
+
+0
+8
+8
+ComponentsEvo
+HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm_ThermalVias
+HSOP, 8 Pin (https://www.st.com/resource/en/datasheet/l5973d.pdf), generated with kicad-footprint-generator ipc_gullwing_generator.py
+HSOP SO
+0
+20
+9
+ComponentsEvo
+LDR-Pedestal
+Resistor, LDR 5x4.1mm, see http://cdn-reichelt.de/documents/datenblatt/A500/A90xxxx%23PE.pdf
+Resistor LDR5x4.1mm
+0
+2
+2
+ComponentsEvo
+LED_D5.0mm - Easy
+LED, diameter 5.0mm, 2 pins, http://cdn-reichelt.de/documents/datenblatt/A500/LL-504BC2E-009.pdf
+LED diameter 5.0mm 2 pins
+0
+2
+2
+ComponentsEvo
+LED_D5.0mm-4_RGB - Easy
+LED, diameter 5.0mm, 4 pins, WP154A4, https://www.kingbright.com/attachments/file/psearch/000/00/00/L-154A4SUREQBFZGEW(Ver.11A).pdf
+LED diameter 5.0mm 2 pins diameter 5.0mm 3 pins diameter 5.0mm 4 pins RGB RGBLED
+0
+4
+4
+ComponentsEvo
+LED_D5.0mm-4_RGB_Wide_Pins - Easy
+LED, diameter 5.0mm, 4 pins, WP154A4, https://www.kingbright.com/attachments/file/psearch/000/00/00/L-154A4SUREQBFZGEW(Ver.11A).pdf
+LED diameter 5.0mm 2 pins diameter 5.0mm 3 pins diameter 5.0mm 4 pins RGB RGBLED
+0
+4
+4
+ComponentsEvo
+MODULE_NUCLEO-32
+
+
+0
+30
+30
+ComponentsEvo
+MODULE_NUCLEO-32-SMD
+
+
+0
+32
+31
+ComponentsEvo
+MODULE_NUCLEO-F303RE
+
+
+0
+88
+88
+ComponentsEvo
+MP1584EN
+
+
+0
+8
+4
+ComponentsEvo
+NodeMCU Esp32
+
+
+0
+30
+30
+ComponentsEvo
+PAA5163E1
+
+
+0
+17
+17
+ComponentsEvo
+Pimoroni PAA5100JE
+
+
+0
+9
+7
+ComponentsEvo
+Power Switch RS SPDT
+
+
+0
+3
+3
+ComponentsEvo
+Power Switch RS SPDT Angled
+
+
+0
+5
+4
+ComponentsEvo
+PowerPak-SO8_5.15x6.15mm_Pitch1.27mm
+
+Powerpak SO-8 SOIC 1.27 dual
+0
+9
+3
+ComponentsEvo
+PowerPak-SO8_5.15x6.15mm_Pitch1.27mm_Dual
+
+Powerpak SO-8 SOIC 1.27 dual
+0
+10
+6
+ComponentsEvo
+QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm-Without thermal pad
+QFN, 32 Pin (http://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/ltc-legacy-qfn/QFN_32_05-08-1693.pdf), generated with kicad-footprint-generator ipc_noLead_generator.py
+QFN NoLead
+0
+32
+32
+ComponentsEvo
+Raspberry_Pi_Zero_W_Vertical
+
+
+0
+48
+41
+ComponentsEvo
+S1325
+
+
+0
+2
+2
+ComponentsEvo
+SC70-5
+
+
+0
+5
+5
+ComponentsEvo
+SSD1306-0.91-OLED-4pin-128x32
+
+
+0
+4
+4
+ComponentsEvo
+STM32F4XX M
+
+
+0
+93
+84
+ComponentsEvo
+STM32F4XX M Low Profile
+
+
+0
+93
+84
+ComponentsEvo
+SW_Gateron_LowProfile_THT
+Gateron Low Profile (KS-27 & KS-33) style mechanical keyboard switch, through-hole soldering, single-sided mounting. Gateron Low Profile and Cherry MX Low Profile are NOT compatible.
+switch, low_profile
+0
+2
+2
+ComponentsEvo
+SW_PUSH_6mm_H5mm
+tactile push button, 6x6mm e.g. PHAP33xx series, height=5mm
+tact sw push 6mm
+0
+4
+4
+ComponentsEvo
+SeeedStudio LoRa E5 Mini
+
+
+0
+24
+23
+ComponentsEvo
+Shield_Raspberry_Pi_Zero_W
+
+
+0
+76
+41
+ComponentsEvo
+Shield_Raspberry_Pi_Zero_W_SMD
+
+
+0
+42
+41
+ComponentsEvo
+Shield_Raspberry_Pi_with_11mm_Header
+
+
+0
+76
+41
+ComponentsEvo
+Shield_Raspberry_Pi_with_18mm_Header
+
+
+0
+76
+41
+ComponentsEvo
+Silicon Pad 6x2mm
+
+
+0
+0
+0
+ComponentsEvo
+TB6612FNG
+
+
+0
+16
+16
+ComponentsEvo
+TO-220-3_Horizontal_TabDown
+TO-220-3, Horizontal, RM 2.54mm, see https://www.vishay.com/docs/66542/to-220-1.pdf
+TO-220-3 Horizontal RM 2.54mm
+0
+31
+3
+ComponentsEvo
+TO-263-2_Goldorak
+TO-263/D2PAK/DDPAK SMD package, http://www.infineon.com/cms/en/product/packages/PG-TO263/PG-TO263-3-1/
+D2PAK DDPAK TO-263 D2PAK-3 TO-263-3 SOT-404
+0
+7
+3
+ComponentsEvo
+TPS2121RUXR
+
+
+0
+16
+12
+ComponentsEvo
+TRACO_CONV_TDN
+
+
+0
+6
+6
+ComponentsEvo
+TRACO_CONV_TEN
+
+
+0
+6
+6
+ComponentsEvo
+TRACO_CONV_THL
+
+
+0
+6
+6
+ComponentsEvo
+TSR_2-2450
+
+
+0
+3
+3
+ComponentsEvo
+Texas_EUW_R-PDSS-T7_THT
+Texas Instruments EUW 7 Pin Double Sided Module
+module pcb
+0
+7
+7
+ComponentsEvo
+UWE
+
+
+0
+8
+8
+ComponentsEvo
+Usb-c_Pdc004_Pd
+
+
+0
+6
+2
+ComponentsEvo
+VNH7040AYTR
+
+
+0
+39
+11
+ComponentsEvo
+WA-SMSI_9774010243
+<B>WA-SMSI SMT Steel Spacer, M2 Thread Internal<BR></B>Thread Internal M2<BR>Height = 1mm
+
+0
+1
+1
+ComponentsEvo
+WA-SMSI_9774015243
+<B>WA-SMSI SMT Steel Spacer, M2 Thread Internal{return}<BR></B>Thread Internal M2{return}<BR>Height = 1mm
+
+0
+1
+1
+ComponentsEvo
+WA-SMSI_9774015243_Reversed
+<B>WA-SMSI SMT Steel Spacer, M2 Thread Internal{return}<BR></B>Thread Internal M2{return}<BR>Height = 1mm
+
+0
+1
+1
+ComponentsEvo
+WA-SMSI_9774030360
+<B>WA-SMSI SMT Steel Spacer, M3 Thread Internal{return}<BR></B>Thread Internal M3{return}<BR>Height = 3mm
+
+0
+1
+1
+ComponentsEvo
+WA-SMSI_9774100360
+<B>WA-SMSI SMT Steel Spacer, M3 Thread Internal{return}<BR></B>Thread Internal M3{return}<BR>Height = 10mm
+
+0
+1
+1
+ComponentsEvo
+WA-SMSI_9774110360
+Mounting Hardware, inside through hole M3, height 16, Wuerth electronics 9774160360 (https://www.we-online.com/components/products/datasheet/9774160360R.pdf), generated with kicad-footprint-generator
+Mounting M3 9774160360
+0
+8
+1
+ComponentsEvo
+WE-MCA_7488910092
+<B>WE-MCA Antennas{return}<Br></b>Single band
+
+0
+8
+1
+ComponentsEvo
+WIO-E5
+
+
+0
+28
+28
+ComponentsEvo
+WL-OSEN_2734_1642730961200
+<B>WL-OSEN Optical Sensor - Reflective{return}<BR><BR></B>Size:2734, SMT, 4pins{return}<br>LXWXH=3.4X2.7X1.5mm
+
+0
+4
+4
+ComponentsEvo
+WL-SBCW_1210
+<B>WL-SBCW SMT Bi-color Chip LED Waterclear{return}</B> <BR><BR>Size 0606, SMT, 4pins{return}<BR>3.2x2.7x0.7mm(LXWXH)
+
+0
+4
+4
+ComponentsEvo
+WL-SBTW_3528
+<B>WL-SBTW</B><BR>SMT Bi-color TOP LED Waterclear,Size:3528,3.5x2.8x1.9mm(LXWXH)
+
+0
+4
+4
+ComponentsEvo
+WL-SMTD_3528_DOME_150141XX631X0
+<b>WL-SMTD SMT Mono-color TOP LED Diffused Dome</b><br><br>{return}{return}Size: 3528 30° dome, SMT, 4pins<br>{return}2.8x3.5x3.25mm(LXWXH)
+
+0
+4
+4
+ComponentsEvo
+WL-SMTW_3020
+<B>WL-SMTW SMT Mono-color TOP LED Waterclear </B>{return}<br><br>Size:3020, SMT, 2pins{return}<br>3x2x1.3mm(LXWXH)
+
+0
+2
+2
+ComponentsEvo
+WP-SMRA_74663025
+<B>WP-SMRA REDCUBE SMT Right Angled 90° without Pins, M3/Ø 3.3 mm{return}<BR></B>Thread M2.5 {return}<br>Height = 5mm
+
+0
+4
+1
+ComponentsEvo
+WPME-VDLM 1710x1801
+
+
+0
+20
+17
+ComponentsEvo
+WSEN-PDUS_2513130810X01
+<b>WSEN-PDUS - 2513130810x01<br><br></b>Differential Pressure Sensor
+
+0
+8
+8
+ComponentsEvo
+Waveshare 1.5 inch with 8mm spacers
+
+
+0
+28
+9
+ComponentsEvo
+XDCR_MPRLS0025PA00001A
+
+
+0
+12
+12
+ComponentsEvo
+XDCR_SMT-0540-S-R
+
+
+0
+3
+3
+ComponentsEvo
+evo-motor-controller
+
+
+0
+24
+20
 Connector
 BJB_Pico_46.110.1001_Receptacle_Horizontal
 BJB Pico, single terminal block/receptacle, uninsulated, SMD, 6.9x2.3x2.7mm, https://www.bjb.com/media/7a/b3/df/1740905546/DM-6265102-v6_BJB_Datasheet_46.110.1001-0_SMD_Terminal_block_without_housing_Update_03_2022.PDF
@@ -55530,6 +56237,538 @@ connector Wuerth WR-WTB vertical
 0
 10
 10
+ConnectorsEvo
+651005136421
+<b>WR-COM</b><br>Mini USB 2.0 Type B Vertical 5 Contacts , 5 pins
+
+0
+7
+6
+ConnectorsEvo
+62701420621
+<b>WR-BHD 1.27 mm Male SMT Box Header{return}</b><br><br>Pitch: 1.27mm, 14pins, SMT
+
+0
+14
+14
+ConnectorsEvo
+629722000214
+
+
+0
+20
+17
+ConnectorsEvo
+690357281076
+<B>WR-MM</B><BR> Male SMT Connector w/o Latch & w/o Polarization, 10 pins
+
+0
+10
+10
+ConnectorsEvo
+690367181072
+<b>WR-MM</b><br> Female Connector w/o Latch & w/o Polarization,10 Pins
+
+0
+10
+10
+ConnectorsEvo
+690367280476
+<b>WR-MM</b><br> Female SMT Connector with Polarization, 10 pins
+
+0
+4
+4
+ConnectorsEvo
+690367280676
+<b>WR-MM</b><br> Female SMT Connector with Polarization, 6Pins
+
+0
+6
+6
+ConnectorsEvo
+690367280876
+<b>WR-MM</b><br> Female SMT Connector with Polarization, 8 pins
+
+0
+8
+8
+ConnectorsEvo
+690367281076
+<b>WR-MM</b><br> Female SMT Connector with Polarization, 10 pins
+
+0
+10
+10
+ConnectorsEvo
+690367281476
+
+
+0
+14
+14
+ConnectorsEvo
+690367281676
+<b>WR-MM</b><br> Female SMT Connector with Polarization,16 pins
+
+0
+16
+16
+ConnectorsEvo
+686108188622
+<b>WR-FPC</b> <br >1.00 mm SMT LIF Horizontal Top Contact,8 Pins
+
+0
+10
+9
+ConnectorsEvo
+686108188822
+WR-FPC 1.00 mm SMT LIF Vertical Type A,8 Pins
+
+0
+8
+8
+ConnectorsEvo
+686115183422
+
+
+0
+17
+17
+ConnectorsEvo
+686115183522
+
+
+0
+17
+17
+ConnectorsEvo
+648105131822
+<b>WR-WTB</b><br>1.50 mm SMT Male Horizontal Shrouded Header, 5 Pins
+
+0
+7
+6
+ConnectorsEvo
+691321100002
+<b>WR-TBL Serie 3211 - 3.50 mm Vertical PCB Header<br></b>Max Height = 9.2mm , Pitch 3.5mm , 2pins
+
+0
+2
+2
+ConnectorsEvo
+657002140101
+<B>WR-MPC5 THT Single Row Male Header Right Angled{return}<br><br></b>THT, 2pins
+
+0
+2
+2
+ConnectorsEvo
+657003140101
+<B>WR-MPC5 THT Single Row Male Header Right Angled{return}<br><br></b>THT, 3pins
+
+0
+3
+3
+ConnectorsEvo
+691406710002B
+<b>WR-TBL Series 4067B - Screwless Push In 5.0mm pitch - Horizontal cable entry - THT<br><br></b>Series 4067B, Pitch 5mm,THT, 2pins
+
+0
+4
+2
+ConnectorsEvo
+18K314305
+
+
+0
+9
+5
+ConnectorsEvo
+22-03-5025
+Molex SPOX Connector System, 5267-02A, 2 Pins per row (http://www.molex.com/pdm_docs/sd/022035035_sd.pdf), generated with kicad-footprint-generator
+connector Molex SPOX side entry
+0
+2
+2
+ConnectorsEvo
+22-03-5035
+Molex SPOX Connector System, 5267-03A, 3 Pins per row (http://www.molex.com/pdm_docs/sd/022035035_sd.pdf), generated with kicad-footprint-generator
+connector Molex SPOX side entry
+0
+3
+3
+ConnectorsEvo
+22-03-5045
+Molex SPOX Connector System, 5267-04A, 4 Pins per row (http://www.molex.com/pdm_docs/sd/022035035_sd.pdf), generated with kicad-footprint-generator
+connector Molex SPOX side entry
+0
+4
+4
+ConnectorsEvo
+22-05-7025
+Molex SPOX Connector System, 5268-03A, 3 Pins per row (https://www.molex.com/pdm_docs/sd/022057045_sd.pdf), generated with kicad-footprint-generator
+connector Molex SPOX horizontal
+0
+2
+2
+ConnectorsEvo
+22-05-7035
+Molex SPOX Connector System, 5268-03A, 3 Pins per row (https://www.molex.com/pdm_docs/sd/022057045_sd.pdf), generated with kicad-footprint-generator
+connector Molex SPOX horizontal
+0
+3
+3
+ConnectorsEvo
+681M7W2103LYYY
+
+
+0
+7
+7
+ConnectorsEvo
+684M7W2103L461
+
+
+0
+7
+7
+ConnectorsEvo
+636101111001
+<B>WR-UMRF PCB Receptacle SMT with 3 Pads{return}</B><Br><Br>SMT, 3pins
+
+0
+3
+2
+ConnectorsEvo
+649002227222
+<B>WR-MPC4 </B><BR>4.20 mm Male Dual Row Angled Header w. Mounting Pegs,2 pins
+
+0
+2
+2
+ConnectorsEvo
+649002227222-with-larger-pads
+<B>WR-MPC4 </B><BR>4.20 mm Male Dual Row Angled Header w. Mounting Pegs,2 pins
+
+0
+2
+2
+ConnectorsEvo
+649004227222
+<B>WR-MPC4 </B><BR>4.20 mm Male Dual Row Angled Header w. Mounting Pegs,4 pins
+
+0
+4
+4
+ConnectorsEvo
+649006227222
+<B>WR-MPC4 </B><BR>4.20 mm Male Dual Row Angled Header w. Mounting Pegs,6 pins
+
+0
+6
+6
+ConnectorsEvo
+649006227222-with-larger-pads
+<B>WR-MPC4 </B><BR>4.20 mm Male Dual Row Angled Header w. Mounting Pegs,6 pins
+
+0
+6
+6
+ConnectorsEvo
+64900311122
+<B>WR-MPC4 </B><BR>4.20 mm Male Single Row Vertical Header,3 Pins
+
+0
+3
+3
+ConnectorsEvo
+61300815721
+<B>WR-PHD </B><BR>2.54 mm Socket Header Bottom Entry,  8 Pins
+
+0
+8
+8
+ConnectorsEvo
+632722110112
+WR-COM USB 3.1 Type C Receptacle Vertical SMT 1.0 mm
+
+0
+28
+25
+ConnectorsEvo
+693071020811
+<B>WR-CRD Micro SD Card Connector Push & Push 8 pins
+
+0
+13
+13
+ConnectorsEvo
+66200211022
+<b>WR-MPC3<br></b>3.00 mm Male Single Row Angled Header w. Plastic Pegs, 2 Pins
+
+0
+2
+2
+ConnectorsEvo
+66200221022
+<b>WR-MPC3<br></b>3.00 mm Male Dual Row Angled Header w. Plastic Pegs,2 Pins
+
+0
+2
+2
+ConnectorsEvo
+66200221122
+WR-MPC3-3.00mm Male Dual Row Vertical Header,2 pins
+
+0
+2
+2
+ConnectorsEvo
+66200221124
+WR-MPC3-3.00mm Male Dual Row Vertical Header,2 pins
+
+0
+2
+2
+ConnectorsEvo
+66200421022
+<b>WR-MPC3<br></b>3.00 mm Male Dual Row Angled Header w. Plastic Pegs,4 Pins
+
+0
+4
+4
+ConnectorsEvo
+66200421122
+<b>WR-MPC3<br></b>3.00 mm Male Dual Row Vertical Header,4 pins
+
+0
+4
+4
+ConnectorsEvo
+66200621022
+<b>WR-MPC3<br></b>3.00 mm Male Dual Row Angled Header w. Plastic Pegs, 6 Pins
+
+0
+6
+6
+ConnectorsEvo
+66200621122
+<b>WR-MPC3<br></b>3.00 mm Male Dual Row Vertical Header,6 pins
+
+0
+6
+6
+ConnectorsEvo
+66201021022
+WR-MPC3{return}3.00 mm Male Dual Row Angled Header w. Plastic Pegs,10 Pins
+
+0
+10
+10
+ConnectorsEvo
+AMPHENOL_SFW15R-1STE1LF
+
+
+0
+17
+16
+ConnectorsEvo
+AMPHENOL_SFW15R-2STE1LF
+
+
+0
+17
+16
+ConnectorsEvo
+B02B-PASK
+
+
+0
+2
+2
+ConnectorsEvo
+B03B-PASK
+
+
+0
+3
+3
+ConnectorsEvo
+B04B-PASK
+
+
+0
+4
+4
+ConnectorsEvo
+B05B-PASK
+
+
+0
+5
+5
+ConnectorsEvo
+B06B-PASK
+
+
+0
+6
+6
+ConnectorsEvo
+Banana_Plug_Staubli_Black
+
+
+0
+1
+1
+ConnectorsEvo
+Banana_Plug_Staubli_Red
+
+
+0
+1
+1
+ConnectorsEvo
+ESQ-120-24-T-D
+
+
+0
+40
+40
+ConnectorsEvo
+G2-port
+
+
+0
+16
+12
+ConnectorsEvo
+G2-port-extended
+
+
+0
+24
+20
+ConnectorsEvo
+GCT_USB4125-GF-A_REVA2
+
+
+0
+10
+7
+ConnectorsEvo
+GCT_USB4140-GF-0170-C_REV0.4
+
+
+0
+10
+7
+ConnectorsEvo
+JST_SH_BM09B-SRSS-TB_1x09-1MP_P1.00mm_Vertical
+JST SH series connector, BM09B-SRSS-TB (http://www.jst-mfg.com/product/pdf/eng/eSH.pdf), generated with kicad-footprint-generator
+connector JST SH vertical
+0
+11
+10
+ConnectorsEvo
+J_Wurth_WR-MM_690367281276
+Female SMT Connector with Polarization, body 17.24x7x5.75mm, https://www.we-online.com/en/components/products/datasheet/690367281276?ki
+SMT
+0
+12
+12
+ConnectorsEvo
+Pad 4x2mm
+
+
+0
+1
+1
+ConnectorsEvo
+Pogo Connector 19 pins Female
+
+
+0
+19
+19
+ConnectorsEvo
+Pogo Connector 19 pins Male
+
+
+0
+19
+19
+ConnectorsEvo
+S02B-PASK
+
+
+0
+2
+2
+ConnectorsEvo
+S03B-PASK
+
+
+0
+3
+3
+ConnectorsEvo
+S04B-PASK
+
+
+0
+4
+4
+ConnectorsEvo
+SAMTEC_FTSH-107-01-L-DV-K
+
+
+0
+14
+14
+ConnectorsEvo
+SAMTEC_TSM-103-01-F-SH
+translated Allegro footprint
+
+0
+3
+3
+ConnectorsEvo
+USB_A_CONNFLY_DS1095-WNR0
+http://www.connfly.com/userfiles/image/UpLoadFile/File/2013/5/6/DS1095.pdf
+USB-A receptacle horizontal through-hole
+0
+6
+5
+ConnectorsEvo
+USB_Mini-B_Wuerth_65100516121_Horizontal
+Mini USB 2.0 Type B SMT Horizontal 5 Contacts (https://katalog.we-online.de/em/datasheet/65100516121.pdf)
+Mini USB 2.0 Type B
+0
+9
+6
+ConnectorsEvo
+WA-BCPH_79527141
+<B>WA-BCPH Battery Holder{return}<BR></B>Battery Type : 2032
+
+0
+2
+2
+ConnectorsEvo
+WireSolder_Pad_5.0x5.0mm
+SMD rectangular pad as test Point, square 4.0mm side length
+test point SMD pad rectangle square
+0
+10
+1
+ConnectorsEvo
+XT30
+
+
+0
+2
+2
 Converter_ACDC
 Converter_ACDC_CUI_PBO-3-Sxx_THT_Vertical
 ACDC-Converter, 3W, CUI PBO-3, THT https://www.cui.com/product/resource/pbo-3.pdf
@@ -69754,6 +70993,97 @@ Yellow 5381 Series LED
 0
 2
 2
+MarkingEvo
+CAN ID Label
+Generated with KiBuzzard
+CAN ID Lable
+0
+0
+0
+MarkingEvo
+CAN ID Label 2
+Generated with KiBuzzard
+kb_params=eyJBbGlnbm1lbnRDaG9pY2UiOiAiQ2VudGVyIiwgIkNhcExlZnRDaG9pY2UiOiAiKCIsICJDYXBSaWdodENob2ljZSI6ICIpIiwgIkZvbnRDb21ib0JveCI6ICJVYnVudHVNb25vLUIiLCAiSGVpZ2h0Q3RybCI6IDAuOCwgIkxheWVyQ29tYm9Cb3giOiAiRi5TaWxrUyIsICJMaW5lU3BhY2luZ0N0cmwiOiAxLjUsICJNdWx0aUxpbmVUZXh0IjogIkNBTiBJRCIsICJQYWRkaW5nQm90dG9tQ3RybCI6IDI1LjAsICJQYWRkaW5nTGVmdEN0cmwiOiAwLjAsICJQYWRkaW5nUmlnaHRDdHJsIjogMC4wLCAiUGFkZGluZ1RvcEN0cmwiOiAxLjUsICJXaWR0aEN0cmwiOiAwLjAsICJhZHZhbmNlZENoZWNrYm94IjogdHJ1ZSwgImlubGluZUZvcm1hdFRleHRib3giOiBmYWxzZSwgImxpbmVvdmVyU3R5bGVDaG9pY2UiOiAiU3F1YXJlIiwgImxpbmVvdmVyVGhpY2tuZXNzQ3RybCI6IDF9
+0
+0
+0
+MarkingEvo
+Logo Aisler
+
+
+0
+0
+0
+MarkingEvo
+Logo Aisler Micro
+
+
+0
+0
+0
+MarkingEvo
+Logo Aisler Min
+
+
+0
+0
+0
+MarkingEvo
+Logo Lora Micro
+
+
+0
+0
+0
+MarkingEvo
+logo-coffee-micro
+
+
+0
+0
+0
+MarkingEvo
+logo-evo
+
+
+0
+0
+0
+MarkingEvo
+logo-evo-micro
+
+
+0
+0
+0
+MarkingEvo
+logo-evo-min
+
+
+0
+0
+0
+MarkingEvo
+logo-evo-min-cu
+
+
+0
+0
+0
+MarkingEvo
+logo_coffee
+
+
+0
+0
+0
+MarkingEvo
+logo_coffee-min
+
+
+0
+0
+0
 Module
 A20_OLINUXINO_LIME2
 A20 Olinuxino LIME2, 1.2GHz, 512-1024MB RAM, Micro-SD, NAND or eMMC, 1000Mbit Ethernet

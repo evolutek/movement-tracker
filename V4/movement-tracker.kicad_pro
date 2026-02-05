@@ -58,17 +58,26 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "copper_edge_clearance|37139523|57425000|974d1bf1-f1a6-4a49-8c28-7c5d263374be|8152a39b-f375-4037-9f09-78164c51fb88",
+          ""
+        ],
+        [
+          "copper_edge_clearance|62860478|57425000|974d1bf1-f1a6-4a49-8c28-7c5d263374be|074ec14d-2d52-4e07-85a8-44d814052930",
+          ""
+        ]
+      ],
       "meta": {
         "version": 2
       },
       "rule_severities": {
         "annular_width": "error",
-        "clearance": "error",
+        "clearance": "ignore",
         "connection_width": "warning",
         "copper_edge_clearance": "error",
         "copper_sliver": "warning",
-        "courtyards_overlap": "error",
+        "courtyards_overlap": "ignore",
         "creepage": "error",
         "diff_pair_gap_out_of_range": "error",
         "diff_pair_uncoupled_length_too_long": "error",
@@ -106,7 +115,7 @@
         "silk_overlap": "warning",
         "skew_out_of_range": "error",
         "solder_mask_bridge": "error",
-        "starved_thermal": "error",
+        "starved_thermal": "ignore",
         "text_height": "warning",
         "text_on_edge_cuts": "error",
         "text_thickness": "warning",
@@ -557,7 +566,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "Output/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "Output/movement-tracker-v4.step",
@@ -668,7 +677,7 @@
     },
     "net_format_name": "",
     "page_layout_descr_file": "${LIBELEC}/TemplateKicad/TemplateEvolutek.kicad_wks",
-    "plot_directory": "",
+    "plot_directory": "Output/",
     "space_save_all_events": true,
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",

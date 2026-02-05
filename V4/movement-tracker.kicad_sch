@@ -6,7 +6,7 @@
 	(paper "A4")
 	(title_block
 		(title "Movement Tracker")
-		(date "2025-01-02")
+		(date "2026-02-05")
 		(rev "V4.1")
 	)
 	(lib_symbols
@@ -11102,9 +11102,9 @@
 		)
 		(uuid "35fa420f-e916-4f02-88ec-651e753d2766")
 	)
-	(text "TODO: Document JP3/4"
+	(text "config of SSBE with JP3/4\ncontacts 2-3 soldered = CAN\ncontact 1-2 soldered = I2C"
 		(exclude_from_sim no)
-		(at 34.29 48.26 0)
+		(at 35.56 47.498 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11156,7 +11156,7 @@
 	)
 	(text_box "Optical flow sensor\n"
 		(exclude_from_sim no)
-		(at 449.58 68.58 0)
+		(at 157.48 71.12 0)
 		(size 87.63 62.23)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11176,7 +11176,7 @@
 	)
 	(text_box "Power input and processing\n"
 		(exclude_from_sim no)
-		(at 304.8 132.08 0)
+		(at 12.7 134.62 0)
 		(size 77.47 27.94)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11196,7 +11196,7 @@
 	)
 	(text_box "Reset circuit"
 		(exclude_from_sim no)
-		(at 383.54 132.08 0)
+		(at 91.44 134.62 0)
 		(size 59.69 49.53)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11216,7 +11216,7 @@
 	)
 	(text_box "IMU"
 		(exclude_from_sim no)
-		(at 449.58 10.16 0)
+		(at 157.48 12.7 0)
 		(size 87.63 57.15)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11236,7 +11236,7 @@
 	)
 	(text_box "CAN interface"
 		(exclude_from_sim no)
-		(at 353.06 10.16 0)
+		(at 60.96 12.7 0)
 		(size 95.25 39.37)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11256,7 +11256,7 @@
 	)
 	(text_box "Mouting holes"
 		(exclude_from_sim no)
-		(at 304.8 161.29 0)
+		(at 12.7 163.83 0)
 		(size 30.48 33.02)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11276,7 +11276,7 @@
 	)
 	(text_box "USB"
 		(exclude_from_sim no)
-		(at 304.8 50.8 0)
+		(at 12.7 53.34 0)
 		(size 59.69 80.01)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11316,7 +11316,7 @@
 	)
 	(text_box "STM32"
 		(exclude_from_sim no)
-		(at 365.76 50.8 0)
+		(at 73.66 53.34 0)
 		(size 82.55 80.01)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11336,7 +11336,7 @@
 	)
 	(text_box "LEDs"
 		(exclude_from_sim no)
-		(at 336.55 161.29 0)
+		(at 44.45 163.83 0)
 		(size 45.72 33.02)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11356,7 +11356,7 @@
 	)
 	(text_box "Main interface"
 		(exclude_from_sim no)
-		(at 304.8 10.16 0)
+		(at 12.7 12.7 0)
 		(size 46.99 39.37)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -11541,6 +11541,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "606f4e10-3c59-4aaa-aaf4-5529065e72bc")
+	)
+	(junction
+		(at 64.77 62.23)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "617e831a-2564-42c2-9249-5638303b4764")
 	)
 	(junction
 		(at 57.15 146.05)
@@ -13300,7 +13306,7 @@
 	)
 	(wire
 		(pts
-			(xy 68.58 62.23) (xy 71.12 62.23)
+			(xy 68.58 62.23) (xy 64.77 62.23)
 		)
 		(stroke
 			(width 0)
@@ -13310,7 +13316,7 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 62.23) (xy 68.58 62.23)
+			(xy 50.8 62.23) (xy 64.77 62.23)
 		)
 		(stroke
 			(width 0)
@@ -14215,7 +14221,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "MarkingEvo:logo-evo"
+		(property "Footprint" "MarkingEvo:logo-evo-min"
 			(at 137.16 191.77 0)
 			(effects
 				(font
@@ -15455,7 +15461,7 @@
 	)
 	(symbol
 		(lib_id "power:VBUS")
-		(at 71.12 62.23 0)
+		(at 64.77 62.23 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -15464,7 +15470,7 @@
 		(fields_autoplaced yes)
 		(uuid "211e58bc-7980-4698-94fd-7e37c529e9ff")
 		(property "Reference" "#PWR010"
-			(at 71.12 66.04 0)
+			(at 64.77 66.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15473,7 +15479,7 @@
 			)
 		)
 		(property "Value" "VBUS"
-			(at 71.12 57.15 0)
+			(at 64.77 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15481,7 +15487,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 71.12 62.23 0)
+			(at 64.77 62.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15490,7 +15496,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 71.12 62.23 0)
+			(at 64.77 62.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15499,7 +15505,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 71.12 62.23 0)
+			(at 64.77 62.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16025,7 +16031,7 @@
 		(at 82.55 106.68 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
@@ -16587,7 +16593,7 @@
 				)
 			)
 		)
-		(property "Footprint" "MarkingEvo:CAN ID lablel"
+		(property "Footprint" "MarkingEvo:CAN ID Label"
 			(at 120.65 196.85 0)
 			(effects
 				(font
@@ -17297,7 +17303,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "MarkingEvo:Logo Aisler"
+		(property "Footprint" "MarkingEvo:Logo Aisler Min"
 			(at 102.87 191.77 0)
 			(effects
 				(font
