@@ -11082,6 +11082,16 @@
 		)
 		(uuid 5e4df27d-be1e-4fdb-ba5e-fd3fc29f3d61)
 	)
+	(text "(5V)"
+		(exclude_from_sim no)
+		(at 176.53 137.414 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "12d0024d-8436-4c51-96e5-dfc78e3df851")
+	)
 	(text "PU I2C"
 		(exclude_from_sim no)
 		(at 146.304 103.886 0)
@@ -11114,7 +11124,7 @@
 	)
 	(text "STLINK\n"
 		(exclude_from_sim no)
-		(at 171.958 136.906 0)
+		(at 156.464 136.398 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11143,16 +11153,6 @@
 			(justify left bottom)
 		)
 		(uuid "955956d8-6e13-412b-b439-f3eec17b8d58")
-	)
-	(text "FIXME: 5V?"
-		(exclude_from_sim no)
-		(at 172.72 140.97 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "d628a9f3-fe5b-4d9e-9709-eec56654237f")
 	)
 	(text_box "Optical flow sensor\n"
 		(exclude_from_sim no)
@@ -11549,6 +11549,12 @@
 		(uuid "617e831a-2564-42c2-9249-5638303b4764")
 	)
 	(junction
+		(at 34.29 153.67)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "62bebef6-55c3-4ff8-b30d-4825551f345e")
+	)
+	(junction
 		(at 57.15 146.05)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -11799,10 +11805,6 @@
 		(uuid "bddca2cc-6c8e-42f4-85e9-1fbf37782e92")
 	)
 	(no_connect
-		(at 165.1 142.24)
-		(uuid "ccd0b6f7-31ef-4b13-b83f-c5c763dc28e2")
-	)
-	(no_connect
 		(at 41.91 97.79)
 		(uuid "de7c6a79-6aeb-4103-a638-ffc22b554c80")
 	)
@@ -11863,6 +11865,16 @@
 			(type default)
 		)
 		(uuid "0847f84f-85ea-4934-a898-01e2c49cfb06")
+	)
+	(wire
+		(pts
+			(xy 21.59 160.02) (xy 24.13 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "087808f7-5ad4-481e-ac85-faa36aeca34f")
 	)
 	(wire
 		(pts
@@ -11933,6 +11945,16 @@
 			(type default)
 		)
 		(uuid "0ebf5a38-b680-44da-a300-08735dc0ff68")
+	)
+	(wire
+		(pts
+			(xy 165.1 142.24) (xy 170.18 142.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0f606d69-a9fa-4860-870d-84492655609f")
 	)
 	(wire
 		(pts
@@ -12043,6 +12065,16 @@
 			(type default)
 		)
 		(uuid "1bab6ecd-311f-462b-9afa-a5cdef985fad")
+	)
+	(wire
+		(pts
+			(xy 34.29 160.02) (xy 34.29 153.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1c40a772-95ec-49cf-b0f5-cdb11d5c67d9")
 	)
 	(wire
 		(pts
@@ -12656,6 +12688,16 @@
 	)
 	(wire
 		(pts
+			(xy 31.75 160.02) (xy 34.29 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7520aefa-f5cb-42e2-b9d9-c81ce1406559")
+	)
+	(wire
+		(pts
 			(xy 151.13 88.9) (xy 151.13 91.44)
 		)
 		(stroke
@@ -12933,6 +12975,16 @@
 			(type default)
 		)
 		(uuid "9f4cb971-a7e8-47ad-b644-92a46111c532")
+	)
+	(wire
+		(pts
+			(xy 170.18 142.24) (xy 170.18 140.97)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a083cf14-5094-4c58-8560-f6aec55f67b4")
 	)
 	(wire
 		(pts
@@ -14608,6 +14660,70 @@
 			(project "movement-tracker"
 				(path "/2685138d-4593-4100-9180-78f7b41c1375"
 					(reference "#PWR08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 170.18 140.97 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "0c5856d0-b4f9-4b89-a708-dcde2f7e2a56")
+		(property "Reference" "#PWR017"
+			(at 170.18 144.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "VSTLINK"
+			(at 170.18 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 170.18 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 170.18 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 170.18 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c1a2cce9-0fee-4a32-a951-0a9e273971ac")
+		)
+		(instances
+			(project "movement-tracker"
+				(path "/2685138d-4593-4100-9180-78f7b41c1375"
+					(reference "#PWR017")
 					(unit 1)
 				)
 			)
@@ -17889,10 +18005,9 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "85819b82-53a9-44f7-bfb6-39bc55827bfc")
 		(property "Reference" "J2"
-			(at 160.02 135.89 0)
+			(at 159.766 138.938 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17900,7 +18015,7 @@
 			)
 		)
 		(property "Value" "Conn_01x08"
-			(at 160.02 138.43 0)
+			(at 159.258 163.322 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18426,6 +18541,71 @@
 			(project "movement-tracker"
 				(path "/2685138d-4593-4100-9180-78f7b41c1375"
 					(reference "C18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 21.59 160.02 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "99d92160-e353-4daa-93ee-fb0b1d992fd2")
+		(property "Reference" "#PWR028"
+			(at 21.59 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "VSTLINK"
+			(at 21.59 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 21.59 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 21.59 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 21.59 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "932a50d4-b986-4f4b-9fcc-c80fd7ce2dc2")
+		)
+		(instances
+			(project "movement-tracker"
+				(path "/2685138d-4593-4100-9180-78f7b41c1375"
+					(reference "#PWR028")
 					(unit 1)
 				)
 			)
@@ -20553,6 +20733,91 @@
 			(project "movement-tracker"
 				(path "/2685138d-4593-4100-9180-78f7b41c1375"
 					(reference "C6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D")
+		(at 27.94 160.02 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e7c90fef-1c74-4736-bc58-9467c2a53486")
+		(property "Reference" "D4"
+			(at 27.94 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "D"
+			(at 27.94 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SOD-523"
+			(at 27.94 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 27.94 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 27.94 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Device" "D"
+			(at 27.94 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=K 2=A"
+			(at 27.94 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3f496486-6664-4766-b27d-8b15f117be2d")
+		)
+		(pin "2"
+			(uuid "f54c908d-ca82-447e-8ea8-8240b2b1ca04")
+		)
+		(instances
+			(project "movement-tracker"
+				(path "/2685138d-4593-4100-9180-78f7b41c1375"
+					(reference "D4")
 					(unit 1)
 				)
 			)
