@@ -685,5 +685,7 @@
       "Root"
     ]
   ],
-  "text_variables": {}
+  "text_variables": {
+    "REV": "V4.1"
+  }
 }
