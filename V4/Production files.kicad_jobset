@@ -1,0 +1,230 @@
+{
+  "jobs": [
+    {
+      "description": "",
+      "id": "79dd5409-2a3b-4cae-b1da-4f1c164941ed",
+      "settings": {
+        "black_and_white": false,
+        "color_theme": "KiCad Classic",
+        "description": "",
+        "drawing_sheet": "",
+        "format": "pdf",
+        "hpgl_page_size": "default",
+        "hpgl_pen_size": 1.016,
+        "hpgl_plot_origin": "A3",
+        "min_pen_width": 847,
+        "output_dir": "./Output",
+        "page_size": "auto",
+        "pdf_hierarchical_links": true,
+        "pdf_metadata": true,
+        "pdf_property_popups": true,
+        "plot_all": true,
+        "plot_drawing_sheet": true,
+        "use_background_color": true
+      },
+      "type": "sch_export_plot_pdf"
+    },
+    {
+      "description": "",
+      "id": "d8ad79dd-5893-412f-9a6a-74fbaceae259",
+      "settings": {
+        "black_and_white": true,
+        "create_gerber_job_file": true,
+        "crossout_dnp_footprints_on_fab_layers": true,
+        "description": "",
+        "disable_aperture_macros": false,
+        "drawing_sheet": "",
+        "drill_shape": "full",
+        "hide_dnp_footprints_on_fab_layers": false,
+        "include_netlist_attributes": true,
+        "layers": [
+          "B.Cu",
+          "B.Mask",
+          "B.Paste",
+          "B.SilkS",
+          "In30.Cu",
+          "In29.Cu",
+          "In28.Cu",
+          "In27.Cu",
+          "In26.Cu",
+          "In25.Cu",
+          "In24.Cu",
+          "In23.Cu",
+          "In22.Cu",
+          "In21.Cu",
+          "In20.Cu",
+          "In19.Cu",
+          "In18.Cu",
+          "In17.Cu",
+          "In16.Cu",
+          "In15.Cu",
+          "In14.Cu",
+          "In13.Cu",
+          "In12.Cu",
+          "In11.Cu",
+          "In10.Cu",
+          "In9.Cu",
+          "In8.Cu",
+          "In7.Cu",
+          "In6.Cu",
+          "In5.Cu",
+          "In4.Cu",
+          "In3.Cu",
+          "In2.Cu",
+          "In1.Cu",
+          "F.Cu",
+          "F.Mask",
+          "F.Paste",
+          "F.SilkS",
+          "Edge.Cuts"
+        ],
+        "layers_to_include_on_all_layers": [],
+        "mirror": false,
+        "negative": false,
+        "output_filename": "./Output",
+        "plot_drawing_sheet": false,
+        "plot_footprint_values": true,
+        "plot_pad_numbers": false,
+        "plot_ref_des": true,
+        "precision": 5,
+        "sketch_dnp_footprints_on_fab_layers": true,
+        "sketch_pads_on_fab_layers": false,
+        "subtract_solder_mask_from_silk": false,
+        "use_drill_origin": false,
+        "use_protel_file_extension": false,
+        "use_x2_format": true
+      },
+      "type": "pcb_export_gerbers"
+    },
+    {
+      "description": "",
+      "id": "42f299e6-1039-4eaf-b0a1-fd7882f5ddfc",
+      "settings": {
+        "description": "",
+        "drill_origin": "abs",
+        "excellon.combine_pth_npth": false,
+        "excellon.minimal_header": false,
+        "excellon.mirror_y": false,
+        "excellon.oval_drill_route": true,
+        "format": "excellon",
+        "generate_map": false,
+        "gerber_precision": 5,
+        "map_format": "pdf",
+        "output_dir": "./Output",
+        "units": "mm",
+        "zero_format": "decimal"
+      },
+      "type": "pcb_export_drill"
+    },
+    {
+      "description": "",
+      "id": "c10642a2-7493-45fe-97b9-27e9ff3006ee",
+      "settings": {
+        "board_only": false,
+        "board_outlines_chaining_epsilon": 0.001,
+        "cut_vias_in_body": false,
+        "description": "",
+        "export_board_body": true,
+        "export_components": true,
+        "export_inner_copper": false,
+        "export_pads": false,
+        "export_silkscreen": true,
+        "export_soldermask": false,
+        "export_tracks": false,
+        "export_zones": false,
+        "fill_all_vias": false,
+        "format": "step",
+        "fuse_shapes": false,
+        "include_dnp": false,
+        "include_unspecified": true,
+        "occt_format": 0,
+        "optimize_step": true,
+        "output_filename": "./Output/${PROJECTNAME} ${REV}.step",
+        "overwrite": true,
+        "subst_models": true,
+        "use_defined_origin": false,
+        "use_drill_origin": false,
+        "use_grid_origin": false,
+        "use_pcb_center_origin": true,
+        "user_origin.x": 120.0,
+        "user_origin.y": 127.5,
+        "vrml_model_dir": "",
+        "vrml_relative_paths": false
+      },
+      "type": "pcb_export_3d"
+    },
+    {
+      "description": "Generate BOM",
+      "id": "43d00ac3-d48e-49c4-9049-1d46db5d908b",
+      "settings": {
+        "command": "python \"${KICAD9_3RD_PARTY}/plugins/org_openscopeproject_InteractiveHtmlBom/generate_interactive_bom.py\" --dest-dir \"Output\" --name-format \"%f ${REV}\" --no-browser --extra-fields \"MPN,Manufacturer\" --dnp-field \"kicad_dnp\" --extra-data-file \"${PROJECTNAME}.kicad_pcb\" \"${PROJECTNAME}.kicad_pcb\"",
+        "description": "",
+        "ignore_exit_code": false,
+        "output_filename": "43d00ac3-d48e-49c4-9049-1d46db5d908b.log",
+        "record_output": true
+      },
+      "type": "special_execute"
+    },
+    {
+      "description": "Generate ZIP File (Windows)",
+      "id": "13c04879-9998-4951-a82b-75a6ed888125",
+      "settings": {
+        "command": "powershell Compress-Archive -Force -LiteralPath Output -DestinationPath '${PROJECTNAME} ${REV} - ${CURRENT_DATE}.zip'",
+        "description": "",
+        "ignore_exit_code": false,
+        "output_filename": "13c04879-9998-4951-a82b-75a6ed888125.log",
+        "record_output": true
+      },
+      "type": "special_execute"
+    },
+    {
+      "description": "Generate ZIP File (Linux)",
+      "id": "d8799ec0-b455-4823-85ee-4787639936f7",
+      "settings": {
+        "command": "zip -r \"${PROJECTNAME} ${REV} - ${CURRENT_DATE}.zip\" Output/",
+        "description": "",
+        "ignore_exit_code": false,
+        "output_filename": "d8799ec0-b455-4823-85ee-4787639936f7.log",
+        "record_output": true
+      },
+      "type": "special_execute"
+    }
+  ],
+  "meta": {
+    "version": 1
+  },
+  "outputs": [
+    {
+      "description": "Production Files (Windows)",
+      "id": "367aec49-0148-4ee0-9cf9-8ea023903850",
+      "only": [
+        "79dd5409-2a3b-4cae-b1da-4f1c164941ed",
+        "d8ad79dd-5893-412f-9a6a-74fbaceae259",
+        "42f299e6-1039-4eaf-b0a1-fd7882f5ddfc",
+        "c10642a2-7493-45fe-97b9-27e9ff3006ee",
+        "43d00ac3-d48e-49c4-9049-1d46db5d908b",
+        "13c04879-9998-4951-a82b-75a6ed888125"
+      ],
+      "settings": {
+        "output_path": "./"
+      },
+      "type": "folder"
+    },
+    {
+      "description": "Productions Files (Linux)",
+      "id": "2dd97a96-43aa-410b-a899-1074444bdb55",
+      "only": [
+        "79dd5409-2a3b-4cae-b1da-4f1c164941ed",
+        "d8ad79dd-5893-412f-9a6a-74fbaceae259",
+        "42f299e6-1039-4eaf-b0a1-fd7882f5ddfc",
+        "c10642a2-7493-45fe-97b9-27e9ff3006ee",
+        "43d00ac3-d48e-49c4-9049-1d46db5d908b",
+        "d8799ec0-b455-4823-85ee-4787639936f7"
+      ],
+      "settings": {
+        "output_path": "./"
+      },
+      "type": "folder"
+    }
+  ]
+}
