@@ -98,6 +98,26 @@
     },
     {
       "description": "",
+      "id": "42f299e6-1039-4eaf-b0a1-fd7882f5ddfc",
+      "settings": {
+        "description": "",
+        "drill_origin": "abs",
+        "excellon.combine_pth_npth": false,
+        "excellon.minimal_header": false,
+        "excellon.mirror_y": false,
+        "excellon.oval_drill_route": true,
+        "format": "excellon",
+        "generate_map": false,
+        "gerber_precision": 5,
+        "map_format": "pdf",
+        "output_dir": "./Output",
+        "units": "mm",
+        "zero_format": "decimal"
+      },
+      "type": "pcb_export_drill"
+    },
+    {
+      "description": "",
       "id": "c10642a2-7493-45fe-97b9-27e9ff3006ee",
       "settings": {
         "board_only": false,
@@ -180,6 +200,7 @@
       "only": [
         "79dd5409-2a3b-4cae-b1da-4f1c164941ed",
         "d8ad79dd-5893-412f-9a6a-74fbaceae259",
+        "42f299e6-1039-4eaf-b0a1-fd7882f5ddfc",
         "c10642a2-7493-45fe-97b9-27e9ff3006ee",
         "43d00ac3-d48e-49c4-9049-1d46db5d908b",
         "13c04879-9998-4951-a82b-75a6ed888125"
@@ -195,6 +216,7 @@
       "only": [
         "79dd5409-2a3b-4cae-b1da-4f1c164941ed",
         "d8ad79dd-5893-412f-9a6a-74fbaceae259",
+        "42f299e6-1039-4eaf-b0a1-fd7882f5ddfc",
         "c10642a2-7493-45fe-97b9-27e9ff3006ee",
         "43d00ac3-d48e-49c4-9049-1d46db5d908b",
         "d8799ec0-b455-4823-85ee-4787639936f7"
